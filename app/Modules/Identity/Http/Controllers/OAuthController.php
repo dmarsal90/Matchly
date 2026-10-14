@@ -19,9 +19,19 @@ use Throwable;
 
 final class OAuthController
 {
-    public function redirect(OAuthProvider $provider): SymfonyRedirect
+    /** Pages a signed-in user may come back to after linking an account. */
+    private const array RETURN_ROUTES = ['skills' => 'skills.index'];
+
+    public function redirect(Request $request, OAuthProvider $provider): SymfonyRedirect
     {
         abort_unless(self::configured($provider), 404);
+
+        $return = self::RETURN_ROUTES[(string) $request->query('return')] ?? null;
+        if ($request->user() !== null && $return !== null) {
+            $request->session()->put('oauth.return', $return);
+        } else {
+            $request->session()->forget('oauth.return');
+        }
 
         $driver = Socialite::driver($provider->value);
 
@@ -55,7 +65,9 @@ final class OAuthController
         if ($current !== null) {
             Inertia::flash('toast', ['type' => 'success', 'message' => __('oauth.linked')]);
 
-            return to_route('security.edit');
+            $return = $request->session()->pull('oauth.return');
+
+            return to_route(in_array($return, self::RETURN_ROUTES, true) ? $return : 'security.edit');
         }
 
         Auth::login($user, remember: true);

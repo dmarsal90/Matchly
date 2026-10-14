@@ -14,7 +14,7 @@ enum OAuthProvider: string
      */
     public function scopes(): array
     {
-        // Identity only: GitHub data import uses the public API, not this token.
+        // Identity only. The GitHub import may send this token, but only to public endpoints (higher rate limit).
         return match ($this) {
             self::Google => ['openid', 'email', 'profile'],
             self::Github => ['read:user', 'user:email'],

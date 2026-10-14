@@ -61,6 +61,10 @@ final class JobController
             'groups' => $filters->groupBy !== null ? $search->groupCounts($filters) : null,
             'filters' => $this->echo($filters),
             'options' => Inertia::once(fn (): array => $this->options($search)),
+            'viewer' => $user !== null ? [
+                'onboarding_completed' => $user->profile?->onboarding_completed_at !== null,
+                'search_query' => $user->profile?->searchProfile()?->toListingQuery() ?: null,
+            ] : null,
         ]);
     }
 

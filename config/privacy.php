@@ -30,6 +30,8 @@ return [
         'unverified_account_days' => (int) env('PRIVACY_UNVERIFIED_ACCOUNT_DAYS', 30),
         // Extracted CV text of accounts inactive for this long (null keeps it).
         'inactive_cv_text_months' => env('PRIVACY_INACTIVE_CV_TEXT_MONTHS') !== null ? (int) env('PRIVACY_INACTIVE_CV_TEXT_MONTHS') : 24,
+        // Imports never reviewed (or failed) are discarded after this many days.
+        'unreviewed_import_days' => (int) env('PRIVACY_UNREVIEWED_IMPORT_DAYS', 30),
     ],
 
     /*

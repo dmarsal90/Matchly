@@ -28,6 +28,8 @@ final readonly class ProfileDataContributor implements PersonalDataContributor
             'profile' => $profile?->only([
                 'headline', 'phone', 'country', 'city', 'github_username', 'linkedin_url', 'portfolio_url',
                 'languages', 'salary_min', 'salary_currency', 'salary_period', 'preferences',
+                'target_roles', 'seniority', 'years_experience', 'regions', 'utc_offset_min', 'utc_offset_max',
+                'dealbreakers', 'dealbreaker_notes', 'search_profile', 'onboarding_completed_at',
             ]),
             'cv_documents' => $documents->map(fn (CvDocument $document): array => [
                 'id' => $document->id,

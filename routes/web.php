@@ -6,8 +6,15 @@ use App\Modules\Applications\Http\Controllers\ApplicationController;
 use App\Modules\Applications\Http\Controllers\SavedJobController;
 use App\Modules\Identity\Http\Controllers\OAuthController;
 use App\Modules\Jobs\Http\Controllers\JobController;
+use App\Modules\Profiles\Domain\Enums\QuestionnaireStep;
+use App\Modules\Profiles\Domain\Enums\SkillSource;
 use App\Modules\Profiles\Http\Controllers\CvDocumentController;
+use App\Modules\Profiles\Http\Controllers\OnboardingController;
 use App\Modules\Profiles\Http\Controllers\ProfileController;
+use App\Modules\Profiles\Http\Controllers\ProfileImportController;
+use App\Modules\Profiles\Http\Controllers\SearchProfileController;
+use App\Modules\Profiles\Http\Controllers\SkillsController;
+use App\Modules\Profiles\Http\Controllers\SourceDataController;
 use App\Modules\Shared\Http\Controllers\LocaleController;
 use Illuminate\Support\Facades\Route;
 
@@ -49,6 +56,26 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('profile/cv/{cv}', [CvDocumentController::class, 'download'])->name('career.cv.download');
     Route::patch('profile/cv/{cv}/primary', [CvDocumentController::class, 'primary'])->name('career.cv.primary');
     Route::delete('profile/cv/{cv}', [CvDocumentController::class, 'destroy'])->name('career.cv.destroy');
+
+    // Skills questionnaire (onboarding): one step per request, editable later.
+    Route::get('onboarding', [OnboardingController::class, 'show'])->name('onboarding.show');
+    Route::put('onboarding/{step}', [OnboardingController::class, 'update'])
+        ->whereIn('step', array_column(QuestionnaireStep::cases(), 'value'))
+        ->name('onboarding.update');
+
+    // Merged skill profile, its sources (GitHub, LinkedIn export, CV) and the search profile.
+    Route::get('profile/skills', [SkillsController::class, 'index'])->name('skills.index');
+    Route::post('profile/imports/github', [ProfileImportController::class, 'github'])->middleware('throttle:imports')->name('skills.imports.github');
+    Route::post('profile/imports/linkedin', [ProfileImportController::class, 'linkedin'])->middleware('throttle:uploads')->name('skills.imports.linkedin');
+    Route::post('profile/imports/cv', [ProfileImportController::class, 'cv'])->middleware('throttle:imports')->name('skills.imports.cv');
+    Route::get('profile/imports/{import}', [ProfileImportController::class, 'show'])->name('skills.imports.show');
+    Route::post('profile/imports/{import}/confirm', [ProfileImportController::class, 'confirm'])->name('skills.imports.confirm');
+    Route::delete('profile/imports/{import}', [ProfileImportController::class, 'destroy'])->name('skills.imports.destroy');
+    Route::delete('profile/sources/{source}', [SourceDataController::class, 'destroy'])
+        ->whereIn('source', array_column(SkillSource::cases(), 'value'))
+        ->name('skills.sources.destroy');
+    Route::put('profile/search', [SearchProfileController::class, 'update'])->name('skills.search.update');
+    Route::post('profile/search/regenerate', [SearchProfileController::class, 'regenerate'])->name('skills.search.regenerate');
 });
 
 require __DIR__.'/settings.php';

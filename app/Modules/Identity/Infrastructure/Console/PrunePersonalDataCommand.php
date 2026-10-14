@@ -6,7 +6,9 @@ namespace App\Modules\Identity\Infrastructure\Console;
 
 use App\Modules\Identity\Application\Actions\DeleteAccount;
 use App\Modules\Identity\Infrastructure\Models\User;
+use App\Modules\Profiles\Domain\Enums\ImportStatus;
 use App\Modules\Profiles\Infrastructure\Models\CvDocument;
+use App\Modules\Profiles\Infrastructure\Models\ProfileImport;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
@@ -40,7 +42,12 @@ final class PrunePersonalDataCommand extends Command
                 ->update(['extracted_text' => null, 'parsed_data' => null]);
         }
 
-        $this->components->info("Deleted {$deleted} unverified accounts; cleared extracted text of {$cleared} CVs from inactive accounts.");
+        $discarded = ProfileImport::query()
+            ->whereIn('status', [ImportStatus::PendingReview, ImportStatus::Failed, ImportStatus::Processing])
+            ->where('updated_at', '<', CarbonImmutable::now()->subDays((int) config('privacy.retention.unreviewed_import_days')))
+            ->delete();
+
+        $this->components->info("Deleted {$deleted} unverified accounts; cleared extracted text of {$cleared} CVs from inactive accounts; discarded {$discarded} unreviewed imports.");
 
         return self::SUCCESS;
     }

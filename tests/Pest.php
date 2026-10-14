@@ -78,3 +78,45 @@ function makeDocx(array $paragraphs, int $padding = 0): string
 
     return $contents;
 }
+
+function linkedinFixture(string $name): string
+{
+    return (string) file_get_contents(__DIR__."/Fixtures/linkedin/{$name}");
+}
+
+/**
+ * Writes a ZIP with the given entries to a temp file and returns its path.
+ * $tweak can alter the archive (attributes, odd names) before it is closed.
+ *
+ * @param  array<string, string>  $entries  name => contents
+ * @param  (Closure(ZipArchive): void)|null  $tweak
+ */
+function makeZip(array $entries, ?Closure $tweak = null): string
+{
+    $path = sys_get_temp_dir().'/test-'.bin2hex(random_bytes(8)).'.zip';
+    $zip = new ZipArchive;
+    $zip->open($path, ZipArchive::CREATE);
+    foreach ($entries as $name => $contents) {
+        $zip->addFromString($name, $contents);
+    }
+    if ($tweak !== null) {
+        $tweak($zip);
+    }
+    $zip->close();
+
+    return $path;
+}
+
+/**
+ * A LinkedIn data export as LinkedIn ships it: the profile CSVs plus files
+ * that must never be read (messages, connections).
+ */
+function linkedinExportZip(): string
+{
+    $entries = [];
+    foreach (['Profile', 'Positions', 'Education', 'Skills', 'Languages', 'Certifications', 'Projects', 'Connections', 'messages'] as $name) {
+        $entries["{$name}.csv"] = linkedinFixture("{$name}.csv");
+    }
+
+    return makeZip($entries);
+}
