@@ -6,9 +6,18 @@ use App\Modules\Jobs\Domain\Enums\CloseReason;
 use App\Modules\Jobs\Domain\Enums\JobStatus;
 use App\Modules\Jobs\Infrastructure\Models\JobListing;
 use App\Modules\Jobs\Infrastructure\Queue\CheckJobLinksJob;
+use App\Modules\Shared\Infrastructure\Http\PublicUrlGuard;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Queue;
+
+beforeEach(function (): void {
+    // Test hosts resolve to a public documentation address unless they say "internal".
+    $this->app->instance(PublicUrlGuard::class, new PublicUrlGuard(
+        fn (string $host): array => str_contains($host, 'internal') ? ['10.0.0.5'] : ['93.184.216.34'],
+    ));
+});
 
 it('closes jobs older than the freshness window', function (): void {
     $old = JobListing::factory()->postedDaysAgo(31)->create();
@@ -63,6 +72,43 @@ it('confirms with GET when a server rejects HEAD', function (): void {
     $this->artisan('jobs:check-links --sync')->assertSuccessful();
 
     expect($job->refresh()->status)->toBe(JobStatus::Open);
+});
+
+it('never requests links that resolve to private addresses', function (): void {
+    Http::preventStrayRequests();
+    Http::fake();
+    $job = JobListing::factory()->create(['apply_url' => 'https://jobs.internal-corp.test/1']);
+
+    $this->artisan('jobs:check-links --sync')->assertSuccessful();
+
+    Http::assertNothingSent();
+    expect($job->refresh()->status)->toBe(JobStatus::Open);
+});
+
+it('validates every redirect hop before following it', function (): void {
+    Http::preventStrayRequests();
+    $job = JobListing::factory()->create(['apply_url' => 'https://redirector.test/jobs/1']);
+    Http::fake([
+        'redirector.test/*' => Http::response('', 302, ['Location' => 'http://metadata.internal-cloud.test/latest']),
+        '*' => Http::response('should not be called', 200),
+    ]);
+
+    $this->artisan('jobs:check-links --sync')->assertSuccessful();
+
+    Http::assertNotSent(fn (Request $request): bool => str_contains($request->url(), 'internal'));
+    expect($job->refresh()->status)->toBe(JobStatus::Open);
+});
+
+it('follows safe redirects to detect closed ATS postings', function (): void {
+    $job = JobListing::factory()->create(['apply_url' => 'https://boards.greenhouse.io/acme/jobs/1']);
+    Http::fake([
+        'boards.greenhouse.io/acme/jobs/1' => Http::response('', 301, ['Location' => '/acme?error=true']),
+        'boards.greenhouse.io/acme?error=true' => Http::response('board'),
+    ]);
+
+    $this->artisan('jobs:check-links --sync')->assertSuccessful();
+
+    expect($job->refresh()->close_reason)->toBe(CloseReason::LinkDead);
 });
 
 it('queues link checks in batches for jobs not checked recently', function (): void {

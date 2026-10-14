@@ -19,6 +19,7 @@ use App\Modules\Providers\Domain\Contracts\ReportsPartialFailures;
 use App\Modules\Providers\Domain\Data\IngestionReport;
 use App\Modules\Providers\Domain\Data\RawJob;
 use App\Modules\Shared\Domain\Contracts\HtmlSanitizer;
+use App\Modules\Shared\Infrastructure\Http\PublicUrlGuard;
 use Carbon\CarbonImmutable;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -56,6 +57,7 @@ final readonly class IngestProvider
         private Dispatcher $events,
         private Config $config,
         private LoggerInterface $logger,
+        private PublicUrlGuard $urlGuard,
     ) {}
 
     public function handle(string $key): IngestionReport
@@ -186,6 +188,8 @@ final readonly class IngestProvider
             filter_var($draft->applyUrl, FILTER_VALIDATE_URL) === false,
             preg_match('#^https?://#i', $draft->applyUrl) !== 1,
             mb_strlen($draft->applyUrl) > self::MAX_URL_LENGTH,
+            // Feeds are untrusted: never store links to internal hosts (SSRF via the link checker, phishing).
+            ! $this->urlGuard->looksPublic($draft->applyUrl),
             $draft->sourceUrl !== null && mb_strlen($draft->sourceUrl) > self::MAX_URL_LENGTH => self::SKIP_INVALID_URL,
             // Too old for the freshness window: never stored.
             $draft->postedAt !== null && $draft->postedAt < $cutoff => self::SKIP_STALE,
