@@ -43,13 +43,16 @@ final class SecurityHeaders
                 ? 'Content-Security-Policy-Report-Only'
                 : 'Content-Security-Policy';
 
-            $headers->set($headerName, $this->contentSecurityPolicy((string) Vite::cspNonce()));
+            /** @var list<string> $relaxedPaths */
+            $relaxedPaths = config('security.csp.relaxed_paths', []);
+
+            $headers->set($headerName, $this->contentSecurityPolicy((string) Vite::cspNonce(), $request->is(...$relaxedPaths)));
         }
 
         return $response;
     }
 
-    private function contentSecurityPolicy(string $nonce): string
+    private function contentSecurityPolicy(string $nonce, bool $relaxed = false): string
     {
         /** @var list<string> $connect */
         $connect = config('security.csp.connect_src', []);
@@ -64,7 +67,7 @@ final class SecurityHeaders
             'form-action' => ["'self'"],
             'frame-ancestors' => ["'none'"],
             'object-src' => ["'none'"],
-            'script-src' => ["'self'", "'nonce-{$nonce}'"],
+            'script-src' => $relaxed ? ["'self'", "'unsafe-inline'", "'unsafe-eval'"] : ["'self'", "'nonce-{$nonce}'"],
             // Vue transitions and Reka UI positioning write inline style attributes.
             'style-src' => ["'self'", "'unsafe-inline'", ...$styles],
             'font-src' => ["'self'", 'data:', ...$fonts],

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { Form } from '@inertiajs/vue3';
 import { useTemplateRef } from 'vue';
-import ProfileController from '@/actions/App/Http/Controllers/Settings/ProfileController';
+import ProfileController from '@/actions/App/Modules/Identity/Http/Controllers/Settings/ProfileController';
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
@@ -16,9 +16,12 @@ import {
     DialogTitle,
     DialogTrigger,
 } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useAuthUser } from '@/composables/useAuthUser';
 
 const passwordInput = useTemplateRef('passwordInput');
+const user = useAuthUser();
 </script>
 
 <template>
@@ -68,7 +71,22 @@ const passwordInput = useTemplateRef('passwordInput');
                             </DialogDescription>
                         </DialogHeader>
 
-                        <div class="grid gap-2">
+                        <div v-if="!user.has_password" class="grid gap-2">
+                            <!-- OAuth-only accounts have no password: they confirm by typing their e-mail. -->
+                            <Label for="email_confirmation">{{
+                                user.email
+                            }}</Label>
+                            <Input
+                                id="email_confirmation"
+                                name="email_confirmation"
+                                type="email"
+                                autocomplete="off"
+                                :placeholder="user.email"
+                            />
+                            <InputError :message="errors.email_confirmation" />
+                        </div>
+
+                        <div v-else class="grid gap-2">
                             <Label for="password" class="sr-only"
                                 >Password</Label
                             >

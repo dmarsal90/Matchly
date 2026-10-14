@@ -14,14 +14,17 @@
     "require": {
         "php": "^8.3",
         "ezyang/htmlpurifier": "^4.19",
+        "filament/filament": "^5.10",
         "inertiajs/inertia-laravel": "^3.0",
         "laravel/chisel": "^0.1.0",
         "laravel/fortify": "^1.37.2",
         "laravel/framework": "^13.17",
         "laravel/horizon": "^5.50",
         "laravel/reverb": "^1.12",
+        "laravel/socialite": "^5.31",
         "laravel/tinker": "^3.0",
-        "laravel/wayfinder": "^0.1.14"
+        "laravel/wayfinder": "^0.1.14",
+        "smalot/pdfparser": "^2.13"
     },
     "require-dev": {
         "fakerphp/faker": "^1.24",
@@ -33,7 +36,8 @@
         "mockery/mockery": "^1.6",
         "nunomaduro/collision": "^8.9.3",
         "pestphp/pest": "^5.3",
-        "pestphp/pest-plugin-laravel": "^5.0"
+        "pestphp/pest-plugin-laravel": "^5.0",
+        "pestphp/pest-plugin-livewire": "^5.0"
     },
     "autoload": {
         "psr-4": {
@@ -83,7 +87,8 @@
         ],
         "post-autoload-dump": [
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
-            "@php artisan package:discover --ansi"
+            "@php artisan package:discover --ansi",
+            "@php artisan filament:upgrade"
         ],
         "post-update-cmd": [
             "@php artisan vendor:publish --tag=laravel-assets --ansi --force"

@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Modules\Identity\Http\Middleware\TrackLastActivity;
 use App\Modules\Shared\Http\Middleware\HandleAppearance;
 use App\Modules\Shared\Http\Middleware\HandleInertiaRequests;
 use App\Modules\Shared\Http\Middleware\SecurityHeaders;
@@ -29,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             HandleAppearance::class,
             HandleInertiaRequests::class,
             AddLinkHeadersForPreloadedAssets::class,
+            TrackLastActivity::class,
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {

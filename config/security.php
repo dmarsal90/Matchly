@@ -20,6 +20,10 @@ return [
         'report_only' => (bool) env('SECURITY_CSP_REPORT_ONLY', false),
         'connect_src' => array_values(array_filter(explode(',', (string) env('SECURITY_CSP_CONNECT_SRC', '')))),
         'font_src' => ['https://fonts.bunny.net'],
+        // Filament (Alpine + Livewire) needs eval and inline scripts. The admin
+        // panel is behind admin-only auth, so it gets a relaxed policy instead
+        // of weakening the one every visitor gets.
+        'relaxed_paths' => ['admin', 'admin/*'],
         'style_src' => ['https://fonts.bunny.net'],
     ],
 

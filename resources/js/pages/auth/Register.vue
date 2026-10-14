@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Form, Head } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
+import OAuthButtons from '@/components/OAuthButtons.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
 import TextLink from '@/components/TextLink.vue';
 import { Button } from '@/components/ui/button';
@@ -24,6 +25,8 @@ defineOptions({
 
 <template>
     <Head title="Register" />
+
+    <OAuthButtons class="mb-6" />
 
     <Form
         v-slot="{ errors, processing }"

@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Modules\Shared\Http\Middleware;
 
+use App\Modules\Identity\Http\Controllers\OAuthController;
+use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Shared\Infrastructure\Localization\SupportedLocales;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
@@ -35,9 +37,36 @@ final class HandleInertiaRequests extends Middleware
             'locale' => app()->getLocale(),
             'supportedLocales' => $this->locales->all(),
             'auth' => [
-                'user' => $request->user(),
+                'user' => $this->user($request),
             ],
+            'oauthProviders' => OAuthController::enabledProviders(),
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+        ];
+    }
+
+    /**
+     * Only what the UI needs on every page; the full profile is loaded where it is used.
+     *
+     * @return array<string, mixed>|null
+     */
+    private function user(Request $request): ?array
+    {
+        $user = $request->user();
+
+        if (! $user instanceof User) {
+            return null;
+        }
+
+        return [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'email_verified_at' => $user->email_verified_at?->toIso8601String(),
+            'has_password' => $user->password !== null,
+            'is_admin' => $user->is_admin,
+            'locale' => $user->locale,
+            'two_factor_enabled' => $user->two_factor_confirmed_at !== null,
+            'avatar' => null,
         ];
     }
 }

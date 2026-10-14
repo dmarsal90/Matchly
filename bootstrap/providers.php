@@ -2,18 +2,14 @@
 
 declare(strict_types=1);
 
-use App\Modules\Jobs\JobsServiceProvider;
-use App\Modules\Providers\ProvidersServiceProvider;
-use App\Modules\Shared\SharedServiceProvider;
-use App\Providers\AppServiceProvider;
-use App\Providers\FortifyServiceProvider;
-use App\Providers\HorizonServiceProvider;
-
 return [
-    AppServiceProvider::class,
-    FortifyServiceProvider::class,
-    HorizonServiceProvider::class,
-    SharedServiceProvider::class,
-    JobsServiceProvider::class,
-    ProvidersServiceProvider::class,
+    App\Modules\Identity\FortifyServiceProvider::class,
+    App\Modules\Identity\IdentityServiceProvider::class,
+    App\Modules\Jobs\JobsServiceProvider::class,
+    App\Modules\Profiles\ProfilesServiceProvider::class,
+    App\Modules\Providers\ProvidersServiceProvider::class,
+    App\Modules\Shared\SharedServiceProvider::class,
+    App\Providers\AppServiceProvider::class,
+    App\Providers\Filament\AdminPanelProvider::class,
+    App\Providers\HorizonServiceProvider::class,
 ];

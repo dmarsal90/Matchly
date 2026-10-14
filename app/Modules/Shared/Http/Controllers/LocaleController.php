@@ -14,6 +14,9 @@ final class LocaleController
     {
         $request->session()->put(SetLocale::SESSION_KEY, $request->locale());
 
+        // Signed-in users keep the choice across devices (and in e-mails).
+        $request->user()?->forceFill(['locale' => $request->locale()])->save();
+
         return back();
     }
 }
