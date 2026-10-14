@@ -1,6 +1,7 @@
 import { initializeTheme } from '@/composables/useAppearance';
 import AppLayout from '@/layouts/AppLayout.vue';
 import AuthLayout from '@/layouts/AuthLayout.vue';
+import PublicLayout from '@/layouts/PublicLayout.vue';
 import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { pageTitle, setAppName } from '@/lib/brand';
 import { initializeFlashToast } from '@/lib/flashToast';
@@ -16,11 +17,16 @@ configureEcho({
 
 void createInertiaApp({
     title: pageTitle,
-    layout: (name) => {
+    layout: (name, page) => {
         switch (true) {
             case name === 'Welcome':
             case name.startsWith('legal/'):
                 return null;
+            // Public listing: the app shell when signed in, a light public shell otherwise.
+            case name.startsWith('jobs/'):
+                return (page.props as { auth?: { user: unknown } }).auth?.user
+                    ? AppLayout
+                    : PublicLayout;
             case name.startsWith('auth/'):
                 return AuthLayout;
             case name.startsWith('settings/'):

@@ -170,3 +170,33 @@
         @apply bg-background text-foreground;
     }
 }
+
+/* Third-party job descriptions (sanitized HTML): readable defaults without a typography plugin. */
+@layer components {
+    .job-description :where(p, ul, ol, blockquote, pre, table) {
+        margin-block: 0.75em;
+    }
+    .job-description :where(h3, h4, h5) {
+        margin-block: 1.25em 0.5em;
+        font-weight: 600;
+    }
+    .job-description :where(ul) {
+        list-style: disc;
+        padding-inline-start: 1.25em;
+    }
+    .job-description :where(ol) {
+        list-style: decimal;
+        padding-inline-start: 1.25em;
+    }
+    .job-description :where(a) {
+        text-decoration: underline;
+        text-underline-offset: 3px;
+    }
+    .job-description :where(pre, code) {
+        font-family: var(--font-mono, monospace);
+        font-size: 0.875em;
+    }
+    .job-description :where(pre) {
+        overflow-x: auto;
+    }
+}

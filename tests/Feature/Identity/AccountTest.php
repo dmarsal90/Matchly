@@ -8,7 +8,7 @@ use Inertia\Testing\AssertableInertia as Assert;
 it('shares only safe user fields with every page', function (): void {
     $user = User::factory()->create(['is_admin' => true]);
 
-    $this->actingAs($user)->get('/dashboard')->assertInertia(fn (Assert $page) => $page
+    $this->actingAs($user)->get('/profile')->assertInertia(fn (Assert $page) => $page
         ->where('auth.user.email', $user->email)
         ->where('auth.user.has_password', true)
         ->where('auth.user.is_admin', true)
@@ -26,10 +26,10 @@ it('shares the OAuth providers that are configured', function (): void {
 it('remembers the language choice on the account', function (): void {
     $user = User::factory()->create();
 
-    $this->actingAs($user)->from('/dashboard')->put('/locale', ['locale' => 'pt']);
+    $this->actingAs($user)->from('/profile')->put('/locale', ['locale' => 'pt']);
 
     expect($user->refresh()->locale)->toBe('pt');
-    $this->actingAs($user)->withHeader('Accept-Language', 'en')->get('/dashboard')
+    $this->actingAs($user)->withHeader('Accept-Language', 'en')->get('/profile')
         ->assertInertia(fn (Assert $page) => $page->where('locale', 'pt'));
 });
 

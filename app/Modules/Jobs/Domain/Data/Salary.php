@@ -45,7 +45,22 @@ final readonly class Salary
             ? strtoupper(trim($currency))
             : null;
 
-        return new self($min, $max, $currency, $period ?? SalaryPeriod::Year);
+        return new self($min, $max, $currency, self::plausiblePeriod($period ?? SalaryPeriod::Year, $max ?? $min));
+    }
+
+    /**
+     * Sources mislabel periods ("hourly" with 41600): amounts impossible for
+     * the stated period are re-read as the period they obviously belong to.
+     */
+    private static function plausiblePeriod(SalaryPeriod $period, float $amount): SalaryPeriod
+    {
+        return match (true) {
+            $period === SalaryPeriod::Hour && $amount > 1000,
+            $period === SalaryPeriod::Day && $amount > 5000,
+            $period === SalaryPeriod::Week && $amount > 20000 => $amount >= 20000 ? SalaryPeriod::Year : SalaryPeriod::Month,
+            $period === SalaryPeriod::Month && $amount > 100000 => SalaryPeriod::Year,
+            default => $period,
+        };
     }
 
     public function annualMin(): ?float

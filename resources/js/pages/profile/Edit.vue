@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Separator } from '@/components/ui/separator';
-import CheckboxGroup from '@/features/profile/components/CheckboxGroup.vue';
+import CheckboxGroup from '@/components/CheckboxGroup.vue';
 import CvSection from '@/features/profile/components/CvSection.vue';
 import LanguagesField from '@/features/profile/components/LanguagesField.vue';
 import type {

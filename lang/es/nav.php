@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 return [
+    'jobs' => 'Ofertas',
+    'applications' => 'Mis ofertas',
     'dashboard' => 'Panel',
     'profile' => 'Perfil profesional',
     'settings' => 'Ajustes',

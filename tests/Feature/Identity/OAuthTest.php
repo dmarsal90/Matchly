@@ -34,7 +34,7 @@ it('hides providers without credentials', function (): void {
 it('creates a verified account on first sign-in', function (): void {
     Socialite::fake('github', githubIdentity());
 
-    $this->get('/auth/github/callback')->assertRedirect(route('dashboard'));
+    $this->get('/auth/github/callback')->assertRedirect(route('jobs.index'));
 
     $user = User::query()->sole();
     $this->assertAuthenticatedAs($user);

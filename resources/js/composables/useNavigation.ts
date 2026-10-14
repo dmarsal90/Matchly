@@ -1,8 +1,9 @@
-import { dashboard } from '@/routes';
+import { index as applications } from '@/routes/applications';
 import { edit as editCareer } from '@/routes/career';
+import { index as jobs } from '@/routes/jobs';
 import type { NavItem } from '@/types';
 import { usePage } from '@inertiajs/vue3';
-import { LayoutGrid, Shield, UserRound } from '@lucide/vue';
+import { Briefcase, Shield, Star, UserRound } from '@lucide/vue';
 import { trans } from 'laravel-vue-i18n';
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
@@ -15,7 +16,8 @@ export function useNavigation(): {
     const page = usePage();
 
     const main = computed<NavItem[]>(() => [
-        { title: trans('nav.dashboard'), href: dashboard(), icon: LayoutGrid },
+        { title: trans('nav.jobs'), href: jobs(), icon: Briefcase },
+        { title: trans('nav.applications'), href: applications(), icon: Star },
         { title: trans('nav.profile'), href: editCareer(), icon: UserRound },
     ]);
 
