@@ -23,8 +23,10 @@ import type {
     JobPage,
     MultiFilterKey,
 } from '@/features/jobs/types';
-import { Head } from '@inertiajs/vue3';
-import { SearchX, SlidersHorizontal, Search } from '@lucide/vue';
+import { show as questionnaire } from '@/routes/onboarding';
+import { index as jobsIndex } from '@/routes/jobs';
+import { Head, Link } from '@inertiajs/vue3';
+import { SearchX, SlidersHorizontal, Search, Sparkles } from '@lucide/vue';
 import { trans, transChoice } from 'laravel-vue-i18n';
 import { computed, toRef } from 'vue';
 
@@ -33,6 +35,10 @@ const props = defineProps<{
     groups: Record<string, number> | null;
     filters: JobFilters;
     options: JobOptions;
+    viewer: {
+        onboarding_completed: boolean;
+        search_query: Record<string, string> | null;
+    } | null;
 }>();
 
 const { state, loading, setSearch, toggle, set, clear, goToPage, activeCount } =
@@ -91,6 +97,31 @@ function onSet(key: keyof JobFilters, value: string | number | null): void {
                 </p>
             </div>
 
+            <div
+                v-if="viewer && !viewer.onboarding_completed"
+                class="flex flex-col gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+                <div class="flex items-start gap-3">
+                    <Sparkles
+                        class="mt-0.5 size-5 shrink-0 text-primary"
+                        aria-hidden="true"
+                    />
+                    <div>
+                        <p class="font-medium">
+                            {{ trans('jobs.onboarding.title') }}
+                        </p>
+                        <p class="text-sm text-muted-foreground">
+                            {{ trans('jobs.onboarding.description') }}
+                        </p>
+                    </div>
+                </div>
+                <Button size="sm" as-child>
+                    <Link :href="questionnaire()">{{
+                        trans('jobs.onboarding.action')
+                    }}</Link>
+                </Button>
+            </div>
+
             <form role="search" class="relative" @submit.prevent>
                 <label for="job-search" class="sr-only">{{
                     trans('jobs.search_label')
@@ -138,6 +169,21 @@ function onSet(key: keyof JobFilters, value: string | number | null): void {
                             })
                         }}
                     </p>
+
+                    <Button
+                        v-if="viewer?.search_query"
+                        variant="outline"
+                        size="sm"
+                        as-child
+                    >
+                        <Link
+                            :href="jobsIndex({ query: viewer.search_query })"
+                            preserve-scroll
+                        >
+                            <Sparkles class="size-4" aria-hidden="true" />
+                            {{ trans('jobs.my_search') }}
+                        </Link>
+                    </Button>
 
                     <Sheet>
                         <SheetTrigger as-child>

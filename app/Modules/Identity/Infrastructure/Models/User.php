@@ -7,6 +7,8 @@ namespace App\Modules\Identity\Infrastructure\Models;
 use App\Modules\Identity\Domain\Enums\ConsentPurpose;
 use App\Modules\Profiles\Infrastructure\Models\CvDocument;
 use App\Modules\Profiles\Infrastructure\Models\Profile;
+use App\Modules\Profiles\Infrastructure\Models\ProfileImport;
+use App\Modules\Profiles\Infrastructure\Models\UserSkill;
 use Carbon\CarbonImmutable;
 use Database\Factories\UserFactory;
 use Filament\Models\Contracts\FilamentUser;
@@ -91,6 +93,22 @@ final class User extends Authenticatable implements FilamentUser, MustVerifyEmai
     public function cvDocuments(): HasMany
     {
         return $this->hasMany(CvDocument::class);
+    }
+
+    /**
+     * @return HasMany<UserSkill, $this>
+     */
+    public function skills(): HasMany
+    {
+        return $this->hasMany(UserSkill::class);
+    }
+
+    /**
+     * @return HasMany<ProfileImport, $this>
+     */
+    public function profileImports(): HasMany
+    {
+        return $this->hasMany(ProfileImport::class);
     }
 
     /**
