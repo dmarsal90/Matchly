@@ -2,9 +2,16 @@
 
 declare(strict_types=1);
 
-use Illuminate\Foundation\Inspiring;
-use Illuminate\Support\Facades\Artisan;
+use Illuminate\Support\Facades\Schedule;
 
-Artisan::command('inspire', function () {
-    $this->comment(Inspiring::quote());
-})->purpose('Display an inspiring quote');
+// Ingestion: checked often, but each source only runs when its own interval
+// (config/jobs.php) and failure back-off allow it.
+Schedule::command('jobs:ingest')->everyTenMinutes()->withoutOverlapping()->onOneServer();
+
+Schedule::command('jobs:close-expired')->hourly()->onOneServer();
+
+Schedule::command('jobs:check-links')->dailyAt('03:30')->onOneServer();
+
+Schedule::command('horizon:snapshot')->everyFiveMinutes();
+
+Schedule::command('queue:prune-failed --hours=168')->daily();

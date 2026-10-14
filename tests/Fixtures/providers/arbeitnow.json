@@ -1,0 +1,72 @@
+{
+  "data": [
+    {
+      "slug": "infor-ln-consultant-schwerpunkt-lager-und-logistik-hildesheim-264326",
+      "company_name": "ZWF Digitale Informationstechnologie GmbH",
+      "title": "Infor LN Consultant (m/w/d) - Schwerpunkt Lager und Logistik",
+      "description": "<p><strong>Kreativ. Kundenorientiert. Zielstrebig.</strong> Beschreibt das auch Ihre Performance?</p>\n<p>Für die Verstärkung unseres Teams in Saarbrücken suchen wir <strong>Sie als Infor LN Consultant</strong> mit Schwerpunkt <strong>Lager und Logistik</strong>.</p>\n<p>Wir sind ein Team aus <strong>30 hochqualifizierten Mitarbeiterinnen und Mitarbeitern</strong>, die über <strong>30 Jahre Erfahrung</strong> und mehr als <strong>300 erfolgreiche Projekte</strong> in der IT mitbringen. Als motivierte und ergebnisorientierte Teamplayer sorgen wir dafür, dass die von uns eingesetzten Lösungen Info",
+      "remote": true,
+      "url": "https://www.arbeitnow.com/jobs/companies/zwf-digitale-informationstechnologie-gmbh/infor-ln-consultant-schwerpunkt-lager-und-logistik-hildesheim-264326",
+      "tags": [
+        "Remote",
+        "IT"
+      ],
+      "job_types": [
+        "Unbefristeter arbeitsvertrag"
+      ],
+      "location": "Hildesheim",
+      "created_at": 1791979276
+    },
+    {
+      "slug": "senior-fullstack-engineer-all-identities-berlin-218932",
+      "company_name": "Caspar Health",
+      "title": "Senior Fullstack Engineer (all identities)",
+      "description": "<h2>Das erwartet Dich</h2>\n<p>Caspar Health builds digital rehabilitation products that enable patients to continue their therapy beyond the clinic and help therapists support them more efficiently.</p>\n<p>As a Senior Fullstack Engineer in our Healthcare Professionals Squad, you will build and improve the interface therapists use to manage their daily work. Working across our Ruby on Rails backend and React and TypeScript frontend, you will shape solutions with Product and Design and take them from an initial problem through to production.</p>\n<p>You will join a cross-functional team of four e",
+      "remote": true,
+      "url": "https://www.arbeitnow.com/jobs/companies/caspar-health/senior-fullstack-engineer-all-identities-berlin-218932",
+      "tags": [
+        "Remote",
+        "Software Development"
+      ],
+      "job_types": [
+        "Permanent employment",
+        "professional / experienced"
+      ],
+      "location": "Berlin",
+      "created_at": 1791979276
+    },
+    {
+      "slug": "sachbearbeiter-hausverwaltung-aachen-387073",
+      "company_name": "Parte Verwaltung GmbH",
+      "title": "Sachbearbeiter (m/w/d) Hausverwaltung",
+      "description": "<h2>Das bewegen Sie bei uns:</h2>\n<ul>\n<li>In Ihrer Position unterstützen Sie unsere Objektbetreuer im Tagesgeschäft der Wohnungseigentumsverwaltung.</li>\n<li>In der Korrespondenz mit Eigentümern, Beiräten und Dienstleistern sind Sie eine verlässliche Ansprechperson.</li>\n<li>Zudem bereiten Sie Eigentümerversammlungen vor und nach – von der Terminorganisation bis zur Nachverfolgung offener Punkte.</li>\n<li>Anfallende Versicherungsfälle bearbeiten Sie eigenständig und behalten den Bearbeitungsstand im Blick.</li>\n<li>Nicht zuletzt koordinieren Sie Termine vorausschauend und sorgen dafür, dass n",
+      "remote": false,
+      "url": "https://www.arbeitnow.com/jobs/companies/parte-verwaltung-gmbh/sachbearbeiter-hausverwaltung-aachen-387073",
+      "tags": [
+        "Finance"
+      ],
+      "job_types": [
+        "Unbefristeter arbeitsvertrag",
+        "berufserfahren"
+      ],
+      "location": "Aachen",
+      "created_at": 1791979276
+    }
+  ],
+  "links": {
+    "first": "https://www.arbeitnow.com/api/job-board-api?page=1",
+    "last": null,
+    "prev": null,
+    "next": null
+  },
+  "meta": {
+    "current_page": 1,
+    "current_page_url": "https://www.arbeitnow.com/api/job-board-api?page=1",
+    "from": 1,
+    "path": "https://www.arbeitnow.com/api/job-board-api",
+    "per_page": 300,
+    "to": 300,
+    "terms": "This is a free public API for jobs, please do not abuse. I would appreciate linking back to the site. By using the API, you agree to the terms of service present on Arbeitnow.com",
+    "info": "Jobs are updated every hour and order by the `created_at` timestamp. Use `?page=` to paginate. Read more information here: https://www.arbeitnow.com/blog/job-board-api"
+  }
+}
