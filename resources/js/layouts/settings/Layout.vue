@@ -6,24 +6,19 @@ import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { toUrl } from '@/lib/utils';
 import { edit as editAppearance } from '@/routes/appearance';
+import { edit as editPrivacy } from '@/routes/privacy';
 import { edit as editProfile } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
 import type { NavItem } from '@/types';
+import { trans } from 'laravel-vue-i18n';
+import { computed } from 'vue';
 
-const sidebarNavItems: NavItem[] = [
-    {
-        title: 'Profile',
-        href: editProfile(),
-    },
-    {
-        title: 'Security',
-        href: editSecurity(),
-    },
-    {
-        title: 'Appearance',
-        href: editAppearance(),
-    },
-];
+const sidebarNavItems = computed<NavItem[]>(() => [
+    { title: trans('nav.account'), href: editProfile() },
+    { title: trans('nav.security'), href: editSecurity() },
+    { title: trans('nav.privacy'), href: editPrivacy() },
+    { title: trans('nav.appearance'), href: editAppearance() },
+]);
 
 const { isCurrentOrParentUrl } = useCurrentUrl();
 </script>
@@ -31,15 +26,15 @@ const { isCurrentOrParentUrl } = useCurrentUrl();
 <template>
     <div class="px-4 py-6">
         <Heading
-            title="Settings"
-            description="Manage your profile and account settings"
+            :title="trans('nav.settings')"
+            :description="trans('nav.settings_description')"
         />
 
         <div class="flex flex-col lg:flex-row lg:space-x-12">
             <aside class="w-full max-w-xl lg:w-48">
                 <nav
                     class="flex flex-col space-y-1 space-x-0"
-                    aria-label="Settings"
+                    :aria-label="trans('nav.settings')"
                 >
                     <Button
                         v-for="item in sidebarNavItems"

@@ -32,6 +32,7 @@ final class SetLocale
     private function resolve(Request $request): string
     {
         $candidates = [
+            $request->user()?->getAttribute('locale'),
             $request->hasSession() ? $request->session()->get(self::SESSION_KEY) : null,
             $request->getPreferredLanguage($this->locales->all()),
         ];

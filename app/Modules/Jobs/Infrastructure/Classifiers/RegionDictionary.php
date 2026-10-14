@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Jobs\Infrastructure\Classifiers;
 
 use App\Modules\Jobs\Domain\Enums\Region;
+use App\Modules\Shared\Infrastructure\Localization\Countries;
 use Locale;
 
 /**
@@ -15,19 +16,6 @@ use Locale;
  */
 final class RegionDictionary
 {
-    private const array ISO_CODES = [
-        'AD', 'AE', 'AF', 'AG', 'AL', 'AM', 'AO', 'AR', 'AT', 'AU', 'AZ', 'BA', 'BB', 'BD', 'BE', 'BF', 'BG', 'BH', 'BI', 'BJ',
-        'BN', 'BO', 'BR', 'BS', 'BT', 'BW', 'BY', 'BZ', 'CA', 'CD', 'CF', 'CG', 'CH', 'CI', 'CL', 'CM', 'CN', 'CO', 'CR', 'CU',
-        'CV', 'CY', 'CZ', 'DE', 'DJ', 'DK', 'DM', 'DO', 'DZ', 'EC', 'EE', 'EG', 'ER', 'ES', 'ET', 'FI', 'FJ', 'FR', 'GA', 'GB',
-        'GD', 'GE', 'GH', 'GM', 'GN', 'GQ', 'GR', 'GT', 'GW', 'GY', 'HK', 'HN', 'HR', 'HT', 'HU', 'ID', 'IE', 'IL', 'IN', 'IQ',
-        'IR', 'IS', 'IT', 'JM', 'JO', 'JP', 'KE', 'KG', 'KH', 'KM', 'KN', 'KR', 'KW', 'KZ', 'LA', 'LB', 'LC', 'LI', 'LK', 'LR',
-        'LS', 'LT', 'LU', 'LV', 'LY', 'MA', 'MC', 'MD', 'ME', 'MG', 'MK', 'ML', 'MM', 'MN', 'MO', 'MR', 'MT', 'MU', 'MV', 'MW',
-        'MX', 'MY', 'MZ', 'NA', 'NE', 'NG', 'NI', 'NL', 'NO', 'NP', 'NZ', 'OM', 'PA', 'PE', 'PG', 'PH', 'PK', 'PL', 'PR', 'PS',
-        'PT', 'PY', 'QA', 'RO', 'RS', 'RU', 'RW', 'SA', 'SB', 'SC', 'SD', 'SE', 'SG', 'SI', 'SK', 'SL', 'SM', 'SN', 'SO', 'SR',
-        'SS', 'SV', 'SY', 'SZ', 'TD', 'TG', 'TH', 'TJ', 'TL', 'TM', 'TN', 'TO', 'TR', 'TT', 'TW', 'TZ', 'UA', 'UG', 'US', 'UY',
-        'UZ', 'VE', 'VN', 'VU', 'WS', 'XK', 'YE', 'ZA', 'ZM', 'ZW',
-    ];
-
     private const array NAME_LOCALES = ['en', 'es', 'de', 'pt', 'fr'];
 
     /** Common spellings ICU does not produce. */
@@ -135,7 +123,7 @@ final class RegionDictionary
                     $code === 'EU' => 'EU',
                     in_array($code, self::CANADIAN_PROVINCES, true) && $this->followsComma($text, $offset) => 'CA',
                     in_array($code, self::US_STATE_CODES, true) && $this->followsComma($text, $offset) => 'US',
-                    in_array($code, self::ISO_CODES, true) => $code,
+                    in_array($code, Countries::CODES, true) => $code,
                     default => null,
                 };
 
@@ -160,7 +148,7 @@ final class RegionDictionary
         if (preg_match('/^[A-Za-z]{2}$/', $trimmed) === 1) {
             $upper = strtoupper($trimmed);
 
-            return $upper === 'UK' ? 'GB' : (in_array($upper, self::ISO_CODES, true) ? $upper : null);
+            return $upper === 'UK' ? 'GB' : (in_array($upper, Countries::CODES, true) ? $upper : null);
         }
 
         return $this->extract($trimmed)[0] ?? null;
@@ -191,7 +179,7 @@ final class RegionDictionary
 
         $names = self::COUNTRY_ALIASES;
 
-        foreach (self::ISO_CODES as $code) {
+        foreach (Countries::CODES as $code) {
             foreach (self::NAME_LOCALES as $locale) {
                 $name = Locale::getDisplayRegion('-'.$code, $locale);
                 if (is_string($name) && $name !== '' && $name !== $code) {

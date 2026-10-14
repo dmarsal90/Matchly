@@ -1,0 +1,16 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'dashboard' => 'Dashboard',
+    'profile' => 'Career profile',
+    'settings' => 'Settings',
+    'settings_description' => 'Manage your account, security and privacy',
+    'account' => 'Account',
+    'security' => 'Security',
+    'appearance' => 'Appearance',
+    'privacy' => 'Privacy',
+    'admin' => 'Admin',
+    'log_out' => 'Log out',
+];

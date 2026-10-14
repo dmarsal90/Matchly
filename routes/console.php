@@ -15,3 +15,5 @@ Schedule::command('jobs:check-links')->dailyAt('03:30')->onOneServer();
 Schedule::command('horizon:snapshot')->everyFiveMinutes();
 
 Schedule::command('queue:prune-failed --hours=168')->daily();
+
+Schedule::command('privacy:prune')->dailyAt('04:00')->onOneServer();

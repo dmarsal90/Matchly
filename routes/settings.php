@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-use App\Http\Controllers\Settings\ProfileController;
-use App\Http\Controllers\Settings\SecurityController;
-use Illuminate\Auth\Middleware\RequirePassword;
+use App\Modules\Identity\Http\Controllers\PrivacyController;
+use App\Modules\Identity\Http\Controllers\Settings\ProfileController;
+use App\Modules\Identity\Http\Controllers\Settings\SecurityController;
+use App\Modules\Identity\Http\Middleware\RequirePasswordIfSet;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -18,7 +19,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('settings/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 
     Route::get('settings/security', [SecurityController::class, 'edit'])
-        ->middleware(RequirePassword::class)
+        ->middleware(RequirePasswordIfSet::class)
         ->name('security.edit');
 
     Route::put('settings/password', [SecurityController::class, 'update'])
@@ -26,6 +27,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('user-password.update');
 
     Route::inertia('settings/appearance', 'settings/Appearance')->name('appearance.edit');
+
+    Route::get('settings/privacy', [PrivacyController::class, 'edit'])->name('privacy.edit');
+    Route::put('settings/privacy/consent', [PrivacyController::class, 'updateConsent'])->name('privacy.consent');
+    Route::get('settings/privacy/export', [PrivacyController::class, 'export'])->middleware('throttle:exports')->name('privacy.export');
 });
 
 Route::get('.well-known/passkey-endpoints', function () {

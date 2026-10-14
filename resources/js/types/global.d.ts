@@ -19,6 +19,7 @@ declare module '@inertiajs/core' {
             name: string;
             locale: string;
             supportedLocales: string[];
+            oauthProviders: ('google' | 'github')[];
             auth: Auth;
             sidebarOpen: boolean;
             [key: string]: unknown;
