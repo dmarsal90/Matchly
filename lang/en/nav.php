@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 return [
+    'jobs' => 'Jobs',
+    'applications' => 'My jobs',
     'dashboard' => 'Dashboard',
     'profile' => 'Career profile',
     'settings' => 'Settings',

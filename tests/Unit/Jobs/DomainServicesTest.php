@@ -65,6 +65,16 @@ describe('SalaryParser', function (): void {
         expect($salary->annualMin())->toBe(41600.0)->and($salary->annualMax())->toBe(62400.0);
     });
 
+    it('re-reads periods that are impossible for the amount', function (float $amount, SalaryPeriod $stated, SalaryPeriod $expected): void {
+        expect(Salary::tryFrom($amount, null, 'USD', $stated)?->period)->toBe($expected);
+    })->with([
+        'yearly labelled hourly' => [41600, SalaryPeriod::Hour, SalaryPeriod::Year],
+        'monthly labelled hourly' => [3500, SalaryPeriod::Hour, SalaryPeriod::Month],
+        'real hourly' => [85, SalaryPeriod::Hour, SalaryPeriod::Hour],
+        'yearly labelled monthly' => [180000, SalaryPeriod::Month, SalaryPeriod::Year],
+        'real monthly' => [6000, SalaryPeriod::Month, SalaryPeriod::Month],
+    ]);
+
     it('repairs reversed or zero ranges from sources', function (): void {
         expect(Salary::tryFrom(0, 0, 'USD'))->toBeNull()
             ->and(Salary::tryFrom(90000, 70000, 'usd')?->min)->toBe(70000.0)

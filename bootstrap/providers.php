@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 return [
+    App\Modules\Applications\ApplicationsServiceProvider::class,
     App\Modules\Identity\FortifyServiceProvider::class,
     App\Modules\Identity\IdentityServiceProvider::class,
     App\Modules\Jobs\JobsServiceProvider::class,
