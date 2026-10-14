@@ -75,6 +75,24 @@ El rol del contenedor lo elige el primer argumento del entrypoint (`docker/entry
 make prod-image          # construir la imagen de producción en local
 ```
 
+## Ingesta de ofertas
+
+Fuentes gratuitas: Remotive, Remote OK, Jobicy, Himalayas, Arbeitnow, We Work Remotely (RSS), Adzuna y Jooble (con clave gratuita), y los tableros públicos de Greenhouse, Lever, Ashby, Workable y SmartRecruiters de las empresas de la tabla `ats_companies`.
+
+- El scheduler ejecuta `jobs:ingest` cada 10 minutos. Cada fuente solo se lanza cuando ha pasado su `interval` (que respeta sus términos de uso) y el back-off por fallos. Se encola un job por fuente en la cola `ingestion`.
+- Flujo: normalizar → descartar lo antiguo, lo presencial o lo incompleto → sanear HTML → clasificar modalidad, alcance, regiones, categoría, rol y seniority → marcar sospechosas → upsert idempotente → cerrar lo que la fuente ya no lista → evento `JobsIngested`.
+- Deduplicación: por `(fuente, id externo)` dentro de una fuente, y por URL canónica o título + empresa normalizados entre fuentes. Gana la primera vista.
+- `jobs:close-expired` (cada hora) y `jobs:check-links` (cada noche) cierran las ofertas caducadas o con enlace muerto.
+- La UI consulta siempre la base de datos, nunca las APIs externas.
+
+```sh
+php artisan jobs:ingest                    # encola las fuentes que tocan
+php artisan jobs:ingest remotive --sync -v # una fuente, ahora, con motivos de descarte
+php artisan jobs:sources                   # estado de cada fuente
+```
+
+Cómo añadir una fuente: [docs/adding-a-job-provider.md](docs/adding-a-job-provider.md).
+
 ## Estructura
 
 El código de negocio vive en `app/Modules/<Dominio>/{Domain,Application,Infrastructure,Http}`. Los tests de `tests/Architecture` hacen cumplir las fronteras: `Domain` no depende del framework, los controladores no tocan la base de datos y todo archivo declara `strict_types`.

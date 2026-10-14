@@ -1,0 +1,84 @@
+{
+  "apiVersion": "2.2.19",
+  "documentationUrl": "https://jobi.cy/apidocs",
+  "friendlyNotice": "Thanks for using Jobicy API! Please ensure Jobicy is clearly credited with a direct link to the source, and all application buttons redirect to the original job URL provided in this feed. That’s all! You might be building something amazing, we wish you the best of luck!",
+  "jobCount": 3,
+  "lastUpdate": "2026-10-14T04:48:41+00:00",
+  "hasMore": false,
+  "appliedFilters": {
+    "count": 3
+  },
+  "jobs": [
+    {
+      "id": 155263,
+      "url": "https://jobicy.com/jobs/155263-director-of-enterprise-sales",
+      "jobSlug": "155263-director-of-enterprise-sales",
+      "jobTitle": "Director of Enterprise Sales",
+      "companyName": "MaintainX",
+      "companyLogo": "https://jobicy.com/data/server-nyc0409/galaxy/mercury/2025/08/f0177662-221.png",
+      "jobIndustry": [
+        "Sales"
+      ],
+      "jobType": [
+        "Full-Time"
+      ],
+      "jobGeo": "Canada,  USA",
+      "jobLevel": "Director",
+      "jobExcerpt": "MaintainX is a leading mobile-first work execution platform for industrial and frontline teams. More than 13,000 customers, including Duracell, McDonald's, Shell, DHL and Volvo, use MaintainX to cut unplanned downtime and run better operations, across 13.9 million managed assets and 79.5 million completed work orders. In August 2026 MaintainX became part of Autodesk, joining Autodesk&hellip;",
+      "jobDescription": "<p><em><strong><a href=\"https://jobicy.com/company/maintainx\" target=\"_blank\" rel=\"noopener\">MaintainX</a> is a leading mobile-first work execution platform </strong>for industrial and frontline teams. <strong>More than 13,000 customers</strong>, including Duracell, McDonald's, Shell, DHL and Volvo, use MaintainX to cut unplanned downtime and run better operations, across 13.9 million managed assets and 79.5 million completed work orders.</em></p>\n<p><em><strong>In August 2026 MaintainX became part of Autodesk, joining </strong></em><a href=\"https://adsknews.autodesk.com/en/views/inside-autode",
+      "pubDate": "2026-10-14T04:48:41+00:00",
+      "salaryMin": 213500,
+      "salaryMax": 390000,
+      "salaryCurrency": "USD",
+      "salaryPeriod": "yearly"
+    },
+    {
+      "id": 155259,
+      "url": "https://jobicy.com/jobs/155259-enterprise-account-director-north-east",
+      "jobSlug": "155259-enterprise-account-director-north-east",
+      "jobTitle": "Enterprise Account Director - North East",
+      "companyName": "MaintainX",
+      "companyLogo": "https://jobicy.com/data/server-nyc0409/galaxy/mercury/2025/08/f0177662-221.png",
+      "jobIndustry": [
+        "Sales"
+      ],
+      "jobType": [
+        "Full-Time"
+      ],
+      "jobGeo": "USA",
+      "jobLevel": "Director",
+      "jobExcerpt": "MaintainX is a leading mobile-first work execution platform for industrial and frontline teams. More than 13,000 customers, including Duracell, McDonald's, Shell, DHL and Volvo, use MaintainX to cut unplanned downtime and run better operations, across 13.9 million managed assets and 79.5 million completed work orders. In August 2026 MaintainX became part of Autodesk, joining Autodesk&hellip;",
+      "jobDescription": "<p><em><strong><a href=\"https://jobicy.com/company/maintainx\" target=\"_blank\" rel=\"noopener\">MaintainX</a> is a leading mobile-first work execution platform </strong>for industrial and frontline teams. <strong>More than 13,000 customers</strong>, including Duracell, McDonald's, Shell, DHL and Volvo, use MaintainX to cut unplanned downtime and run better operations, across 13.9 million managed assets and 79.5 million completed work orders.</em></p>\n<p><em><strong>In August 2026 MaintainX became part of Autodesk, joining </strong></em><a href=\"https://adsknews.autodesk.com/en/views/inside-autode",
+      "pubDate": "2026-10-14T04:48:41+00:00",
+      "salaryMin": 230000,
+      "salaryMax": 310000,
+      "salaryCurrency": "USD",
+      "salaryPeriod": "yearly"
+    },
+    {
+      "id": 155258,
+      "url": "https://jobicy.com/jobs/155258-mobile-marketing-operations-manager-firefox",
+      "jobSlug": "155258-mobile-marketing-operations-manager-firefox",
+      "jobTitle": "Mobile Marketing Operations Manager, Firefox",
+      "companyName": "Mozilla",
+      "companyLogo": "https://jobicy.com/data/server-nyc0409/galaxy/mercury/2020/10/mozilla.jpg",
+      "jobIndustry": [
+        "Marketing & Sales"
+      ],
+      "jobType": [
+        "Full-Time"
+      ],
+      "jobGeo": "Canada",
+      "jobLevel": "Any",
+      "jobExcerpt": "Why Mozilla? Mozilla Corporation is the non-profit-backed technology company that has shaped the internet for the better over the last 25 years. We make pioneering brands like Firefox, the privacy-minded web browser. Now, with more than 225 million people around the world using our products each month, we’re shaping the next 25 years of technology&hellip;",
+      "jobDescription": "<p> <strong>Why <a href=\"https://jobicy.com/company/mozilla\" target=\"_blank\" rel=\"noopener\">Mozilla</a>?</strong></p>\n<p>Mozilla Corporation is the non-profit-backed technology company that has shaped the internet for the better over the last 25 years. We make pioneering brands like Firefox, the privacy-minded web browser. Now, with more than 225 million people around the world using our products each month, we’re shaping the next 25 years of technology and helping to reclaim an internet built for people, not companies. Our work focuses on diverse areas including AI, social media, security and",
+      "pubDate": "2026-10-14T04:48:41+00:00",
+      "salaryMin": 63000,
+      "salaryMax": 93000,
+      "salaryCurrency": "CAD",
+      "salaryPeriod": "yearly"
+    }
+  ],
+  "statusCode": 200,
+  "success": true
+}
