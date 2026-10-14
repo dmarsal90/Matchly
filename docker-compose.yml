@@ -1,0 +1,184 @@
+# Development stack. Every PHP process runs the same "dev" image with the code
+# bind-mounted; only the command (role) changes. All values come from .env.
+name: ${COMPOSE_PROJECT_NAME:-jobs-platform}
+
+# Only "app" builds the image; the other PHP services reuse it.
+x-app: &app
+  image: ${COMPOSE_PROJECT_NAME:-jobs-platform}-dev:latest
+  pull_policy: never
+  env_file: .env
+  environment:
+    XDEBUG_MODE: ${XDEBUG_MODE:-off}
+  volumes:
+    - .:/var/www/html
+  networks:
+    - internal
+  extra_hosts:
+    - host.docker.internal:host-gateway
+  restart: unless-stopped
+
+x-after-app: &after-app
+  depends_on:
+    app:
+      condition: service_healthy
+
+services:
+  app:
+    <<: *app
+    build:
+      context: .
+      target: dev
+      args:
+        HOST_UID: ${HOST_UID:-1000}
+        HOST_GID: ${HOST_GID:-1000}
+    command: fpm
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: [CMD, healthcheck]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 120s
+
+  web:
+    image: nginx:1.30.5-alpine
+    ports:
+      - ${APP_PORT:-8000}:80
+    volumes:
+      - ./docker/nginx/dev.conf:/etc/nginx/conf.d/default.conf:ro
+      - ./public:/var/www/html/public:ro
+    networks:
+      - internal
+    restart: unless-stopped
+    <<: *after-app
+    healthcheck:
+      test: [CMD, wget, -q, -O, /dev/null, http://127.0.0.1/up]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  vite:
+    <<: [*app, *after-app]
+    command: vite
+    ports:
+      - ${VITE_PORT:-5173}:${VITE_PORT:-5173}
+    healthcheck:
+      test: [CMD, healthcheck]
+      interval: 10s
+      timeout: 5s
+      retries: 30
+      start_period: 120s
+
+  horizon:
+    <<: [*app, *after-app]
+    command: horizon
+    stop_signal: SIGTERM
+    healthcheck:
+      test: [CMD, healthcheck]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+  scheduler:
+    <<: [*app, *after-app]
+    command: scheduler
+    healthcheck:
+      test: [CMD, healthcheck]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  reverb:
+    <<: [*app, *after-app]
+    command: reverb
+    ports:
+      - ${FORWARD_REVERB_PORT:-8080}:${REVERB_SERVER_PORT:-8080}
+    healthcheck:
+      test: [CMD, healthcheck]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  postgres:
+    image: postgres:17.11-alpine
+    environment:
+      POSTGRES_DB: ${DB_DATABASE}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - ${FORWARD_DB_PORT:-5432}:5432
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/10-extensions.sql:ro
+    networks:
+      - internal
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD-SHELL, 'pg_isready -U "$${POSTGRES_USER}" -d "$${POSTGRES_DB}"']
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  redis:
+    image: redis:7.4.6-alpine
+    command: [redis-server, --appendonly, 'yes']
+    ports:
+      - ${FORWARD_REDIS_PORT:-6379}:6379
+    volumes:
+      - redis-data:/data
+    networks:
+      - internal
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, redis-cli, ping]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  mailpit:
+    image: axllent/mailpit:v1.31.5
+    ports:
+      - ${FORWARD_MAILPIT_PORT:-8025}:8025
+    networks:
+      - internal
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, /mailpit, readyz]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  # Optional: docker compose --profile search up -d
+  meilisearch:
+    image: getmeili/meilisearch:v1.55.0
+    profiles: [search]
+    environment:
+      MEILI_MASTER_KEY: ${MEILISEARCH_KEY:-}
+      MEILI_NO_ANALYTICS: 'true'
+      MEILI_ENV: development
+    ports:
+      - ${FORWARD_MEILISEARCH_PORT:-7700}:7700
+    volumes:
+      - meilisearch-data:/meili_data
+    networks:
+      - internal
+    restart: unless-stopped
+    healthcheck:
+      test: [CMD, curl, -fsS, http://127.0.0.1:7700/health]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres-data:
+  redis-data:
+  meilisearch-data:
+
+networks:
+  internal:
+    driver: bridge
