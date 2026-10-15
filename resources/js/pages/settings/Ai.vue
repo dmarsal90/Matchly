@@ -28,7 +28,7 @@ defineProps<{
 
 defineOptions({
     layout: {
-        breadcrumbs: [{ title: 'AI', href: edit() }],
+        breadcrumbs: [{ title: 'nav.ai', href: edit() }],
     },
 });
 

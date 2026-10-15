@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import InputError from '@/components/InputError.vue';
 import PasswordInput from '@/components/PasswordInput.vue';
@@ -14,24 +15,23 @@ import PasskeyVerify from '@/components/PasskeyVerify.vue';
 
 defineOptions({
     layout: {
-        title: 'Confirm password',
-        description:
-            'This is a secure area of the application. Please confirm your password before continuing.',
+        title: 'account.auth.confirm.title',
+        description: 'account.auth.confirm.description',
     },
 });
 </script>
 
 <template>
-    <Head title="Confirm password" />
+    <Head :title="trans('account.auth.confirm.title')" />
 
     <PasskeyVerify
         :routes="{
             options: confirmOptions(),
             submit: confirmStore(),
         }"
-        label="Confirm with passkey"
-        loading-label="Confirming..."
-        separator="Or confirm with password"
+        :label="trans('account.auth.confirm.passkey')"
+        :loading-label="trans('account.auth.confirm.passkey_loading')"
+        :separator="trans('account.auth.confirm.or_password')"
     />
 
     <Form
@@ -41,7 +41,9 @@ defineOptions({
     >
         <div class="space-y-6">
             <div class="grid gap-2">
-                <Label html-for="password">Password</Label>
+                <Label html-for="password">{{
+                    trans('account.auth.password')
+                }}</Label>
                 <PasswordInput
                     id="password"
                     name="password"
@@ -61,7 +63,7 @@ defineOptions({
                     data-test="confirm-password-button"
                 >
                     <Spinner v-if="processing" />
-                    Confirm password
+                    {{ trans('account.auth.confirm.submit') }}
                 </Button>
             </div>
         </div>

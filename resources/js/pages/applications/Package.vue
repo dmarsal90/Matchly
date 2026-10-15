@@ -51,7 +51,7 @@ const props = defineProps<{
 
 defineOptions({
     layout: {
-        breadcrumbs: [{ title: 'My jobs', href: applicationsIndex() }],
+        breadcrumbs: [{ title: 'nav.applications', href: applicationsIndex() }],
     },
 });
 

@@ -10,6 +10,8 @@ async function change(event: Event): Promise<void> {
     const locale = (event.target as HTMLSelectElement).value;
 
     await loadLanguageAsync(locale);
+    // Screen readers, hyphenation and Intl formatting read the document language.
+    document.documentElement.lang = locale;
     router.put(update.url(), { locale }, { preserveScroll: true });
 }
 </script>

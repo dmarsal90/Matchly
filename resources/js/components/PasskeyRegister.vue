@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { usePasskeyRegister } from '@laravel/passkeys/vue';
 import { ref } from 'vue';
 import InputError from '@/components/InputError.vue';
@@ -29,7 +30,10 @@ const getDefaultPasskeyName = () => {
         { pattern: /Windows/, name: 'Windows' },
     ].find(({ pattern }) => pattern.test(ua))?.name;
 
-    return [browser, os].filter(Boolean).join(' on ') || '';
+    if (browser && os)
+        return trans('account.passkeys.default_name', { browser, os });
+
+    return browser ?? os ?? '';
 };
 
 const name = ref(getDefaultPasskeyName());
@@ -61,11 +65,11 @@ const handleCancel = () => {
 
 <template>
     <div v-if="!isSupported" class="text-sm text-muted-foreground">
-        Passkeys are not supported in this browser.
+        {{ trans('account.passkeys.unsupported') }}
     </div>
 
     <Button v-else-if="!showForm" variant="outline" @click="showForm = true">
-        Add passkey
+        {{ trans('account.passkeys.add') }}
     </Button>
 
     <form
@@ -74,17 +78,19 @@ const handleCancel = () => {
         @submit="handleSubmit"
     >
         <div class="grid gap-2">
-            <Label for="passkey-name">Passkey name</Label>
+            <Label for="passkey-name">{{
+                trans('account.passkeys.name')
+            }}</Label>
             <Input
                 id="passkey-name"
                 v-model="name"
                 v-focus
                 type="text"
-                placeholder="e.g., MacBook Pro, iPhone"
+                :placeholder="trans('account.passkeys.name_placeholder')"
                 class="mt-1 block w-full border-foreground/20"
             />
             <p class="text-xs text-muted-foreground">
-                A name helps you identify this passkey later.
+                {{ trans('account.passkeys.name_hint') }}
             </p>
         </div>
 
@@ -92,10 +98,14 @@ const handleCancel = () => {
 
         <div class="flex gap-2">
             <Button type="submit" :disabled="isLoading || !name.trim()">
-                {{ isLoading ? 'Registering...' : 'Register passkey' }}
+                {{
+                    isLoading
+                        ? trans('account.passkeys.registering')
+                        : trans('account.passkeys.register')
+                }}
             </Button>
             <Button type="button" variant="ghost" @click="handleCancel">
-                Cancel
+                {{ trans('common.cancel') }}
             </Button>
         </div>
     </form>

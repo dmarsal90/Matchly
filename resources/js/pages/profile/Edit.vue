@@ -27,7 +27,7 @@ const props = defineProps<{
 
 defineOptions({
     layout: {
-        breadcrumbs: [{ title: 'Career profile', href: edit() }],
+        breadcrumbs: [{ title: 'nav.profile', href: edit() }],
     },
 });
 
