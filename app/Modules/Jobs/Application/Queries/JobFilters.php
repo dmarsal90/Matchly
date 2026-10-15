@@ -49,7 +49,16 @@ final readonly class JobFilters
         public JobSort $sort = JobSort::Newest,
         public ?JobGroup $groupBy = null,
         public int $perPage = 20,
+        public ?int $viewerId = null,
+        public bool $recommended = false,
+        public ?int $minScore = null,
     ) {}
+
+    /** Whether scores of the viewer take part in filtering or ordering. */
+    public function usesMatches(): bool
+    {
+        return $this->viewerId !== null && ($this->recommended || $this->minScore !== null || $this->sort === JobSort::Match);
+    }
 
     public function hasSearch(): bool
     {
@@ -59,6 +68,10 @@ final readonly class JobFilters
     /** Relevance without a query has nothing to rank by. */
     public function effectiveSort(): JobSort
     {
-        return $this->sort === JobSort::Relevance && ! $this->hasSearch() ? JobSort::Newest : $this->sort;
+        return match (true) {
+            $this->sort === JobSort::Relevance && ! $this->hasSearch() => JobSort::Newest,
+            $this->sort === JobSort::Match && $this->viewerId === null => JobSort::Newest,
+            default => $this->sort,
+        };
     }
 }

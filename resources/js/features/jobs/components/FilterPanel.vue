@@ -16,7 +16,11 @@ const props = defineProps<{
     filters: JobFilters;
     options: JobOptions;
     activeCount: number;
+    /** Signed-in viewers can filter by their compatibility score. */
+    canMatch?: boolean;
 }>();
+
+const MIN_SCORES = [50, 60, 70, 80, 90];
 const emit = defineEmits<{
     toggle: [key: MultiFilterKey, value: string];
     set: [key: keyof JobFilters, value: string | number | null];
@@ -63,6 +67,26 @@ function applySalary(): void {
             >
                 {{ trans('jobs.filters.clear') }}
             </Button>
+        </div>
+
+        <div v-if="canMatch" class="grid gap-1.5">
+            <label for="min-score" class="text-sm font-medium">{{
+                trans('jobs.filters.min_score')
+            }}</label>
+            <NativeSelect
+                id="min-score"
+                :model-value="filters.min_score"
+                @update:model-value="
+                    emit('set', 'min_score', $event ? Number($event) : null)
+                "
+            >
+                <option :value="null">
+                    {{ trans('jobs.filters.any_score') }}
+                </option>
+                <option v-for="score in MIN_SCORES" :key="score" :value="score">
+                    ≥ {{ score }}
+                </option>
+            </NativeSelect>
         </div>
 
         <DateFilter

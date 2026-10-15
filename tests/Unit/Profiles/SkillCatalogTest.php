@@ -3,14 +3,6 @@
 declare(strict_types=1);
 
 use App\Modules\Profiles\Domain\Data\GitHubUsername;
-use App\Modules\Profiles\Domain\Services\SkillCatalog;
-
-function catalog(): SkillCatalog
-{
-    $config = require __DIR__.'/../../../config/skills.php';
-
-    return new SkillCatalog($config['catalog'], $config['packages']);
-}
 
 describe('normalize', function (): void {
     it('collapses synonyms, spelling and versions into one skill', function (string $input, string $slug, string $label): void {

@@ -28,7 +28,76 @@ export type Job = {
     source: { key: string; name: string; url: string };
     tracking_status: string | null;
     viewed: boolean;
+    match: JobMatchSummary | null;
     description?: string;
+};
+
+export type MatchLevel = 'high' | 'medium' | 'low';
+
+export type JobMatchSummary = {
+    score: number;
+    level: MatchLevel;
+    eligible: boolean;
+};
+
+export type MatchMessage = { key: string; params: Record<string, string> };
+
+export type MatchCategory =
+    | 'skills'
+    | 'experience'
+    | 'role'
+    | 'location'
+    | 'languages'
+    | 'salary'
+    | 'education';
+
+export type JobMatch = JobMatchSummary & {
+    ineligible_reasons: MatchMessage[];
+    breakdown: Record<
+        MatchCategory,
+        { points: number; max: number; ratio: number; known: boolean }
+    >;
+    matched_skills: {
+        skill: string;
+        name: string;
+        required: boolean;
+        evidenced: boolean;
+        level: number | null;
+    }[];
+    missing_skills: { skill: string; name: string; required: boolean }[];
+    suggestions: MatchMessage[];
+    computed_at: string;
+};
+
+export type JobRequirements = {
+    source: 'rules' | 'ai';
+    required_skills: {
+        skill: string;
+        name: string;
+        min_years: number | null;
+    }[];
+    nice_to_have_skills: { skill: string; name: string }[];
+    min_years_experience: number | null;
+    seniority: string | null;
+    languages: { code: string; level: string | null; required: boolean }[];
+    education: { degree_required: boolean; field: string | null };
+    certifications: string[];
+    location: {
+        exclusive: boolean;
+        countries: string[];
+        regions: string[];
+        utc_offset_min: number | null;
+        utc_offset_max: number | null;
+    };
+    asks_for: Record<
+        | 'cover_letter'
+        | 'github'
+        | 'portfolio'
+        | 'salary_expectations'
+        | 'additional_questions',
+        boolean
+    >;
+    language: string | null;
 };
 
 export type JobPage = {
@@ -62,6 +131,8 @@ export type JobFilters = {
     sort: string;
     group: string | null;
     per_page: number;
+    tab: 'recommended' | null;
+    min_score: number | null;
 };
 
 export type MultiFilterKey =

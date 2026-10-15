@@ -23,6 +23,8 @@ final class StartGithubImportRequest extends FormRequest
             }],
             // Explicit consent to read public GitHub data (GDPR art. 7).
             'consent' => ['accepted'],
+            // Optional AI summary of the repositories, with its own consent.
+            'ai_summary' => ['boolean'],
         ];
     }
 

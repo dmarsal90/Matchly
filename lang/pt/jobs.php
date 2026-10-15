@@ -31,12 +31,15 @@ return [
         'custom_range' => 'Período personalizado',
         'any_date' => 'Qualquer data',
         'active' => ':count filtros ativos',
+        'min_score' => 'Compatibilidade mínima',
+        'any_score' => 'Qualquer',
     ],
     'sort' => [
         'label' => 'Ordenar por',
         'newest' => 'Mais recentes',
         'relevance' => 'Relevância',
         'salary' => 'Salário',
+        'match' => 'Maior compatibilidade',
     ],
     'group' => [
         'label' => 'Agrupar por',
@@ -149,6 +152,17 @@ return [
         'action' => 'Começar',
     ],
     'my_search' => 'Aplicar o meu perfil de procura',
+    'tabs' => [
+        'label' => 'Vista da lista',
+        'all' => 'Todas',
+        'recommended' => 'Recomendadas para si',
+    ],
+    'recommended_empty' => [
+        'title' => 'Ainda não há recomendações',
+        'description' => 'Complete o seu perfil de competências e calcularemos a sua compatibilidade com cada oferta.',
+        'action' => 'Completar perfil',
+        'pending' => 'Estamos a calcular a sua compatibilidade. Volte dentro de alguns minutos.',
+    ],
     'card' => [
         'apply' => 'Candidatar-se',
         'apply_hint' => 'Abre a vaga original em uma nova aba',

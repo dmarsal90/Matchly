@@ -21,6 +21,7 @@ const props = defineProps<{
 const form = useForm({
     username: props.state.suggested_username ?? '',
     consent: props.consented,
+    ai_summary: false,
 });
 
 // Server-side import errors (e.g. one already running) come back under "import".
@@ -71,6 +72,19 @@ function submit(): void {
                 </p>
                 <InputError :message="form.errors.consent" />
             </div>
+        </div>
+
+        <div class="flex items-start gap-2">
+            <Checkbox
+                id="github-ai-summary"
+                v-model="form.ai_summary"
+                class="mt-0.5"
+            />
+            <Label
+                for="github-ai-summary"
+                class="text-sm leading-snug font-normal"
+                >{{ trans('skills.github.ai_summary') }}</Label
+            >
         </div>
 
         <div class="flex flex-wrap items-center gap-2">

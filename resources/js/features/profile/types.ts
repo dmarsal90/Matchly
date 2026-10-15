@@ -220,5 +220,13 @@ export type ImportReview = {
         files?: string[];
         skipped_files?: number;
         cv?: { id: number; name: string };
+        ai?: { provider: string; model: string };
+        ai_error?: string;
+        summary?: {
+            summary: string | null;
+            technologies: string[];
+            project_types: string[];
+            highlights: { repository: string; note: string }[];
+        } | null;
     };
 };

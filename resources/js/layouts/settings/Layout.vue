@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { toUrl } from '@/lib/utils';
+import { edit as editAi } from '@/routes/ai';
 import { edit as editAppearance } from '@/routes/appearance';
 import { edit as editPrivacy } from '@/routes/privacy';
 import { edit as editProfile } from '@/routes/profile';
@@ -17,6 +18,7 @@ const sidebarNavItems = computed<NavItem[]>(() => [
     { title: trans('nav.account'), href: editProfile() },
     { title: trans('nav.security'), href: editSecurity() },
     { title: trans('nav.privacy'), href: editPrivacy() },
+    { title: trans('nav.ai'), href: editAi() },
     { title: trans('nav.appearance'), href: editAppearance() },
 ]);
 

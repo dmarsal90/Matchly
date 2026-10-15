@@ -38,9 +38,14 @@ final class JobSearchRequest extends FormRequest
         ];
     }
 
-    public function toFilters(): JobFilters
+    /**
+     * @param  int|null  $viewerId  signed-in user: enables the recommended tab, match sort and score filter
+     */
+    public function toFilters(?int $viewerId = null): JobFilters
     {
         $perPage = $this->integer('per_page', (int) config('jobs.per_page'));
+        $recommended = $viewerId !== null && $this->query('tab') === 'recommended';
+        $minScore = $viewerId !== null && is_numeric($this->query('min_score')) ? max(0, min(100, $this->integer('min_score'))) : null;
 
         return new JobFilters(
             search: $this->filled('q') ? $this->string('q')->squish()->toString() : null,
@@ -57,9 +62,13 @@ final class JobSearchRequest extends FormRequest
             postedTo: $this->dateParam('to'),
             salaryMin: $this->filled('salary_min') && is_numeric($this->input('salary_min')) ? max(0, $this->integer('salary_min')) : null,
             salaryCurrency: preg_match('/^[A-Z]{3}$/', $this->string('currency')->upper()->toString()) === 1 ? $this->string('currency')->upper()->toString() : null,
-            sort: JobSort::tryFrom($this->string('sort')->toString()) ?? JobSort::Newest,
+            // The recommended tab is ordered by score unless the user picks another order.
+            sort: JobSort::tryFrom($this->string('sort')->toString()) ?? ($recommended ? JobSort::Match : JobSort::Newest),
             groupBy: JobGroup::tryFrom($this->string('group')->toString()),
             perPage: in_array($perPage, self::PER_PAGE_OPTIONS, true) ? $perPage : (int) config('jobs.per_page'),
+            viewerId: $viewerId,
+            recommended: $recommended,
+            minScore: $minScore !== null && $minScore > 0 ? $minScore : null,
         );
     }
 

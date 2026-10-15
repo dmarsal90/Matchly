@@ -44,6 +44,10 @@ final readonly class JobSearchQuery
             JobSort::Relevance => $this->textSearch->orderByRelevance($query, (string) $filters->search),
             JobSort::Salary => $query->orderByRaw('COALESCE(salary_annual_max, salary_annual_min) IS NULL')
                 ->orderByRaw('COALESCE(salary_annual_max, salary_annual_min) DESC'),
+            JobSort::Match => $query->orderByRaw(
+                'COALESCE((SELECT score FROM job_matches WHERE job_matches.job_listing_id = job_listings.id AND job_matches.user_id = ?), -1) DESC',
+                [$filters->viewerId],
+            ),
             JobSort::Newest => null,
         };
 
@@ -159,6 +163,15 @@ final readonly class JobSearchQuery
         }
         if ($filters->postedTo !== null) {
             $query->where('sort_at', '<=', CarbonImmutable::instance($filters->postedTo)->endOfDay());
+        }
+
+        // Scores live in job_matches (one row per user and job), computed in the background.
+        if ($filters->usesMatches() && ($filters->recommended || $filters->minScore !== null)) {
+            $query->whereIn('id', $this->db->table('job_matches')
+                ->select('job_listing_id')
+                ->where('user_id', $filters->viewerId)
+                ->when($filters->recommended, fn ($matches) => $matches->where('eligible', true))
+                ->when($filters->minScore !== null, fn ($matches) => $matches->where('score', '>=', $filters->minScore)));
         }
 
         if ($filters->salaryMin !== null) {

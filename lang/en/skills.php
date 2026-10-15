@@ -54,6 +54,9 @@ return [
             'analyze' => 'Analyse my CV',
             'missing' => 'Upload a CV in your profile to analyse it.',
             'go_to_profile' => 'Go to profile',
+            'use_ai' => 'Structure with AI (experience, education and projects)',
+            'ai_consent' => 'I agree to my CV being sent to an AI provider to structure it. Only what the CV says is extracted, and you review it before saving.',
+            'started' => 'Analysing your CV with AI. This takes a few seconds.',
         ],
         'github' => [
             'title' => 'GitHub',
@@ -75,6 +78,7 @@ return [
         'connect' => 'Connect GitHub',
         'connect_hint' => 'Optional: connecting your account lets us read more repositories (higher API limit).',
         'connected' => 'Connected account: :username',
+        'ai_summary' => 'Add an AI summary of my repositories (I agree to them being sent to an AI provider)',
     ],
     'linkedin' => [
         'file' => 'LinkedIn ZIP file',
@@ -146,6 +150,11 @@ return [
         'files_read' => 'Files read: :files. Skipped unread: :skipped.',
         'nothing' => 'Nothing to show in this section.',
         'unknown_language' => 'Unrecognised language',
+        'ai_summary' => 'AI summary',
+        'technologies' => 'Technologies detected',
+        'project_types' => 'Project types',
+        'ai_fallback' => 'AI could not be used (:reason); only the skills detected in the text are shown.',
+        'ai_note' => 'Structured with AI and checked against your CV text. Review it before saving.',
     ],
     'search_profile' => [
         'title' => 'Search profile',

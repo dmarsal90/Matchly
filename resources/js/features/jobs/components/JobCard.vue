@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Badge } from '@/components/ui/badge';
 import ApplyButton from '@/features/jobs/components/ApplyButton.vue';
+import MatchScore from '@/features/jobs/components/MatchScore.vue';
 import SalaryLabel from '@/features/jobs/components/SalaryLabel.vue';
 import SaveJobButton from '@/features/jobs/components/SaveJobButton.vue';
 import { relativeTime } from '@/features/jobs/lib/format';
@@ -74,15 +75,18 @@ const logoFailed = ref(false);
                         {{ job.company }}
                     </p>
                 </div>
-                <Badge
-                    v-if="job.viewed"
-                    variant="outline"
-                    class="shrink-0 gap-1 text-muted-foreground"
-                >
-                    <Eye class="size-3" aria-hidden="true" />{{
-                        trans('jobs.card.viewed')
-                    }}
-                </Badge>
+                <div class="flex shrink-0 items-start gap-2">
+                    <Badge
+                        v-if="job.viewed"
+                        variant="outline"
+                        class="gap-1 text-muted-foreground"
+                    >
+                        <Eye class="size-3" aria-hidden="true" />{{
+                            trans('jobs.card.viewed')
+                        }}
+                    </Badge>
+                    <MatchScore v-if="job.match" :match="job.match" />
+                </div>
             </div>
 
             <div class="flex flex-wrap gap-1.5">

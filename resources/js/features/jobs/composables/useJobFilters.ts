@@ -19,7 +19,9 @@ const MULTI_KEYS: MultiFilterKey[] = [
     'source',
     'tag',
 ];
-const DEFAULT_SORT = 'newest';
+/** The recommended tab is ordered by score; everything else by date. */
+export const defaultSort = (filters: Pick<JobFilters, 'tab'>): string =>
+    filters.tab === 'recommended' ? 'match' : 'newest';
 
 /** Query string for the current state: empty values and defaults are left out so URLs stay short. */
 export function toQuery(
@@ -39,8 +41,10 @@ export function toQuery(
     if (filters.salary_min) query.salary_min = String(filters.salary_min);
     if (filters.salary_min && filters.currency)
         query.currency = filters.currency;
-    if (filters.sort && filters.sort !== DEFAULT_SORT)
+    if (filters.sort && filters.sort !== defaultSort(filters))
         query.sort = filters.sort;
+    if (filters.tab) query.tab = filters.tab;
+    if (filters.min_score) query.min_score = String(filters.min_score);
     if (filters.group) query.group = filters.group;
     if (filters.per_page !== defaultPerPage)
         query.per_page = String(filters.per_page);
@@ -110,7 +114,15 @@ export function useJobFilters(server: Ref<JobFilters>, defaultPerPage: number) {
             to: null,
             salary_min: null,
             currency: null,
+            min_score: null,
         });
+        visit();
+    }
+
+    /** Switching tabs resets the order to that tab's default. */
+    function setTab(tab: JobFilters['tab']): void {
+        state.tab = tab;
+        state.sort = defaultSort(state);
         visit();
     }
 
@@ -118,7 +130,8 @@ export function useJobFilters(server: Ref<JobFilters>, defaultPerPage: number) {
         () =>
             MULTI_KEYS.reduce((total, key) => total + state[key].length, 0) +
             (state.posted || state.from || state.to ? 1 : 0) +
-            (state.salary_min ? 1 : 0),
+            (state.salary_min ? 1 : 0) +
+            (state.min_score ? 1 : 0),
     );
 
     return {
@@ -128,6 +141,7 @@ export function useJobFilters(server: Ref<JobFilters>, defaultPerPage: number) {
         toggle,
         set,
         clear,
+        setTab,
         goToPage: visit,
         activeCount,
     };
