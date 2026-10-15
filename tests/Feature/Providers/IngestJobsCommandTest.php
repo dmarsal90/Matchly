@@ -2,9 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Modules\Jobs\Infrastructure\Models\JobListing;
 use App\Modules\Providers\Infrastructure\Models\Source;
 use App\Modules\Providers\Infrastructure\Queue\IngestProviderJob;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Queue;
 
 beforeEach(function (): void {
@@ -60,4 +62,26 @@ it('makes ingestion jobs unique per source', function (): void {
 
 it('lists sources with their status', function (): void {
     $this->artisan('jobs:sources')->expectsOutputToContain('remotive')->assertSuccessful();
+});
+
+it('ingests its source when the queued job runs and logs a summary', function (): void {
+    $this->travelTo('2026-10-14 13:00:00');
+    config(['jobs.providers.remotive.rate_limit' => 1000]);
+    Http::fake(['remotive.com/*' => Http::response(providerFixtureRaw('remotive.json'))]);
+    Log::spy();
+
+    app()->call([new IngestProviderJob('remotive'), 'handle']);
+
+    expect(JobListing::query()->count())->toBe(3);
+    Log::shouldHaveReceived('info')->with('Job source ingested', Mockery::on(
+        fn (array $context): bool => $context['source'] === 'remotive' && $context['fetched'] === 3 && $context['created'] === 3,
+    ));
+});
+
+it('logs the error when every retry failed', function (): void {
+    Log::spy();
+
+    (new IngestProviderJob('remotive'))->failed(new RuntimeException('upstream down'));
+
+    Log::shouldHaveReceived('error')->with('Job source ingestion failed', ['source' => 'remotive', 'error' => 'upstream down']);
 });
