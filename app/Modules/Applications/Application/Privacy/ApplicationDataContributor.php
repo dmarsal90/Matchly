@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Applications\Application\Privacy;
 
 use App\Modules\Applications\Infrastructure\Models\Application;
+use App\Modules\Applications\Infrastructure\Models\ApplicationEvent;
 use App\Modules\Applications\Infrastructure\Models\ApplicationPackage;
 use App\Modules\Identity\Domain\Contracts\PersonalDataContributor;
 use App\Modules\Identity\Domain\Data\PersonalData;
@@ -14,7 +15,7 @@ final class ApplicationDataContributor implements PersonalDataContributor
 {
     public function export(int $userId): PersonalData
     {
-        $applications = Application::query()->with('job:id,title,company,apply_url')->where('user_id', $userId)->orderBy('id')->get();
+        $applications = Application::query()->with(['job:id,title,company,apply_url', 'events'])->where('user_id', $userId)->orderBy('id')->get();
 
         return new PersonalData('applications', [
             'applications' => $applications->map(fn (Application $application): array => [
@@ -22,6 +23,13 @@ final class ApplicationDataContributor implements PersonalDataContributor
                 'status' => $application->status->value,
                 'notes' => $application->notes,
                 'applied_at' => $application->applied_at?->toIso8601String(),
+                'history' => $application->events->map(fn (ApplicationEvent $event): array => [
+                    'type' => $event->type->value,
+                    'status' => $event->status?->value,
+                    'round' => $event->round,
+                    'note' => $event->note,
+                    'occurred_at' => $event->occurred_at->toIso8601String(),
+                ])->values()->all(),
                 'created_at' => $application->created_at->toIso8601String(),
             ])->values()->all(),
             'viewed_jobs' => DB::table('job_views')->where('user_id', $userId)->count(),
@@ -40,6 +48,6 @@ final class ApplicationDataContributor implements PersonalDataContributor
 
     public function erase(int $userId): void
     {
-        // applications and job_views cascade from users.
+        // applications (with their events) and job_views cascade from users.
     }
 }

@@ -12,6 +12,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 /**
  * @property int $id
@@ -23,6 +24,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property CarbonImmutable|null $applied_at
  * @property CarbonImmutable $created_at
  * @property-read JobListing $job
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ApplicationEvent> $events
  */
 #[UsePolicy(ApplicationPolicy::class)]
 final class Application extends Model
@@ -49,6 +51,14 @@ final class Application extends Model
     public function job(): BelongsTo
     {
         return $this->belongsTo(JobListing::class, 'job_listing_id');
+    }
+
+    /**
+     * @return HasMany<ApplicationEvent, $this>
+     */
+    public function events(): HasMany
+    {
+        return $this->hasMany(ApplicationEvent::class)->orderBy('occurred_at')->orderBy('id');
     }
 
     protected function casts(): array
