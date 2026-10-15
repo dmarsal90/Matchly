@@ -40,6 +40,8 @@ final class HandleInertiaRequests extends Middleware
                 'user' => $this->user($request),
             ],
             'oauthProviders' => OAuthController::enabledProviders(),
+            // Unread count for the header bell; live updates come over the broadcast channel.
+            'notifications' => fn (): ?array => $request->user() instanceof User ? ['unread' => $request->user()->unreadNotifications()->count()] : null,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
         ];
     }

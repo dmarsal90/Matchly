@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 return [
     App\Modules\AI\AiServiceProvider::class,
+    App\Modules\Alerts\AlertsServiceProvider::class,
     App\Modules\Applications\ApplicationsServiceProvider::class,
     App\Modules\Identity\FortifyServiceProvider::class,
     App\Modules\Identity\IdentityServiceProvider::class,

@@ -32,6 +32,8 @@ return [
         'inactive_cv_text_months' => env('PRIVACY_INACTIVE_CV_TEXT_MONTHS') !== null ? (int) env('PRIVACY_INACTIVE_CV_TEXT_MONTHS') : 24,
         // Imports never reviewed (or failed) are discarded after this many days.
         'unreviewed_import_days' => (int) env('PRIVACY_UNREVIEWED_IMPORT_DAYS', 30),
+        // Read in-app notifications are deleted after this many days.
+        'read_notification_days' => (int) env('PRIVACY_READ_NOTIFICATION_DAYS', 90),
     ],
 
     /*

@@ -7,6 +7,7 @@ import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { toUrl } from '@/lib/utils';
 import { edit as editAi } from '@/routes/ai';
 import { edit as editAppearance } from '@/routes/appearance';
+import { edit as editNotifications } from '@/routes/notification-preferences';
 import { edit as editPrivacy } from '@/routes/privacy';
 import { edit as editProfile } from '@/routes/profile';
 import { edit as editSecurity } from '@/routes/security';
@@ -17,6 +18,7 @@ import { computed } from 'vue';
 const sidebarNavItems = computed<NavItem[]>(() => [
     { title: trans('nav.account'), href: editProfile() },
     { title: trans('nav.security'), href: editSecurity() },
+    { title: trans('nav.notifications'), href: editNotifications() },
     { title: trans('nav.privacy'), href: editPrivacy() },
     { title: trans('nav.ai'), href: editAi() },
     { title: trans('nav.appearance'), href: editAppearance() },

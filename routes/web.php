@@ -2,11 +2,14 @@
 
 declare(strict_types=1);
 
+use App\Modules\Alerts\Http\Controllers\AlertController;
+use App\Modules\Alerts\Http\Controllers\UnsubscribeController;
 use App\Modules\Applications\Http\Controllers\ApplicationController;
 use App\Modules\Applications\Http\Controllers\QuickApplyController;
 use App\Modules\Applications\Http\Controllers\SavedJobController;
 use App\Modules\Identity\Http\Controllers\OAuthController;
 use App\Modules\Jobs\Http\Controllers\JobController;
+use App\Modules\Notifications\Http\Controllers\NotificationController;
 use App\Modules\Profiles\Domain\Enums\QuestionnaireStep;
 use App\Modules\Profiles\Domain\Enums\SkillSource;
 use App\Modules\Profiles\Http\Controllers\CvDocumentController;
@@ -34,6 +37,12 @@ Route::inertia('privacy', 'legal/Privacy', ['retention' => [
     'months' => (string) config('privacy.retention.inactive_cv_text_months'),
 ]])->name('legal.privacy');
 Route::inertia('terms', 'legal/Terms')->name('legal.terms');
+
+// One-click unsubscribe from alert e-mails: signed links, no sign-in needed.
+Route::middleware(['signed', 'throttle:30,1'])->group(function () {
+    Route::get('alerts/{savedSearch}/unsubscribe', [UnsubscribeController::class, 'show'])->name('alerts.unsubscribe');
+    Route::post('alerts/{savedSearch}/unsubscribe', [UnsubscribeController::class, 'oneClick'])->name('alerts.unsubscribe.one-click');
+});
 
 Route::middleware('throttle:oauth')->group(function () {
     Route::get('auth/{provider}/redirect', [OAuthController::class, 'redirect'])->name('oauth.redirect');
@@ -68,6 +77,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('profile/cv/{cv}', [CvDocumentController::class, 'download'])->name('career.cv.download');
     Route::patch('profile/cv/{cv}/primary', [CvDocumentController::class, 'primary'])->name('career.cv.primary');
     Route::delete('profile/cv/{cv}', [CvDocumentController::class, 'destroy'])->name('career.cv.destroy');
+
+    // Saved-search alerts and the notification centre.
+    Route::get('alerts', [AlertController::class, 'index'])->name('alerts.index');
+    Route::post('alerts', [AlertController::class, 'store'])->middleware('throttle:30,1')->name('alerts.store');
+    Route::put('alerts/{alert}', [AlertController::class, 'update'])->name('alerts.update');
+    Route::delete('alerts/{alert}', [AlertController::class, 'destroy'])->name('alerts.destroy');
+    Route::get('notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::get('notifications/latest', [NotificationController::class, 'latest'])->name('notifications.latest');
+    Route::post('notifications/read-all', [NotificationController::class, 'readAll'])->name('notifications.read-all');
+    Route::post('notifications/{notification}/read', [NotificationController::class, 'read'])->whereUuid('notification')->name('notifications.read');
 
     // Skills questionnaire (onboarding): one step per request, editable later.
     Route::get('onboarding', [OnboardingController::class, 'show'])->name('onboarding.show');
