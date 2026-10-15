@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["required_skills", "nice_to_have_skills", "min_years_experience", "seniority", "languages", "education", "certifications", "location", "asks_for", "language"],
+  "properties": {
+    "required_skills": {
+      "type": "array",
+      "maxItems": 25,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "min_years"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1, "maxLength": 60},
+          "min_years": {"type": ["number", "null"], "minimum": 0, "maximum": 30}
+        }
+      }
+    },
+    "nice_to_have_skills": {
+      "type": "array",
+      "maxItems": 25,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name"],
+        "properties": {"name": {"type": "string", "minLength": 1, "maxLength": 60}}
+      }
+    },
+    "min_years_experience": {"type": ["integer", "null"], "minimum": 0, "maximum": 30},
+    "seniority": {"enum": ["intern", "junior", "mid", "senior", "lead", "manager", "director", "executive", null]},
+    "languages": {
+      "type": "array",
+      "maxItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["code", "level", "required"],
+        "properties": {
+          "code": {"type": "string", "pattern": "^[a-z]{2,3}$"},
+          "level": {"enum": ["A1", "A2", "B1", "B2", "C1", "C2", "native", null]},
+          "required": {"type": "boolean"}
+        }
+      }
+    },
+    "education": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["degree_required", "field"],
+      "properties": {
+        "degree_required": {"type": "boolean"},
+        "field": {"type": ["string", "null"], "maxLength": 100}
+      }
+    },
+    "certifications": {"type": "array", "maxItems": 10, "items": {"type": "string", "maxLength": 100}},
+    "location": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["exclusive", "countries", "regions", "utc_offset_min", "utc_offset_max"],
+      "properties": {
+        "exclusive": {"type": "boolean"},
+        "countries": {"type": "array", "maxItems": 60, "items": {"type": "string", "pattern": "^[A-Z]{2}$"}},
+        "regions": {"type": "array", "items": {"enum": ["EUROPE", "EU", "EMEA", "NORTH_AMERICA", "LATAM", "AMERICAS", "APAC", "ASIA", "AFRICA", "MIDDLE_EAST", "OCEANIA"]}},
+        "utc_offset_min": {"type": ["integer", "null"], "minimum": -12, "maximum": 14},
+        "utc_offset_max": {"type": ["integer", "null"], "minimum": -12, "maximum": 14}
+      }
+    },
+    "asks_for": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["cover_letter", "github", "portfolio", "salary_expectations", "additional_questions"],
+      "properties": {
+        "cover_letter": {"type": "boolean"},
+        "github": {"type": "boolean"},
+        "portfolio": {"type": "boolean"},
+        "salary_expectations": {"type": "boolean"},
+        "additional_questions": {"type": "boolean"}
+      }
+    },
+    "language": {"type": ["string", "null"], "pattern": "^[a-z]{2}$"}
+  }
+}

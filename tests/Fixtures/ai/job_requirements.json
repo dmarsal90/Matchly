@@ -1,0 +1,12 @@
+{
+  "required_skills": [{"name": "Vue.js", "min_years": 3}, {"name": "TypeScript", "min_years": null}, {"name": "vue", "min_years": null}],
+  "nice_to_have_skills": [{"name": "Nuxt"}, {"name": "Cypress"}],
+  "min_years_experience": 4,
+  "seniority": "senior",
+  "languages": [{"code": "en", "level": "C1", "required": true}],
+  "education": {"degree_required": false, "field": null},
+  "certifications": [],
+  "location": {"exclusive": true, "countries": [], "regions": ["EU"], "utc_offset_min": 0, "utc_offset_max": 2},
+  "asks_for": {"cover_letter": true, "github": false, "portfolio": true, "salary_expectations": false, "additional_questions": false},
+  "language": "en"
+}

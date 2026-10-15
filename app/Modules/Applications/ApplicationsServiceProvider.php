@@ -1,0 +1,28 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Modules\Applications;
+
+use App\Modules\Applications\Application\Privacy\ApplicationDataContributor;
+use App\Modules\Applications\Domain\Contracts\ApplicationAssistant;
+use App\Modules\Applications\Infrastructure\Assistant\PackageFormFields;
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
+use Illuminate\Support\ServiceProvider;
+
+final class ApplicationsServiceProvider extends ServiceProvider
+{
+    public function register(): void
+    {
+        $this->app->tag([ApplicationDataContributor::class], 'personal-data');
+        $this->app->bind(ApplicationAssistant::class, PackageFormFields::class);
+    }
+
+    public function boot(): void
+    {
+        // Each package can make two AI calls (CV and letter).
+        RateLimiter::for('quick-apply', fn (Request $request): Limit => Limit::perHour(20)->by((string) ($request->user()?->getAuthIdentifier() ?? $request->ip())));
+    }
+}

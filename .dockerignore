@@ -1,0 +1,58 @@
+# VCS, editors, local tooling
+.git
+.github
+.gitignore
+.gitattributes
+.idea
+.vscode
+.fleet
+.zed
+.claude
+.remember
+README.md
+CHANGELOG.md
+docs
+
+# Dependencies (installed inside the image)
+node_modules
+vendor
+
+# Secrets and local environment
+.env
+.env.*
+!.env.example
+auth.json
+
+# Build output and runtime state
+public/build
+public/hot
+public/storage
+bootstrap/cache/*.php
+bootstrap/ssr
+storage/logs/*
+storage/framework/cache/*
+storage/framework/sessions/*
+storage/framework/views/*
+storage/framework/testing
+storage/app/private/*
+storage/app/public/*
+storage/pail
+!storage/**/.gitignore
+database/*.sqlite
+lang/php_*.json
+resources/js/actions
+resources/js/routes
+resources/js/wayfinder
+
+# Tests and reports
+tests
+coverage
+playwright-report
+test-results
+blob-report
+.phpunit.cache
+.phpunit.result.cache
+
+# Docker files that are not needed in the build context
+docker-compose*.yml
+Makefile
