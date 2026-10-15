@@ -7,6 +7,7 @@ use App\Modules\Identity\Http\Controllers\PrivacyController;
 use App\Modules\Identity\Http\Controllers\Settings\ProfileController;
 use App\Modules\Identity\Http\Controllers\Settings\SecurityController;
 use App\Modules\Identity\Http\Middleware\RequirePasswordIfSet;
+use App\Modules\Notifications\Http\Controllers\NotificationPreferencesController;
 use Illuminate\Support\Facades\Route;
 
 Route::middleware(['auth'])->group(function () {
@@ -31,6 +32,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('settings/privacy', [PrivacyController::class, 'edit'])->name('privacy.edit');
     Route::put('settings/privacy/consent', [PrivacyController::class, 'updateConsent'])->name('privacy.consent');
+    Route::get('settings/notifications', [NotificationPreferencesController::class, 'edit'])->name('notification-preferences.edit');
+    Route::put('settings/notifications', [NotificationPreferencesController::class, 'update'])->name('notification-preferences.update');
+
     Route::get('settings/ai', [AiSettingsController::class, 'edit'])->name('ai.edit');
     Route::put('settings/ai/key', [AiSettingsController::class, 'update'])->middleware('throttle:10,1')->name('ai.key.update');
     Route::delete('settings/ai/key', [AiSettingsController::class, 'destroy'])->name('ai.key.destroy');

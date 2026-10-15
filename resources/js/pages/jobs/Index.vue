@@ -16,7 +16,11 @@ import FilterPanel from '@/features/jobs/components/FilterPanel.vue';
 import JobCard from '@/features/jobs/components/JobCard.vue';
 import JobGroup from '@/features/jobs/components/JobGroup.vue';
 import JobListSkeleton from '@/features/jobs/components/JobListSkeleton.vue';
-import { useJobFilters } from '@/features/jobs/composables/useJobFilters';
+import SaveSearchDialog from '@/features/alerts/components/SaveSearchDialog.vue';
+import {
+    toQuery,
+    useJobFilters,
+} from '@/features/jobs/composables/useJobFilters';
 import type {
     Job,
     JobFilters,
@@ -27,9 +31,15 @@ import type {
 import { show as questionnaire } from '@/routes/onboarding';
 import { index as jobsIndex } from '@/routes/jobs';
 import { Head, Link } from '@inertiajs/vue3';
-import { SearchX, SlidersHorizontal, Search, Sparkles } from '@lucide/vue';
+import {
+    BellPlus,
+    SearchX,
+    SlidersHorizontal,
+    Search,
+    Sparkles,
+} from '@lucide/vue';
 import { trans, transChoice } from 'laravel-vue-i18n';
-import { computed, toRef } from 'vue';
+import { computed, ref, toRef } from 'vue';
 
 const props = defineProps<{
     jobs: JobPage;
@@ -41,6 +51,7 @@ const props = defineProps<{
         search_query: Record<string, string> | null;
         has_matches: boolean;
         quick_apply: QuickApplyOptions;
+        email_alerts: boolean;
     } | null;
 }>();
 
@@ -91,6 +102,19 @@ const sortOptions = computed(() =>
     props.options.sort.filter((sort) => sort !== 'match' || props.viewer),
 );
 const TABS = [null, 'recommended'] as const;
+
+const savingSearch = ref(false);
+const currentSearch = computed(() => {
+    // Only what defines the search; paging, order and view are not part of an alert.
+    const query = toQuery(state, props.options.default_per_page);
+    delete query.page;
+    delete query.sort;
+    delete query.group;
+    delete query.per_page;
+    delete query.tab;
+
+    return query;
+});
 
 function onToggle(key: MultiFilterKey, value: string): void {
     toggle(key, value);
@@ -212,6 +236,23 @@ function onSet(key: keyof JobFilters, value: string | number | null): void {
                             })
                         }}
                     </p>
+
+                    <Button
+                        v-if="viewer"
+                        variant="outline"
+                        size="sm"
+                        :title="trans('alerts.save_search_hint')"
+                        @click="savingSearch = true"
+                    >
+                        <BellPlus class="size-4" aria-hidden="true" />
+                        {{ trans('alerts.save_search') }}
+                    </Button>
+                    <SaveSearchDialog
+                        v-if="viewer"
+                        v-model:open="savingSearch"
+                        :filters="currentSearch"
+                        :email-consented="viewer.email_alerts"
+                    />
 
                     <Button
                         v-if="viewer?.search_query"

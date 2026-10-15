@@ -55,6 +55,22 @@ final readonly class JobSearchQuery
     }
 
     /**
+     * Which of the given jobs match the filters (alerts check new jobs this way),
+     * newest first.
+     *
+     * @param  list<int>  $jobIds
+     * @return list<int>
+     */
+    public function matchingIds(JobFilters $filters, array $jobIds): array
+    {
+        if ($jobIds === []) {
+            return [];
+        }
+
+        return array_values(array_map(intval(...), $this->filtered($filters)->whereKey($jobIds)->latestFirst()->pluck('id')->all()));
+    }
+
+    /**
      * Totals per group over the whole filtered result (not just the page),
      * largest first. Keys are category/role values or source keys.
      *

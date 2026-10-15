@@ -33,6 +33,7 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import UserMenuContent from '@/components/UserMenuContent.vue';
+import NotificationBell from '@/features/alerts/components/NotificationBell.vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { getInitials } from '@/composables/useInitials';
 import { toUrl } from '@/lib/utils';
@@ -220,6 +221,7 @@ const { main: mainNavItems, secondary: rightNavItems } = useNavigation();
                         </div>
                     </div>
 
+                    <NotificationBell v-if="auth.user" />
                     <DropdownMenu v-if="auth.user">
                         <DropdownMenuTrigger :as-child="true">
                             <Button

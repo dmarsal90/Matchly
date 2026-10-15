@@ -17,3 +17,7 @@ Schedule::command('horizon:snapshot')->everyFiveMinutes();
 Schedule::command('queue:prune-failed --hours=168')->daily();
 
 Schedule::command('privacy:prune')->dailyAt('04:00')->onOneServer();
+
+// Saved-search digests (immediate alerts are sent as jobs arrive).
+Schedule::command('alerts:digest daily')->dailyAt('08:00')->onOneServer();
+Schedule::command('alerts:digest weekly')->weeklyOn(1, '08:00')->onOneServer();

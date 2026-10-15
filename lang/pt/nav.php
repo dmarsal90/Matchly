@@ -5,6 +5,8 @@ declare(strict_types=1);
 return [
     'jobs' => 'Vagas',
     'skills' => 'Competências',
+    'alerts' => 'Alertas',
+    'notifications' => 'Notificações',
     'applications' => 'Minhas vagas',
     'dashboard' => 'Painel',
     'profile' => 'Perfil profissional',

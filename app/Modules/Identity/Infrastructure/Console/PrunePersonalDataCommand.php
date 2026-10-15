@@ -13,6 +13,7 @@ use Carbon\CarbonImmutable;
 use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
+use Illuminate\Notifications\DatabaseNotification;
 
 #[Signature('privacy:prune')]
 #[Description('Apply data-retention rules (config/privacy.php)')]
@@ -47,7 +48,13 @@ final class PrunePersonalDataCommand extends Command
             ->where('updated_at', '<', CarbonImmutable::now()->subDays((int) config('privacy.retention.unreviewed_import_days')))
             ->delete();
 
-        $this->components->info("Deleted {$deleted} unverified accounts; cleared extracted text of {$cleared} CVs from inactive accounts; discarded {$discarded} unreviewed imports.");
+        // Read notifications are kept for a while for reference, then removed.
+        $notifications = DatabaseNotification::query()
+            ->whereNotNull('read_at')
+            ->where('created_at', '<', CarbonImmutable::now()->subDays((int) config('privacy.retention.read_notification_days')))
+            ->delete();
+
+        $this->components->info("Deleted {$notifications} old notifications; deleted {$deleted} unverified accounts; cleared extracted text of {$cleared} CVs from inactive accounts; discarded {$discarded} unreviewed imports.");
 
         return self::SUCCESS;
     }

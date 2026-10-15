@@ -24,6 +24,7 @@ void createInertiaApp({
                 return null;
             // Public listing: the app shell when signed in, a light public shell otherwise.
             case name.startsWith('jobs/'):
+            case name === 'alerts/Unsubscribed':
                 return (page.props as { auth?: { user: unknown } }).auth?.user
                     ? AppLayout
                     : PublicLayout;

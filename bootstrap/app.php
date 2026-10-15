@@ -25,6 +25,9 @@ return Application::configure(basePath: dirname(__DIR__))
 
         $middleware->append(SecurityHeaders::class);
 
+        // Mail clients POST one-click unsubscribes without a session: the signed URL protects them.
+        $middleware->preventRequestForgery(except: ['alerts/*/unsubscribe']);
+
         $middleware->web(append: [
             SetLocale::class,
             HandleAppearance::class,

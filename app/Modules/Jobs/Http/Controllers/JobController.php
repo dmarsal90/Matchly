@@ -71,6 +71,7 @@ final class JobController
                 'search_query' => $user->profile?->searchProfile()?->toListingQuery() ?: null,
                 'has_matches' => JobMatch::query()->where('user_id', $user->id)->exists(),
                 'quick_apply' => $this->quickApplyOptions($user, $ai),
+                'email_alerts' => $user->acceptsEmailAlerts(),
             ] : null,
         ]);
     }

@@ -1,10 +1,18 @@
+import { index as alerts } from '@/routes/alerts';
 import { index as applications } from '@/routes/applications';
 import { edit as editCareer } from '@/routes/career';
 import { index as jobs } from '@/routes/jobs';
 import { index as skills } from '@/routes/skills';
 import type { NavItem } from '@/types';
 import { usePage } from '@inertiajs/vue3';
-import { Briefcase, Shield, Sparkles, Star, UserRound } from '@lucide/vue';
+import {
+    BellRing,
+    Briefcase,
+    Shield,
+    Sparkles,
+    Star,
+    UserRound,
+} from '@lucide/vue';
 import { trans } from 'laravel-vue-i18n';
 import type { ComputedRef } from 'vue';
 import { computed } from 'vue';
@@ -19,6 +27,7 @@ export function useNavigation(): {
     const main = computed<NavItem[]>(() => [
         { title: trans('nav.jobs'), href: jobs(), icon: Briefcase },
         { title: trans('nav.applications'), href: applications(), icon: Star },
+        { title: trans('nav.alerts'), href: alerts(), icon: BellRing },
         { title: trans('nav.profile'), href: editCareer(), icon: UserRound },
         { title: trans('nav.skills'), href: skills(), icon: Sparkles },
     ]);
