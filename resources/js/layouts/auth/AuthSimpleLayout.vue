@@ -1,7 +1,7 @@
 <script setup lang="ts">
 // Titles arrive as translation keys (page layout options are static).
 import { trans } from 'laravel-vue-i18n';
-import { Link } from '@inertiajs/vue3';
+import { Link, usePage } from '@inertiajs/vue3';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { home } from '@/routes';
 
@@ -9,6 +9,8 @@ defineProps<{
     title?: string;
     description?: string;
 }>();
+
+const page = usePage();
 </script>
 
 <template>
@@ -29,7 +31,7 @@ defineProps<{
                                 class="size-9 fill-current text-[var(--foreground)] dark:text-white"
                             />
                         </div>
-                        <span class="sr-only">{{ trans(title ?? '') }}</span>
+                        <span class="sr-only">{{ page.props.name }}</span>
                     </Link>
                     <div class="space-y-2 text-center">
                         <h1 class="text-xl font-medium">

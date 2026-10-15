@@ -7,11 +7,11 @@ EXEC    := $(COMPOSE) exec app
 RUN     := $(COMPOSE) run --rm --no-deps app
 
 .PHONY: help setup up down build rebuild restart ps logs shell tinker \
-        migrate fresh seed test test-php test-js lint lint-php lint-js \
+        migrate fresh seed test test-php test-js e2e e2e-install coverage lint lint-php lint-js \
         analyse types format check horizon-restart composer npm prod-image
 
 help: ## List available commands
-	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z_-]+:.*##/ {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
+	@awk 'BEGIN {FS = ":.*##"} /^[a-zA-Z0-9_-]+:.*##/ {printf "  \033[36m%-16s\033[0m %s\n", $$1, $$2}' $(MAKEFILE_LIST)
 
 setup: ## First run: create .env, build images, install dependencies, start the stack
 	@sh docker/scripts/init-env.sh
@@ -67,6 +67,16 @@ test-php: ## Run Pest (pass args: make test-php a="--filter=Locale")
 
 test-js: ## Run Vitest
 	$(EXEC) npm run test
+
+e2e: ## End-to-end tests with Playwright on their own database (make e2e a="--headed")
+	$(EXEC) npm run build
+	npx playwright test $(a)
+
+e2e-install: ## Install the Playwright browser on the host (once)
+	npx playwright install chromium
+
+coverage: ## PHP coverage report; fails under 90%
+	$(COMPOSE) exec -e XDEBUG_MODE=coverage app php artisan test --compact --coverage --min=90
 
 lint: lint-php lint-js ## Check code style (Pint, ESLint, Prettier)
 
