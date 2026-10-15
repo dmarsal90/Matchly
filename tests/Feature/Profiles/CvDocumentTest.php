@@ -10,6 +10,7 @@ use App\Modules\Profiles\Infrastructure\Queue\ExtractCvTextJob;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Queue;
 use Illuminate\Support\Facades\Storage;
+use Inertia\Testing\AssertableInertia as Assert;
 
 beforeEach(function (): void {
     Storage::fake('local');
@@ -154,4 +155,19 @@ it('switches the primary CV', function (): void {
     $this->actingAs($user)->patch("/profile/cv/{$second->id}/primary")->assertRedirect();
 
     expect($first->refresh()->is_primary)->toBeFalse()->and($second->refresh()->is_primary)->toBeTrue();
+});
+
+it('lists the CVs on the profile page without exposing their contents', function (): void {
+    $user = User::factory()->create();
+    $this->actingAs($user)->post('/profile/cv', ['file' => pdfUpload(), 'consent' => '1'])->assertSessionHasNoErrors();
+
+    $this->actingAs($user)->get('/profile')
+        ->assertInertia(fn (Assert $page) => $page
+            ->has('cvDocuments', 1)
+            ->where('cvDocuments.0.name', 'cv.pdf')
+            ->where('cvDocuments.0.type', 'pdf')
+            ->where('cvDocuments.0.status', CvStatus::Extracted->value)
+            ->where('cvDocuments.0.is_primary', true)
+            ->missing('cvDocuments.0.path')
+            ->missing('cvDocuments.0.extracted_text'));
 });
