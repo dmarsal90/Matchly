@@ -11,10 +11,6 @@ import { configureEcho } from '@laravel/echo-vue';
 import { i18nVue } from 'laravel-vue-i18n';
 import { createPinia } from 'pinia';
 
-configureEcho({
-    broadcaster: 'reverb',
-});
-
 void createInertiaApp({
     title: pageTitle,
     layout: (name, page) => {
@@ -38,6 +34,21 @@ void createInertiaApp({
     },
     withApp: (app, { page }) => {
         setAppName(page.props.name);
+
+        // The websocket address comes from the server, not from build-time
+        // variables, so the same bundle works in every environment.
+        const reverb = page.props.reverb;
+        if (reverb) {
+            configureEcho({
+                broadcaster: 'reverb',
+                key: reverb.key,
+                wsHost: reverb.host,
+                wsPort: reverb.port,
+                wssPort: reverb.port,
+                forceTLS: reverb.scheme === 'https',
+                enabledTransports: ['ws', 'wss'],
+            });
+        }
 
         app.use(createPinia());
         app.use(i18nVue, {

@@ -15,7 +15,7 @@ import {
     readAll,
 } from '@/routes/notifications';
 import { Link, router, usePage } from '@inertiajs/vue3';
-import { useEchoNotification } from '@laravel/echo-vue';
+import { echoIsConfigured, useEchoNotification } from '@laravel/echo-vue';
 import { Bell } from '@lucide/vue';
 import { getActiveLanguage, trans, transChoice } from 'laravel-vue-i18n';
 import { computed, ref, watch } from 'vue';
@@ -92,8 +92,9 @@ function markAllRead(): void {
     );
 }
 
-// New matching jobs arrive over the private channel while the app is open.
-if (userId.value) {
+// New matching jobs arrive over the private channel while the app is open
+// (when the server has real time on; otherwise the count updates per visit).
+if (userId.value && echoIsConfigured()) {
     useEchoNotification<JobAlertData>(
         `users.${userId.value}`,
         (payload) => {

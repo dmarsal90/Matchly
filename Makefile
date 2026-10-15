@@ -7,7 +7,7 @@ EXEC    := $(COMPOSE) exec app
 RUN     := $(COMPOSE) run --rm --no-deps app
 
 .PHONY: help setup up down build rebuild restart ps logs shell tinker \
-        migrate fresh seed test test-php test-js e2e e2e-install coverage lint lint-php lint-js \
+        migrate fresh seed test test-php test-js test-pgsql e2e e2e-install coverage lint lint-php lint-js \
         analyse types format check horizon-restart composer npm prod-image
 
 help: ## List available commands
@@ -64,6 +64,10 @@ test: test-php test-js ## Run PHP and JS test suites
 
 test-php: ## Run Pest (pass args: make test-php a="--filter=Locale")
 	$(EXEC) php artisan test --compact $(a)
+
+test-pgsql: ## Run Pest on PostgreSQL (database app_testing), as CI does
+	@$(COMPOSE) exec -T postgres sh -c 'psql -U "$$POSTGRES_USER" -d "$$POSTGRES_DB" -tAc "SELECT 1 FROM pg_database WHERE datname = '"'"'app_testing'"'"'" | grep -q 1 || createdb -U "$$POSTGRES_USER" app_testing'
+	$(COMPOSE) exec -e TEST_DB_CONNECTION=pgsql -e TEST_DB_DATABASE=app_testing app php artisan test --compact $(a)
 
 test-js: ## Run Vitest
 	$(EXEC) npm run test

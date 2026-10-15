@@ -57,7 +57,7 @@ Los tests usan SQLite en memoria (`phpunit.xml`) y no necesitan servicios.
 
 | Capa | Herramienta | Qué cubre |
 | --- | --- | --- |
-| Unitarios y de feature | Pest (`tests/Unit`, `tests/Feature`) | Normalizadores de proveedores, clasificador, puntuación, ZIP de LinkedIn con fixtures, Actions y endpoints. IA, GitHub y HTTP externo con `Http::fake`. SQLite en memoria. |
+| Unitarios y de feature | Pest (`tests/Unit`, `tests/Feature`) | Normalizadores de proveedores, clasificador, puntuación, ZIP de LinkedIn con fixtures, Actions y endpoints. IA, GitHub y HTTP externo con `Http::fake`. SQLite en memoria y, en CI, también PostgreSQL (`make test-pgsql`). |
 | Arquitectura | Pest (`tests/Architecture`) | Fronteras entre módulos, `strict_types`, marca solo desde `APP_NAME`, sin texto fijo en las plantillas Vue y mismas claves en es/en/pt. |
 | Frontend | Vitest | Composables y utilidades de `resources/js`. |
 | End-to-end | Playwright (`tests/e2e`) | Registro con verificación por correo, cuestionario, importación de LinkedIn, búsqueda (texto completo de PostgreSQL) y filtros en escritorio y móvil, recomendaciones, solicitud rápida con PDF, alertas con resumen por correo y baja en un clic, y WCAG 2.2 AA con axe en modo claro y oscuro. |
@@ -119,4 +119,27 @@ Cómo añadir una fuente: [docs/adding-a-job-provider.md](docs/adding-a-job-prov
 
 El código de negocio vive en `app/Modules/<Dominio>/{Domain,Application,Infrastructure,Http}`. Los tests de `tests/Architecture` hacen cumplir las fronteras: `Domain` no depende del framework, los controladores no tocan la base de datos y todo archivo declara `strict_types`.
 
-La documentación completa de arquitectura, cómo añadir proveedores de empleo o de IA y el despliegue (Laravel Cloud, Railway/Render/Fly.io, VPS) se completa en la fase de CI/CD.
+Más detalle en [docs/architecture.md](docs/architecture.md): módulos, flujos (ingesta, compatibilidad, solicitud rápida, alertas), colas y privacidad.
+
+- [Añadir una fuente de ofertas](docs/adding-a-job-provider.md)
+- [Añadir un proveedor de IA](docs/adding-an-ai-provider.md)
+- [Entregabilidad del correo (SPF, DKIM, DMARC)](docs/email-deliverability.md)
+
+## CI/CD y despliegue
+
+- **CI** (`.github/workflows/ci.yml`, en cada PR): Pint, Larastan, Pest en SQLite y en PostgreSQL (con cobertura mínima del 90 %), ESLint, Prettier, vue-tsc, Vitest, build del frontend, Playwright y build de la imagen de producción.
+- **CD** (`.github/workflows/deploy.yml`, en `main`): publica la imagen en GHCR (`sha-<commit>` y `latest`), la escanea con Trivy y despliega en staging. Producción y los rollbacks se lanzan a mano con la etiqueta que quieras desplegar.
+- **Dependabot** para Composer, npm, GitHub Actions y Docker.
+
+La misma imagen sirve para todos los procesos y entornos. [docs/deployment.md](docs/deployment.md) explica cada destino:
+
+| Destino | Ficheros |
+| --- | --- |
+| VPS con Docker Compose (Caddy + HTTPS, backups diarios, rotación de logs) | `docker-compose.prod.yml`, `deploy/vps/`, `deploy/env.production.example` |
+| Laravel Cloud · Laravel Forge | pasos en la guía |
+| Render | `deploy/render.yaml` (Blueprint) |
+| Fly.io | `deploy/fly.toml` |
+| Railway | pasos en la guía |
+| Demo mínima (un servicio, cola `sync`, cron externo) | pasos en la guía |
+
+La guía también cubre cómo escalar los workers por separado, el rollback y la restauración de backups. `GET /up` es el endpoint de salud que usan los healthchecks y los balanceadores.

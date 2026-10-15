@@ -22,7 +22,7 @@ if [ "${E2E_DB_DATABASE:-app_e2e}" = "${DB_DATABASE:-}" ]; then
 fi
 export DB_DATABASE="${E2E_DB_DATABASE:-app_e2e}"
 export QUEUE_CONNECTION=sync
-export BROADCAST_CONNECTION=log
+export BROADCAST_CONNECTION="${E2E_BROADCAST_CONNECTION:-log}"
 export CACHE_STORE=array
 export SESSION_DRIVER=file
 export SESSION_ENCRYPT=false

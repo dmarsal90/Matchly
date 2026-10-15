@@ -1,0 +1,174 @@
+# Render Blueprint: web, Horizon, scheduler and Reverb from the image CI publishes
+# to GHCR, with managed PostgreSQL and Key Value (Redis). docs/deployment.md#render
+#
+# New > Blueprint > this repository, Blueprint path "deploy/render.yaml". Then fill
+# the "sync: false" values in the dashboard and copy each service's deploy hook
+# into the GitHub environment secret DEPLOY_HOOK_URL (one hook per service, or
+# one hook plus "Auto-Deploy: On commit" off for the rest).
+#
+# Private GHCR package: add a registry credential in Render and reference it
+# below (image.creds.fromRegistryCreds), or make the package public.
+
+envVarGroups:
+  - name: matchly
+    envVars:
+      - key: APP_NAME
+        value: Matchly
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: 'false'
+      - key: APP_KEY
+        sync: false # php artisan key:generate --show
+      - key: APP_URL
+        sync: false # https://<web service>.onrender.com or your domain
+      - key: TRUSTED_PROXIES
+        value: '*'
+      - key: SECURITY_CSP_ENABLED
+        value: 'true'
+      - key: SECURITY_HSTS_ENABLED
+        value: 'true'
+      - key: LOG_CHANNEL
+        value: stderr
+      - key: CACHE_STORE
+        value: redis
+      - key: QUEUE_CONNECTION
+        value: redis
+      - key: SESSION_DRIVER
+        value: redis
+      - key: SESSION_SECURE_COOKIE
+        value: 'true'
+      - key: BROADCAST_CONNECTION
+        value: reverb
+      - key: REVERB_APP_ID
+        sync: false
+      - key: REVERB_APP_KEY
+        sync: false
+      - key: REVERB_APP_SECRET
+        sync: false
+      # PHP reaches Reverb over Render's private network…
+      - key: REVERB_HOST
+        value: matchly-reverb
+      - key: REVERB_PORT
+        value: '8080'
+      - key: REVERB_SCHEME
+        value: http
+      # …and browsers through its public URL.
+      - key: REVERB_PUBLIC_HOST
+        sync: false # matchly-reverb.onrender.com
+      - key: REVERB_PUBLIC_PORT
+        value: '443'
+      - key: REVERB_PUBLIC_SCHEME
+        value: https
+      - key: SECURITY_CSP_CONNECT_SRC
+        sync: false # wss://matchly-reverb.onrender.com
+      - key: MAIL_MAILER
+        value: resend
+      - key: RESEND_API_KEY
+        sync: false
+      - key: MAIL_FROM_ADDRESS
+        sync: false
+      # Render disks attach to one service only: keep user files on S3.
+      - key: USER_FILES_DISK
+        value: s3
+      - key: AWS_ACCESS_KEY_ID
+        sync: false
+      - key: AWS_SECRET_ACCESS_KEY
+        sync: false
+      - key: AWS_DEFAULT_REGION
+        sync: false
+      - key: AWS_BUCKET
+        sync: false
+      - key: AWS_ENDPOINT
+        sync: false
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: GITHUB_API_TOKEN
+        sync: false
+
+services:
+  - type: web
+    name: matchly-web
+    runtime: image
+    image:
+      url: ghcr.io/dmarsal90/matchly:latest
+    dockerCommand: web
+    healthCheckPath: /up
+    plan: starter
+    region: frankfurt
+    autoDeploy: false
+    envVars:
+      - fromGroup: matchly
+      - key: PORT
+        value: '8080'
+      - key: RUN_MIGRATIONS
+        value: 'true'
+      - key: DB_URL
+        fromDatabase: { name: matchly-db, property: connectionString }
+      - key: REDIS_URL
+        fromService: { type: keyvalue, name: matchly-redis, property: connectionString }
+
+  - type: worker
+    name: matchly-horizon
+    runtime: image
+    image:
+      url: ghcr.io/dmarsal90/matchly:latest
+    dockerCommand: horizon
+    plan: starter
+    region: frankfurt
+    autoDeploy: false
+    envVars:
+      - fromGroup: matchly
+      - key: DB_URL
+        fromDatabase: { name: matchly-db, property: connectionString }
+      - key: REDIS_URL
+        fromService: { type: keyvalue, name: matchly-redis, property: connectionString }
+
+  - type: worker
+    name: matchly-scheduler
+    runtime: image
+    image:
+      url: ghcr.io/dmarsal90/matchly:latest
+    dockerCommand: scheduler
+    plan: starter
+    region: frankfurt
+    autoDeploy: false
+    envVars:
+      - fromGroup: matchly
+      - key: DB_URL
+        fromDatabase: { name: matchly-db, property: connectionString }
+      - key: REDIS_URL
+        fromService: { type: keyvalue, name: matchly-redis, property: connectionString }
+
+  - type: web
+    name: matchly-reverb
+    runtime: image
+    image:
+      url: ghcr.io/dmarsal90/matchly:latest
+    dockerCommand: reverb
+    plan: starter
+    region: frankfurt
+    autoDeploy: false
+    envVars:
+      - fromGroup: matchly
+      - key: PORT
+        value: '8080'
+      - key: REVERB_SERVER_PORT
+        value: '8080'
+      - key: REDIS_URL
+        fromService: { type: keyvalue, name: matchly-redis, property: connectionString }
+
+  - type: keyvalue
+    name: matchly-redis
+    plan: starter
+    region: frankfurt
+    maxmemoryPolicy: noeviction # queues must not be evicted
+    ipAllowList: [] # private network only
+
+databases:
+  - name: matchly-db
+    plan: basic-256mb
+    region: frankfurt
+    databaseName: matchly
+    user: matchly
+    postgresMajorVersion: '17'

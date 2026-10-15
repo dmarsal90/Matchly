@@ -231,7 +231,8 @@ it('skips postings outside the freshness window, on-site ones and broken URLs', 
 
     expect($report->skipped)->toBe(3)
         ->and($report->skipReasons)->toBe(['stale' => 1, 'invalid_url' => 1, 'work_mode' => 1])
-        ->and(IngestionRun::query()->sole()->skip_reasons)->toBe(['stale' => 1, 'invalid_url' => 1, 'work_mode' => 1])
+        // jsonb does not keep key order (PostgreSQL).
+        ->and(IngestionRun::query()->sole()->skip_reasons)->toEqual(['stale' => 1, 'invalid_url' => 1, 'work_mode' => 1])
         ->and(JobListing::query()->pluck('external_id')->all())->toBe(['4']);
 });
 
