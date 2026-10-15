@@ -5,6 +5,8 @@ import MatchScore from '@/features/jobs/components/MatchScore.vue';
 import SalaryLabel from '@/features/jobs/components/SalaryLabel.vue';
 import SaveJobButton from '@/features/jobs/components/SaveJobButton.vue';
 import { relativeTime } from '@/features/jobs/lib/format';
+import QuickApplyButton from '@/features/applications/components/QuickApplyButton.vue';
+import type { QuickApplyOptions } from '@/features/applications/types';
 import type { Job } from '@/features/jobs/types';
 import { show } from '@/routes/jobs';
 import { Link } from '@inertiajs/vue3';
@@ -12,7 +14,11 @@ import { Banknote, Clock, Eye, Globe2, MapPin } from '@lucide/vue';
 import { getActiveLanguage, trans } from 'laravel-vue-i18n';
 import { computed, ref } from 'vue';
 
-const props = defineProps<{ job: Job }>();
+const props = defineProps<{
+    job: Job;
+    /** Quick apply options for signed-in viewers; null for guests. */
+    quickApply?: QuickApplyOptions | null;
+}>();
 const emit = defineEmits<{ tag: [value: string] }>();
 
 const posted = computed(() =>
@@ -158,7 +164,13 @@ const logoFailed = ref(false);
                 :tracking-status="job.tracking_status"
             />
             <div class="flex flex-col items-end gap-1">
-                <ApplyButton :href="job.apply_url" />
+                <div class="flex flex-wrap justify-end gap-1.5">
+                    <QuickApplyButton
+                        :job="job"
+                        :options="quickApply ?? null"
+                    />
+                    <ApplyButton :href="job.apply_url" />
+                </div>
                 <a
                     :href="job.source.url"
                     target="_blank"

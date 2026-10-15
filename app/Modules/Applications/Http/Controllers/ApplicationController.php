@@ -8,6 +8,7 @@ use App\Modules\Applications\Application\Actions\UpdateApplication;
 use App\Modules\Applications\Domain\Enums\ApplicationStatus;
 use App\Modules\Applications\Http\Requests\UpdateApplicationRequest;
 use App\Modules\Applications\Infrastructure\Models\Application;
+use App\Modules\Applications\Infrastructure\Models\ApplicationPackage;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Jobs\Domain\Enums\JobStatus;
 use App\Modules\Jobs\Http\Resources\JobListingResource;
@@ -31,6 +32,14 @@ final class ApplicationController
             ->latest('status_changed_at')
             ->get();
 
+        $packages = ApplicationPackage::query()
+            ->where('user_id', $user->id)
+            ->whereIn('job_listing_id', $applications->pluck('job_listing_id'))
+            ->latest('id')
+            ->get(['id', 'job_listing_id', 'status'])
+            ->unique('job_listing_id')
+            ->keyBy('job_listing_id');
+
         return Inertia::render('applications/Index', [
             'applications' => $applications->map(fn (Application $application): array => [
                 'id' => $application->id,
@@ -40,6 +49,9 @@ final class ApplicationController
                 'applied_at' => $application->applied_at?->toIso8601String(),
                 'job_open' => $application->job->status === JobStatus::Open,
                 'job' => (new JobListingResource($application->job))->resolve($request),
+                'package' => isset($packages[$application->job_listing_id])
+                    ? ['id' => $packages[$application->job_listing_id]->id, 'status' => $packages[$application->job_listing_id]->status->value]
+                    : null,
             ])->values()->all(),
             'statuses' => array_column(ApplicationStatus::cases(), 'value'),
         ]);

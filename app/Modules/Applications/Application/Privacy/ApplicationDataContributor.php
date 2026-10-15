@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Applications\Application\Privacy;
 
 use App\Modules\Applications\Infrastructure\Models\Application;
+use App\Modules\Applications\Infrastructure\Models\ApplicationPackage;
 use App\Modules\Identity\Domain\Contracts\PersonalDataContributor;
 use App\Modules\Identity\Domain\Data\PersonalData;
 use Illuminate\Support\Facades\DB;
@@ -24,6 +25,16 @@ final class ApplicationDataContributor implements PersonalDataContributor
                 'created_at' => $application->created_at->toIso8601String(),
             ])->values()->all(),
             'viewed_jobs' => DB::table('job_views')->where('user_id', $userId)->count(),
+            'prepared_applications' => ApplicationPackage::query()->with('job:id,title,company')->where('user_id', $userId)->orderBy('id')->get()
+                ->map(fn (ApplicationPackage $package): array => [
+                    'job' => $package->job !== null ? "{$package->job->title} · {$package->job->company}" : null,
+                    'status' => $package->status->value,
+                    'language' => $package->language,
+                    'cover_letter' => $package->cover_letter,
+                    'resume' => $package->resume,
+                    'created_at' => $package->created_at->toIso8601String(),
+                    'approved_at' => $package->approved_at?->toIso8601String(),
+                ])->values()->all(),
         ]);
     }
 

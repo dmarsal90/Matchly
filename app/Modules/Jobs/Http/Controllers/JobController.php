@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Modules\Jobs\Http\Controllers;
 
+use App\Modules\AI\Application\AiGateway;
+use App\Modules\Applications\Infrastructure\Models\ApplicationPackage;
+use App\Modules\Identity\Domain\Enums\ConsentPurpose;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Jobs\Application\Actions\RecordJobView;
 use App\Modules\Jobs\Application\Queries\JobFilters;
@@ -38,7 +41,7 @@ use Inertia\Response;
  */
 final class JobController
 {
-    public function index(JobSearchRequest $request, JobSearchQuery $search, ViewerJobState $viewerState, #[CurrentUser] ?User $user): Response
+    public function index(JobSearchRequest $request, JobSearchQuery $search, ViewerJobState $viewerState, AiGateway $ai, #[CurrentUser] ?User $user): Response
     {
         $filters = $request->toFilters($user?->id);
         $jobs = $search->paginate($filters, $request->page());
@@ -67,11 +70,12 @@ final class JobController
                 'onboarding_completed' => $user->profile?->onboarding_completed_at !== null,
                 'search_query' => $user->profile?->searchProfile()?->toListingQuery() ?: null,
                 'has_matches' => JobMatch::query()->where('user_id', $user->id)->exists(),
+                'quick_apply' => $this->quickApplyOptions($user, $ai),
             ] : null,
         ]);
     }
 
-    public function show(Request $request, JobListing $job, RecordJobView $recordView, ViewerJobState $viewerState, JobMatchDetails $fit, #[CurrentUser] ?User $user): Response|RedirectResponse
+    public function show(Request $request, JobListing $job, RecordJobView $recordView, ViewerJobState $viewerState, JobMatchDetails $fit, AiGateway $ai, #[CurrentUser] ?User $user): Response|RedirectResponse
     {
         if ($job->duplicate_of_id !== null) {
             return to_route('jobs.show', ['job' => $job->duplicate_of_id], 301);
@@ -94,7 +98,25 @@ final class JobController
             'isOpen' => $job->status === JobStatus::Open,
             'requirements' => $details['requirements'],
             'match' => $details['match'],
+            'quickApply' => $user !== null ? [
+                ...$this->quickApplyOptions($user, $ai),
+                'packages' => ApplicationPackage::query()->where('user_id', $user->id)->where('job_listing_id', $job->id)->count(),
+                'latest_package_id' => ApplicationPackage::query()->where('user_id', $user->id)->where('job_listing_id', $job->id)->latest('id')->value('id'),
+            ] : null,
         ]);
+    }
+
+    /**
+     * What the quick apply dialog needs to offer the AI option.
+     *
+     * @return array{ai_available: bool, ai_consented: bool}
+     */
+    private function quickApplyOptions(User $user, AiGateway $ai): array
+    {
+        return [
+            'ai_available' => $ai->available($user),
+            'ai_consented' => $user->hasConsented(ConsentPurpose::AiProcessing),
+        ];
     }
 
     /**

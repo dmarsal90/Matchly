@@ -1,0 +1,11 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["greeting", "body", "closing"],
+  "properties": {
+    "greeting": {"type": "string", "minLength": 1, "maxLength": 120},
+    "body": {"type": "string", "minLength": 50, "maxLength": 4000},
+    "closing": {"type": "string", "minLength": 1, "maxLength": 80}
+  }
+}

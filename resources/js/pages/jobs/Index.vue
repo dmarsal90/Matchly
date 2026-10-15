@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import EmptyState from '@/components/EmptyState.vue';
+import type { QuickApplyOptions } from '@/features/applications/types';
 import Pagination from '@/components/Pagination.vue';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -39,6 +40,7 @@ const props = defineProps<{
         onboarding_completed: boolean;
         search_query: Record<string, string> | null;
         has_matches: boolean;
+        quick_apply: QuickApplyOptions;
     } | null;
 }>();
 
@@ -372,6 +374,7 @@ function onSet(key: keyof JobFilters, value: string | number | null): void {
                                 v-for="job in section.jobs"
                                 :key="job.id"
                                 :job="job"
+                                :quick-apply="viewer?.quick_apply ?? null"
                                 @tag="onToggle('tag', $event)"
                             />
                         </JobGroup>
@@ -381,6 +384,7 @@ function onSet(key: keyof JobFilters, value: string | number | null): void {
                             v-for="job in jobs.data"
                             :key="job.id"
                             :job="job"
+                            :quick-apply="viewer?.quick_apply ?? null"
                             @tag="onToggle('tag', $event)"
                         />
                     </div>

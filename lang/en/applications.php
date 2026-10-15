@@ -23,4 +23,5 @@ return [
     'applied_on' => 'Applied on :date',
     'job_closed' => 'Job closed',
     'count' => ':count',
+    'open_package' => 'Open prepared application',
 ];
