@@ -13,6 +13,7 @@
     "license": "MIT",
     "require": {
         "php": "^8.3",
+        "barryvdh/laravel-dompdf": "^3.1",
         "ezyang/htmlpurifier": "^4.19",
         "filament/filament": "^5.10",
         "inertiajs/inertia-laravel": "^3.0",

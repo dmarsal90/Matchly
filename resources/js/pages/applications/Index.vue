@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { NativeSelect } from '@/components/ui/native-select';
 import ApplyButton from '@/features/jobs/components/ApplyButton.vue';
+import { show as showPackage } from '@/routes/applications/packages';
 import type { Job } from '@/features/jobs/types';
 import {
     destroy,
@@ -14,7 +15,7 @@ import {
 } from '@/routes/applications';
 import { index as jobsIndex, show } from '@/routes/jobs';
 import { Head, Link, router } from '@inertiajs/vue3';
-import { Star, Trash2 } from '@lucide/vue';
+import { FileText, Star, Trash2 } from '@lucide/vue';
 import { getActiveLanguage, trans } from 'laravel-vue-i18n';
 import { computed, reactive } from 'vue';
 
@@ -26,6 +27,7 @@ type TrackedApplication = {
     applied_at: string | null;
     job_open: boolean;
     job: Job;
+    package: { id: number; status: string } | null;
 };
 
 const props = defineProps<{
@@ -192,10 +194,26 @@ const formatDate = (iso: string): string =>
                     </details>
 
                     <div class="flex items-center justify-between gap-2">
-                        <ApplyButton
-                            v-if="item.job_open"
-                            :href="item.job.apply_url"
-                        />
+                        <div class="flex flex-wrap items-center gap-2">
+                            <ApplyButton
+                                v-if="item.job_open"
+                                :href="item.job.apply_url"
+                            />
+                            <Button
+                                v-if="item.package"
+                                variant="outline"
+                                size="sm"
+                                as-child
+                            >
+                                <Link :href="showPackage(item.package.id)">
+                                    <FileText
+                                        class="size-4"
+                                        aria-hidden="true"
+                                    />
+                                    {{ trans('applications.open_package') }}
+                                </Link>
+                            </Button>
+                        </div>
                         <Button
                             variant="ghost"
                             size="icon"

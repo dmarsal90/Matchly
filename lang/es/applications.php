@@ -23,4 +23,5 @@ return [
     'applied_on' => 'Aplicaste el :date',
     'job_closed' => 'Oferta cerrada',
     'count' => ':count',
+    'open_package' => 'Ver solicitud preparada',
 ];

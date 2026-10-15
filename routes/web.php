@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Applications\Http\Controllers\ApplicationController;
+use App\Modules\Applications\Http\Controllers\QuickApplyController;
 use App\Modules\Applications\Http\Controllers\SavedJobController;
 use App\Modules\Identity\Http\Controllers\OAuthController;
 use App\Modules\Jobs\Http\Controllers\JobController;
@@ -47,6 +48,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('applications', [ApplicationController::class, 'index'])->name('applications.index');
     Route::patch('applications/{application}', [ApplicationController::class, 'update'])->name('applications.update');
     Route::delete('applications/{application}', [ApplicationController::class, 'destroy'])->name('applications.destroy');
+
+    // Quick apply: a package is prepared for review; the person applies on the employer's site.
+    Route::post('jobs/{job}/quick-apply', [QuickApplyController::class, 'start'])->whereNumber('job')->middleware('throttle:quick-apply')->name('jobs.quick-apply');
+    Route::get('applications/packages/{package}', [QuickApplyController::class, 'show'])->name('applications.packages.show');
+    Route::put('applications/packages/{package}', [QuickApplyController::class, 'update'])->name('applications.packages.update');
+    Route::post('applications/packages/{package}/approve', [QuickApplyController::class, 'approve'])->name('applications.packages.approve');
+    Route::post('applications/packages/{package}/applied', [QuickApplyController::class, 'applied'])->name('applications.packages.applied');
+    Route::post('applications/packages/{package}/retry', [QuickApplyController::class, 'retry'])->middleware('throttle:quick-apply')->name('applications.packages.retry');
+    Route::get('applications/packages/{package}/letter.txt', [QuickApplyController::class, 'letter'])->name('applications.packages.letter');
+    Route::get('applications/packages/{package}/resume.pdf', [QuickApplyController::class, 'resume'])->middleware('throttle:30,1')->name('applications.packages.resume');
+    Route::delete('applications/packages/{package}', [QuickApplyController::class, 'destroy'])->name('applications.packages.destroy');
 
     // Professional profile ("career"); account settings keep the starter kit's profile.* names.
     Route::get('profile', [ProfileController::class, 'edit'])->name('career.edit');

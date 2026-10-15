@@ -23,4 +23,5 @@ return [
     'applied_on' => 'Candidatura em :date',
     'job_closed' => 'Vaga encerrada',
     'count' => ':count',
+    'open_package' => 'Ver candidatura preparada',
 ];

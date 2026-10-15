@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["summary", "skills", "experience", "keywords"],
+  "properties": {
+    "summary": {"type": ["string", "null"], "maxLength": 700},
+    "skills": {"type": "array", "maxItems": 40, "items": {"type": "string", "minLength": 1, "maxLength": 60}},
+    "experience": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["index", "bullets"],
+        "properties": {
+          "index": {"type": "integer", "minimum": 0},
+          "bullets": {"type": "array", "maxItems": 10, "items": {"type": "string", "minLength": 1, "maxLength": 400}}
+        }
+      }
+    },
+    "keywords": {"type": "array", "maxItems": 30, "items": {"type": "string", "minLength": 1, "maxLength": 60}}
+  }
+}

@@ -13,10 +13,15 @@ enum AiTask: string
     case ExtractJobRequirements = 'extract_job_requirements';
     case StructureCv = 'structure_cv';
     case SummarizeGithub = 'summarize_github';
+    case TailorCv = 'tailor_cv';
+    case CoverLetter = 'cover_letter';
 
     public function tier(): ModelTier
     {
-        return ModelTier::Fast;
+        return match ($this) {
+            self::TailorCv, self::CoverLetter => ModelTier::Quality,
+            default => ModelTier::Fast,
+        };
     }
 
     public function maxOutputTokens(): int
@@ -25,6 +30,8 @@ enum AiTask: string
             self::ExtractJobRequirements => 1500,
             self::StructureCv => 4000,
             self::SummarizeGithub => 1200,
+            self::TailorCv => 3000,
+            self::CoverLetter => 1500,
         };
     }
 
@@ -35,6 +42,7 @@ enum AiTask: string
             self::ExtractJobRequirements => 12000,
             self::StructureCv => 20000,
             self::SummarizeGithub => 15000,
+            self::TailorCv, self::CoverLetter => 20000,
         };
     }
 

@@ -23,6 +23,8 @@ return [
             'extract_job_requirements' => 'Requisitos de ofertas',
             'structure_cv' => 'Estructurar CV',
             'summarize_github' => 'Resumen de GitHub',
+            'tailor_cv' => 'Adaptar CV',
+            'cover_letter' => 'Carta de presentación',
         ],
     ],
     'key' => [

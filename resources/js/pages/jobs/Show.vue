@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import QuickApplyButton from '@/features/applications/components/QuickApplyButton.vue';
+import type { QuickApplyOptions } from '@/features/applications/types';
 import ApplyButton from '@/features/jobs/components/ApplyButton.vue';
 import JobRequirementsPanel from '@/features/jobs/components/JobRequirementsPanel.vue';
 import MatchBreakdown from '@/features/jobs/components/MatchBreakdown.vue';
@@ -19,6 +21,7 @@ const props = defineProps<{
     isOpen: boolean;
     requirements: JobRequirements;
     match: JobMatch | null;
+    quickApply: QuickApplyOptions | null;
 }>();
 
 // Public page: guests see the requirements, signed-in users their score too.
@@ -108,6 +111,12 @@ const description = computed(() => `${props.job.title} · ${props.job.company}`)
                 <ApplyButton
                     v-if="isOpen"
                     :href="job.apply_url"
+                    size="default"
+                />
+                <QuickApplyButton
+                    v-if="isOpen"
+                    :job="job"
+                    :options="quickApply"
                     size="default"
                 />
                 <SaveJobButton
