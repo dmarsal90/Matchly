@@ -75,11 +75,13 @@ it('lets the user edit the search profile and keeps it on later changes', functi
         'roles' => ['fullstack'], 'technologies' => ['vue', 'unreal-engine'], 'seniorities' => ['senior'],
         'work_modes' => ['remote'], 'employment_types' => [], 'salary_min' => 70000, 'salary_currency' => 'USD', 'edited' => true,
     ];
-    expect($user->profile()->sole()->search_profile)->toBe($expected);
+    // jsonb does not keep key order (PostgreSQL): compare key/value pairs.
+    expect($user->profile()->sole()->search_profile)->toEqual($expected);
 
     // A later profile change does not overwrite the user's version…
     $this->put('/onboarding/role', ['target_roles' => ['qa'], 'seniority' => 'mid', 'years_experience' => 2]);
-    expect($user->profile()->sole()->search_profile)->toBe($expected);
+    // jsonb does not keep key order (PostgreSQL): compare key/value pairs.
+    expect($user->profile()->sole()->search_profile)->toEqual($expected);
 
     // …until they ask for a new suggestion.
     $this->post('/profile/search/regenerate')->assertRedirect();

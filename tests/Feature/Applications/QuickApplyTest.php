@@ -186,7 +186,8 @@ describe('with AI', function (): void {
             ->and($resume->keywords)->toBe(['Laravel'])
             ->and($package->letter_source->value)->toBe('ai')
             ->and($package->cover_letter)->toEndWith("Un saludo,\nAna García")
-            ->and($package->warnings)->toBe([
+            // jsonb does not keep key order (PostgreSQL): compare key/value pairs.
+            ->and($package->warnings)->toEqual([
                 ['key' => 'unbacked_skills', 'params' => ['skills' => 'Go, Kubernetes']],
                 ['key' => 'years_claim', 'params' => ['claimed' => '10', 'have' => '6']],
             ]);
