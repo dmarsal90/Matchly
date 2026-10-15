@@ -1,0 +1,148 @@
+{
+  "comments": "21/08/2026: Cursor pagination is now available and is the preferred way to page through the feed. Pass the nextCursor value from each response back as ?cursor=. It is faster than offset and will never return the same job twice. The offset parameter is deprecated and will be removed in a future release. 13/03/2026: The API has been updated to include the companySlug field in the response.",
+  "updatedAt": 1791982397,
+  "offset": 0,
+  "limit": 3,
+  "totalCount": 124687,
+  "jobs": [
+    {
+      "title": "Social Media Customer Care Specialist",
+      "excerpt": "Job SummaryCamping World's customers aren't just shoppers.",
+      "companyName": "Camping World",
+      "companySlug": "camping-world",
+      "companyLogo": "https://cdn-images.himalayas.app/2l73s2jq22bwjwqcwnleejdomzaw",
+      "employmentType": "Full Time",
+      "minSalary": 18.45,
+      "maxSalary": 22.14,
+      "salaryPeriod": "hourly",
+      "seniority": [
+        "Mid-level"
+      ],
+      "currency": "USD",
+      "locationRestrictions": [
+        "United States"
+      ],
+      "timezoneRestrictions": [
+        -10,
+        -9,
+        -8,
+        -7,
+        -6,
+        -5,
+        14
+      ],
+      "categories": [
+        "Social-Media-Specialist",
+        "Community-Manager",
+        "Customer-Service",
+        "Social-Media-Manager",
+        "Social-Media-Customer-Care",
+        "Social-Media-Customer-Service-Associate",
+        "Social-Media-Support-Agent",
+        "Social-Media-Response-Specialist",
+        "Social-Media-Customer-Support",
+        "Social-Media-Customer-Service"
+      ],
+      "parentCategories": [
+        "Marketing",
+        "Customer Service"
+      ],
+      "description": "<h3>Job Summary</h3><p><a href=\"https://himalayas.app/companies/camping-world\">Camping World</a>'s customers aren't just shoppers. They are a community of people who are passionate about the RV lifestyle, the outdoors, and the experiences that come with both. As a Social Media Specialist, you will be the person who shows up for that community every day across every platform where they gather. We are not looking for someone to manage a queue. We are looking for someone who genuinely wants to represent this brand and the people behind it.</p><br><p>Social media is 24/7, and so is our community. ",
+      "pubDate": 1791982397,
+      "expiryDate": 1797166396,
+      "applicationLink": "https://himalayas.app/companies/camping-world/jobs/social-media-customer-care-specialist",
+      "guid": "https://himalayas.app/companies/camping-world/jobs/social-media-customer-care-specialist"
+    },
+    {
+      "title": "Admissions Advisor",
+      "excerpt": "JOB SUMMARYThe Admissions Advisor is the heart of the team.",
+      "companyName": "Orbis Education",
+      "companySlug": "orbis-education",
+      "companyLogo": "https://cdn-images.himalayas.app/v1w352waso5m3aow2nansk2vce88",
+      "employmentType": "Full Time",
+      "minSalary": 24.04,
+      "maxSalary": 24.04,
+      "salaryPeriod": "hourly",
+      "seniority": [
+        "Mid-level"
+      ],
+      "currency": "USD",
+      "locationRestrictions": [
+        "United States"
+      ],
+      "timezoneRestrictions": [
+        -10,
+        -9,
+        -8,
+        -7,
+        -6,
+        -5,
+        14
+      ],
+      "categories": [
+        "Admissions-Advisor",
+        "Education-Advisor",
+        "Student-Recruitment-Specialist",
+        "Enrollment-Advisor",
+        "College-Application-Advisor",
+        "Admissions-Counselor",
+        "Admissions-Consultant",
+        "Admissions-Representative",
+        "Student-Enrollment-Advisor",
+        "Admissions-Associate",
+        "Admissions-Officer",
+        "Education"
+      ],
+      "parentCategories": [
+        "Education"
+      ],
+      "description": "<h3>JOB SUMMARY</h3><p>The<b> Admissions Advisor</b> is the heart of the team. These individuals are a driven goal-oriented professional who helps recruits prospective students to healthcare programs, determines student applicants’ admissibility to university partners. They facilitate the new student enrollment process, which includes prospective student and applicant processing and follow-up, in-person recruiting, and community outreach. The Admissions Advisor is highly motivated and passionate about achieving goals, meeting deadlines, and helping shape the future of healthcare. </p><br><h3>R",
+      "pubDate": 1791982333,
+      "expiryDate": 1797166332,
+      "applicationLink": "https://himalayas.app/companies/orbis-education/jobs/admissions-advisor",
+      "guid": "https://himalayas.app/companies/orbis-education/jobs/admissions-advisor"
+    },
+    {
+      "title": "CFD Engineer - AI Trainer",
+      "excerpt": "About the role Help train and evaluate AI agents on expert-level fluid simulation tasks.",
+      "companyName": "Mindrift",
+      "companySlug": "mindrift",
+      "companyLogo": "https://cdn-images.himalayas.app/xq3hn9b4xx58golfhgf8twc4izd7",
+      "employmentType": "Part Time",
+      "minSalary": 23,
+      "maxSalary": 23,
+      "salaryPeriod": "hourly",
+      "seniority": [
+        "Mid-level"
+      ],
+      "currency": "USD",
+      "locationRestrictions": [
+        "Philippines"
+      ],
+      "timezoneRestrictions": [
+        8
+      ],
+      "categories": [
+        "Computational-Fluid-Dynamics-Engineer",
+        "Simulation-Engineer",
+        "Technical-Writer",
+        "AI-Trainer",
+        "Freelance-CFD-Engineering-AI-Trainer",
+        "Freelance-CAD-and-Simulation-Engineering-AI-Trainer",
+        "Freelance-Engineering-AI-Trainer",
+        "Freelance-Mechanical-CAD-and-Simulation-AI-Trainer",
+        "CFD-Instructor",
+        "CFD-Engineering"
+      ],
+      "parentCategories": [
+        "Content Creator",
+        "Data Science"
+      ],
+      "description": "<p><strong>About the role </strong></p><p>Help train and evaluate AI agents on expert-level fluid simulation tasks. You'll take CAD geometry, set up and run simulations, build verified reference solutions, and write Python checks for the agent's results.</p><h3>Requirements</h3><ul>\n<li>A degree in Mechanical or Aerospace Engineering, or a related field such as energy or oil &amp; gas. A PhD is preferred but not required.</li>\n<li>Several years of hands-on industry or research CFD with OpenFOAM, ANSYS Fluent/CFX or STAR-CCM+, including meshing.</li>\n<li>Solid verification and validation practi",
+      "pubDate": 1791982304,
+      "expiryDate": 1797166303,
+      "applicationLink": "https://himalayas.app/companies/mindrift/jobs/cfd-engineer-ai-trainer-1185045085",
+      "guid": "https://himalayas.app/companies/mindrift/jobs/cfd-engineer-ai-trainer-1185045085"
+    }
+  ]
+}

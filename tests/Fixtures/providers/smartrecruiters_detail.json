@@ -1,0 +1,87 @@
+{
+  "id": "744000155499139",
+  "name": "Sales Director, Retail",
+  "uuid": "88398e66-154e-412f-9649-cd214abcb091",
+  "jobId": "ebed2c80-64d6-4463-8e63-b8f304974c02",
+  "jobAdId": "d37c73cc-a15d-4a19-9905-c15f655eec3a",
+  "defaultJobAd": true,
+  "refNumber": "JB0073008",
+  "company": {
+    "name": "ServiceNow",
+    "identifier": "ServiceNow"
+  },
+  "location": {
+    "city": "Amsterdam",
+    "country": "nl",
+    "address": "Hoekenrode 3 Hoekenrode 3",
+    "postalCode": "1102 BR",
+    "remote": false,
+    "hybrid": false,
+    "fullLocation": "Amsterdam, , Netherlands"
+  },
+  "customField": [
+    {
+      "fieldId": "60345fa28b4ba8595bef1863",
+      "fieldLabel": "Recruiting Team",
+      "valueId": "professional",
+      "valueLabel": "Professional"
+    },
+    {
+      "fieldId": "60345e1a0b24a127cbdfa148",
+      "fieldLabel": "Employee Type",
+      "valueId": "0082f6cbe6154da19322cbab1f6aa5af",
+      "valueLabel": "Regular"
+    }
+  ],
+  "releasedDate": "2026-10-14T12:30:38.255Z",
+  "postingUrl": "https://jobs.smartrecruiters.com/ServiceNow/744000155499139-sales-director-retail",
+  "applyUrl": "https://jobs.smartrecruiters.com/ServiceNow/744000155499139-sales-director-retail?oga=true",
+  "referralUrl": "https://jobs.smartrecruiters.com/external-referrals/company/ServiceNow/publication/88398e66-154e-412f-9649-cd214abcb091?dcr_ci=ServiceNow",
+  "jobAd": {
+    "sections": {
+      "companyDescription": {
+        "title": "Company Description",
+        "text": "<p>It all started in sunny San Diego, California in 2004 when a visionary engineer, Fred Luddy, saw the potential to transform how we work. Fast forward to today — ServiceNow stands as a global market leader, bringing innovative AI-enhanced technology to over 8,100 customers, including 85% of the Fortune 500®. Our intelligent cloud-based platform seamlessly connects people, systems, and processes "
+      },
+      "jobDescription": {
+        "title": "Job Description",
+        "text": "<p><strong>What you get to do in this role:</strong></p><ul><li>Build a team of direct Sales Executives to drive rapid new business sales growth in the region</li><li>Build and drive sales strategy for the region in conjunction with Sales Operations to effectively Go-To-Market including understanding the competitive landscape, presence and strength within the region</li><li>Actively engage in terr"
+      },
+      "qualifications": {
+        "title": "Qualifications",
+        "text": "<p><strong>To be successful in this role you have:</strong></p><ul><li>Experience in leveraging or critically thinking about how to integrate AI into work processes, decision-making, or problem-solving. This may include using AI-powered tools, automating workflows, analyzing AI-driven insights, or exploring AI's potential impact on the function or industry.</li><li>Extensive track record of new bu"
+      },
+      "additionalInformation": {
+        "title": "Additional Information",
+        "text": "<p><strong>Work Personas</strong></p><p>We approach our distributed world of work with flexibility and trust. Work personas (flexible, remote, or required in office) are categories that are assigned to ServiceNow employees depending on the nature of their work and their assigned work location. <a href=\"https://careers.servicenow.com/life-at-servicenow#workpersonas\" rel=\"noopener noreferrer\"><u>Lea"
+      }
+    }
+  },
+  "active": true,
+  "visibility": "PUBLIC",
+  "industry": {
+    "id": "it_and_services",
+    "label": "Information Technology And Services"
+  },
+  "function": {
+    "id": "sales",
+    "label": "Sales"
+  },
+  "department": {
+    "id": 2294208,
+    "label": "Sales"
+  },
+  "experienceLevel": {
+    "id": "director",
+    "label": "Director"
+  },
+  "typeOfEmployment": {
+    "id": "permanent",
+    "label": "Full-time"
+  },
+  "language": {
+    "code": "en",
+    "label": "English",
+    "labelNative": "English (US)"
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "offset": 0,
+  "limit": 2,
+  "totalFound": 2,
+  "content": [
+    {
+      "id": "744000155499139",
+      "name": "Sales Director, Retail",
+      "uuid": "88398e66-154e-412f-9649-cd214abcb091",
+      "jobAdId": "d37c73cc-a15d-4a19-9905-c15f655eec3a",
+      "defaultJobAd": true,
+      "refNumber": "JB0073008",
+      "company": {
+        "identifier": "ServiceNow",
+        "name": "ServiceNow"
+      },
+      "releasedDate": "2026-10-14T12:30:38.255Z",
+      "location": {
+        "city": "Amsterdam",
+        "country": "nl",
+        "address": "Hoekenrode 3 Hoekenrode 3",
+        "postalCode": "1102 BR",
+        "remote": false,
+        "hybrid": false,
+        "fullLocation": "Amsterdam, , Netherlands"
+      },
+      "industry": {
+        "id": "it_and_services",
+        "label": "Information Technology And Services"
+      },
+      "department": {
+        "id": "2294208",
+        "label": "Sales"
+      },
+      "function": {
+        "id": "sales",
+        "label": "Sales"
+      },
+      "typeOfEmployment": {
+        "id": "permanent",
+        "label": "Full-time"
+      },
+      "experienceLevel": {
+        "id": "director",
+        "label": "Director"
+      },
+      "customField": [
+        {
+          "fieldId": "60345fa28b4ba8595bef1863",
+          "fieldLabel": "Recruiting Team",
+          "valueId": "professional",
+          "valueLabel": "Professional"
+        },
+        {
+          "fieldId": "60345d5c5165a31b17288279",
+          "fieldLabel": "Region",
+          "valueId": "395ee3093de740ba9cb8b3d35cb67e2d",
+          "valueLabel": "EMEA - Europe, Middle East and Africa"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "ref": "https://api.smartrecruiters.com/v1/companies/ServiceNow/postings/744000155499139",
+      "language": {
+        "code": "en",
+        "label": "English",
+        "labelNative": "English (US)"
+      }
+    },
+    {
+      "id": "744000155473671",
+      "name": "ITAM Specialist (Content Audit)",
+      "uuid": "43e8dabd-40db-4641-930f-623c0a913d4b",
+      "jobAdId": "2f80722e-e118-472c-9dbf-f74d4222054b",
+      "defaultJobAd": true,
+      "refNumber": "JB0076093",
+      "company": {
+        "identifier": "ServiceNow",
+        "name": "ServiceNow"
+      },
+      "releasedDate": "2026-10-14T10:42:43.155Z",
+      "location": {
+        "city": "Hyderabad",
+        "country": "in",
+        "address": "Plot No. 2, Survey No. 83/1, Orwell Block ,Knowledge City Raidurg Village, Serilingampally Mandal",
+        "postalCode": "500081",
+        "remote": false,
+        "hybrid": false,
+        "fullLocation": "Hyderabad, , India"
+      },
+      "industry": {
+        "id": "it_and_services",
+        "label": "Information Technology And Services"
+      },
+      "department": {
+        "id": "2294174",
+        "label": "Product"
+      },
+      "function": {
+        "id": "engineering",
+        "label": "Engineering"
+      },
+      "typeOfEmployment": {
+        "id": "permanent",
+        "label": "Full-time"
+      },
+      "experienceLevel": {
+        "id": "not_applicable",
+        "label": "Not Applicable"
+      },
+      "customField": [
+        {
+          "fieldId": "60345fa28b4ba8595bef1863",
+          "fieldLabel": "Recruiting Team",
+          "valueId": "professional",
+          "valueLabel": "Professional"
+        },
+        {
+          "fieldId": "60345d5c5165a31b17288279",
+          "fieldLabel": "Region",
+          "valueId": "858884996eea4a49baa6231279f39054",
+          "valueLabel": "APAC - Asia Pacific"
+        }
+      ],
+      "visibility": "PUBLIC",
+      "ref": "https://api.smartrecruiters.com/v1/companies/ServiceNow/postings/744000155473671",
+      "language": {
+        "code": "en",
+        "label": "English",
+        "labelNative": "English (US)"
+      }
+    }
+  ]
+}

@@ -1,0 +1,453 @@
+<script setup lang="ts">
+import EmptyState from '@/components/EmptyState.vue';
+import type { QuickApplyOptions } from '@/features/applications/types';
+import Pagination from '@/components/Pagination.vue';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { NativeSelect } from '@/components/ui/native-select';
+import {
+    Sheet,
+    SheetContent,
+    SheetHeader,
+    SheetTitle,
+    SheetTrigger,
+} from '@/components/ui/sheet';
+import FilterPanel from '@/features/jobs/components/FilterPanel.vue';
+import JobCard from '@/features/jobs/components/JobCard.vue';
+import JobGroup from '@/features/jobs/components/JobGroup.vue';
+import JobListSkeleton from '@/features/jobs/components/JobListSkeleton.vue';
+import SaveSearchDialog from '@/features/alerts/components/SaveSearchDialog.vue';
+import {
+    toQuery,
+    useJobFilters,
+} from '@/features/jobs/composables/useJobFilters';
+import type {
+    Job,
+    JobFilters,
+    JobOptions,
+    JobPage,
+    MultiFilterKey,
+} from '@/features/jobs/types';
+import { show as questionnaire } from '@/routes/onboarding';
+import { index as jobsIndex } from '@/routes/jobs';
+import { Head, Link } from '@inertiajs/vue3';
+import {
+    BellPlus,
+    SearchX,
+    SlidersHorizontal,
+    Search,
+    Sparkles,
+} from '@lucide/vue';
+import { trans, transChoice } from 'laravel-vue-i18n';
+import { computed, ref, toRef } from 'vue';
+
+const props = defineProps<{
+    jobs: JobPage;
+    groups: Record<string, number> | null;
+    filters: JobFilters;
+    options: JobOptions;
+    viewer: {
+        onboarding_completed: boolean;
+        search_query: Record<string, string> | null;
+        has_matches: boolean;
+        quick_apply: QuickApplyOptions;
+        email_alerts: boolean;
+    } | null;
+}>();
+
+const {
+    state,
+    loading,
+    setSearch,
+    toggle,
+    set,
+    clear,
+    setTab,
+    goToPage,
+    activeCount,
+} = useJobFilters(toRef(props, 'filters'), props.options.default_per_page);
+
+/** Consecutive jobs of the same group, in server order (largest group first). */
+const grouped = computed(() => {
+    if (!props.groups || !props.filters.group) return null;
+    const key = props.filters.group as 'category' | 'role' | 'source';
+    const sections: { key: string; jobs: Job[] }[] = [];
+
+    for (const job of props.jobs.data) {
+        const value = key === 'source' ? job.source.key : (job[key] ?? '');
+        const last = sections[sections.length - 1];
+        if (last && last.key === value) {
+            last.jobs.push(job);
+        } else {
+            sections.push({ key: value, jobs: [job] });
+        }
+    }
+
+    return sections;
+});
+
+function groupLabel(key: string): string {
+    if (key === '') return trans('jobs.group.ungrouped');
+    if (props.filters.group === 'source')
+        return (
+            props.options.source.find((source) => source.key === key)?.name ??
+            key
+        );
+
+    return trans(`jobs.${props.filters.group}.${key}`);
+}
+
+// Ordering by match needs a signed-in viewer with scores.
+const sortOptions = computed(() =>
+    props.options.sort.filter((sort) => sort !== 'match' || props.viewer),
+);
+const TABS = [null, 'recommended'] as const;
+
+const savingSearch = ref(false);
+const currentSearch = computed(() => {
+    // Only what defines the search; paging, order and view are not part of an alert.
+    const query = toQuery(state, props.options.default_per_page);
+    delete query.page;
+    delete query.sort;
+    delete query.group;
+    delete query.per_page;
+    delete query.tab;
+
+    return query;
+});
+
+function onToggle(key: MultiFilterKey, value: string): void {
+    toggle(key, value);
+}
+
+function onSet(key: keyof JobFilters, value: string | number | null): void {
+    set(key, value as never);
+}
+</script>
+
+<template>
+    <Head :title="trans('jobs.title')" />
+
+    <div class="mx-auto w-full max-w-6xl space-y-6 py-6">
+        <header class="space-y-4">
+            <div>
+                <h1 class="text-2xl font-semibold tracking-tight">
+                    {{ trans('jobs.title') }}
+                </h1>
+                <p class="text-sm text-muted-foreground">
+                    {{ trans('jobs.description') }}
+                </p>
+            </div>
+
+            <div
+                v-if="viewer && !viewer.onboarding_completed"
+                class="flex flex-col gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4 sm:flex-row sm:items-center sm:justify-between"
+            >
+                <div class="flex items-start gap-3">
+                    <Sparkles
+                        class="mt-0.5 size-5 shrink-0 text-primary"
+                        aria-hidden="true"
+                    />
+                    <div>
+                        <p class="font-medium">
+                            {{ trans('jobs.onboarding.title') }}
+                        </p>
+                        <p class="text-sm text-muted-foreground">
+                            {{ trans('jobs.onboarding.description') }}
+                        </p>
+                    </div>
+                </div>
+                <Button size="sm" as-child>
+                    <Link :href="questionnaire()">{{
+                        trans('jobs.onboarding.action')
+                    }}</Link>
+                </Button>
+            </div>
+
+            <form role="search" class="relative" @submit.prevent>
+                <label for="job-search" class="sr-only">{{
+                    trans('jobs.search_label')
+                }}</label>
+                <Search
+                    class="pointer-events-none absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground"
+                    aria-hidden="true"
+                />
+                <Input
+                    id="job-search"
+                    type="search"
+                    class="h-11 pl-9 text-base"
+                    :placeholder="trans('jobs.search_placeholder')"
+                    :model-value="state.q ?? ''"
+                    autocomplete="off"
+                    enterkeyhint="search"
+                    @update:model-value="setSearch(String($event ?? ''))"
+                />
+            </form>
+
+            <div
+                v-if="viewer"
+                role="tablist"
+                :aria-label="trans('jobs.tabs.label')"
+                class="inline-flex rounded-lg border bg-muted/40 p-1"
+            >
+                <button
+                    v-for="tab in TABS"
+                    :key="tab ?? 'all'"
+                    type="button"
+                    role="tab"
+                    :aria-selected="state.tab === tab"
+                    class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                    :class="
+                        state.tab === tab
+                            ? 'bg-background shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
+                    "
+                    @click="setTab(tab)"
+                >
+                    {{ trans(`jobs.tabs.${tab ?? 'all'}`) }}
+                </button>
+            </div>
+        </header>
+
+        <div class="grid gap-8 lg:grid-cols-[16rem_1fr]">
+            <aside class="hidden lg:block">
+                <div class="sticky top-4">
+                    <FilterPanel
+                        :filters="state"
+                        :options="options"
+                        :active-count="activeCount"
+                        :can-match="!!viewer"
+                        @toggle="onToggle"
+                        @set="onSet"
+                        @clear="clear"
+                    />
+                </div>
+            </aside>
+
+            <section class="min-w-0 space-y-4" :aria-busy="loading">
+                <div class="flex flex-wrap items-center gap-2">
+                    <p
+                        class="mr-auto text-sm text-muted-foreground"
+                        aria-live="polite"
+                    >
+                        {{
+                            transChoice('jobs.results', jobs.meta.total, {
+                                count: jobs.meta.total.toLocaleString(),
+                            })
+                        }}
+                    </p>
+
+                    <Button
+                        v-if="viewer"
+                        variant="outline"
+                        size="sm"
+                        :title="trans('alerts.save_search_hint')"
+                        @click="savingSearch = true"
+                    >
+                        <BellPlus class="size-4" aria-hidden="true" />
+                        {{ trans('alerts.save_search') }}
+                    </Button>
+                    <SaveSearchDialog
+                        v-if="viewer"
+                        v-model:open="savingSearch"
+                        :filters="currentSearch"
+                        :email-consented="viewer.email_alerts"
+                    />
+
+                    <Button
+                        v-if="viewer?.search_query"
+                        variant="outline"
+                        size="sm"
+                        as-child
+                    >
+                        <Link
+                            :href="jobsIndex({ query: viewer.search_query })"
+                            preserve-scroll
+                        >
+                            <Sparkles class="size-4" aria-hidden="true" />
+                            {{ trans('jobs.my_search') }}
+                        </Link>
+                    </Button>
+
+                    <Sheet>
+                        <SheetTrigger as-child>
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                class="lg:hidden"
+                            >
+                                <SlidersHorizontal
+                                    class="size-4"
+                                    aria-hidden="true"
+                                />
+                                {{ trans('jobs.filters.open') }}
+                                <span
+                                    v-if="activeCount"
+                                    class="rounded-full bg-primary px-1.5 text-xs text-primary-foreground"
+                                    >{{ activeCount }}</span
+                                >
+                            </Button>
+                        </SheetTrigger>
+                        <SheetContent
+                            side="left"
+                            class="w-80 overflow-y-auto p-5"
+                        >
+                            <SheetHeader class="sr-only"
+                                ><SheetTitle>{{
+                                    trans('jobs.filters.title')
+                                }}</SheetTitle></SheetHeader
+                            >
+                            <FilterPanel
+                                :filters="state"
+                                :options="options"
+                                :active-count="activeCount"
+                                :can-match="!!viewer"
+                                @toggle="onToggle"
+                                @set="onSet"
+                                @clear="clear"
+                            />
+                        </SheetContent>
+                    </Sheet>
+
+                    <NativeSelect
+                        :model-value="state.sort"
+                        class="h-8 w-auto text-sm"
+                        :aria-label="trans('jobs.sort.label')"
+                        @update:model-value="onSet('sort', $event ?? 'newest')"
+                    >
+                        <option
+                            v-for="sort in sortOptions"
+                            :key="sort"
+                            :value="sort"
+                            :disabled="sort === 'relevance' && !state.q"
+                        >
+                            {{ trans(`jobs.sort.${sort}`) }}
+                        </option>
+                    </NativeSelect>
+                    <NativeSelect
+                        :model-value="state.group"
+                        class="h-8 w-auto text-sm"
+                        :aria-label="trans('jobs.group.label')"
+                        @update:model-value="onSet('group', $event ?? null)"
+                    >
+                        <option :value="null">
+                            {{ trans('jobs.group.none') }}
+                        </option>
+                        <option
+                            v-for="group in options.group"
+                            :key="group"
+                            :value="group"
+                        >
+                            {{ trans(`jobs.group.${group}`) }}
+                        </option>
+                    </NativeSelect>
+                    <NativeSelect
+                        :model-value="state.per_page"
+                        class="h-8 w-auto text-sm"
+                        :aria-label="trans('jobs.per_page')"
+                        @update:model-value="onSet('per_page', Number($event))"
+                    >
+                        <option
+                            v-for="size in options.per_page"
+                            :key="size"
+                            :value="size"
+                        >
+                            {{ size }}
+                        </option>
+                    </NativeSelect>
+                </div>
+
+                <JobListSkeleton v-if="loading && jobs.data.length === 0" />
+
+                <EmptyState
+                    v-else-if="
+                        jobs.data.length === 0 &&
+                        state.tab === 'recommended' &&
+                        !viewer?.has_matches
+                    "
+                    :icon="Sparkles"
+                    :title="trans('jobs.recommended_empty.title')"
+                    :description="
+                        viewer?.onboarding_completed
+                            ? trans('jobs.recommended_empty.pending')
+                            : trans('jobs.recommended_empty.description')
+                    "
+                >
+                    <Button
+                        v-if="!viewer?.onboarding_completed"
+                        size="sm"
+                        as-child
+                    >
+                        <Link :href="questionnaire()">{{
+                            trans('jobs.recommended_empty.action')
+                        }}</Link>
+                    </Button>
+                </EmptyState>
+
+                <EmptyState
+                    v-else-if="jobs.data.length === 0"
+                    :icon="SearchX"
+                    :title="trans('jobs.empty.title')"
+                    :description="trans('jobs.empty.description')"
+                >
+                    <Button
+                        v-if="activeCount"
+                        variant="outline"
+                        size="sm"
+                        @click="clear"
+                        >{{ trans('jobs.filters.clear') }}</Button
+                    >
+                </EmptyState>
+
+                <div
+                    v-else
+                    class="space-y-6 transition-opacity"
+                    :class="loading && 'opacity-60'"
+                >
+                    <template v-if="grouped && groups">
+                        <JobGroup
+                            v-for="section in grouped"
+                            :key="section.key"
+                            :label="groupLabel(section.key)"
+                            :count="groups[section.key] ?? section.jobs.length"
+                        >
+                            <JobCard
+                                v-for="job in section.jobs"
+                                :key="job.id"
+                                :job="job"
+                                :quick-apply="viewer?.quick_apply ?? null"
+                                @tag="onToggle('tag', $event)"
+                            />
+                        </JobGroup>
+                    </template>
+                    <div v-else class="space-y-3">
+                        <JobCard
+                            v-for="job in jobs.data"
+                            :key="job.id"
+                            :job="job"
+                            :quick-apply="viewer?.quick_apply ?? null"
+                            @tag="onToggle('tag', $event)"
+                        />
+                    </div>
+                </div>
+
+                <div v-if="jobs.meta.total > 0" class="space-y-2 pt-2">
+                    <Pagination
+                        :current-page="jobs.meta.current_page"
+                        :last-page="jobs.meta.last_page"
+                        @page="goToPage"
+                    />
+                    <p class="text-center text-xs text-muted-foreground">
+                        {{
+                            trans('jobs.showing', {
+                                from: String(jobs.meta.from ?? 0),
+                                to: String(jobs.meta.to ?? 0),
+                                total: jobs.meta.total.toLocaleString(),
+                            })
+                        }}
+                    </p>
+                </div>
+            </section>
+        </div>
+    </div>
+</template>
