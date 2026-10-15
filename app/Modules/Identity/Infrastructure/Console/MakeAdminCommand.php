@@ -9,7 +9,7 @@ use Illuminate\Console\Attributes\Description;
 use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
-#[Signature('users:admin {email : E-mail of an existing account} {--revoke : Remove admin rights}')]
+#[Signature('users:admin {email : E-mail of an existing account} {--revoke : Remove admin rights} {--verify : Also mark the e-mail as verified (servers without a mail provider)}')]
 #[Description('Grant (or revoke) access to the admin panel and Horizon')]
 final class MakeAdminCommand extends Command
 {
@@ -23,7 +23,11 @@ final class MakeAdminCommand extends Command
             return self::FAILURE;
         }
 
-        $user->forceFill(['is_admin' => ! $this->option('revoke')])->save();
+        $user->forceFill(['is_admin' => ! $this->option('revoke')]);
+        if ($this->option('verify') && $user->email_verified_at === null) {
+            $user->forceFill(['email_verified_at' => now()]);
+        }
+        $user->save();
 
         $this->components->info($user->is_admin ? "{$user->email} is now an admin." : "{$user->email} is no longer an admin.");
 
