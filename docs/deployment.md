@@ -42,7 +42,7 @@ Composer, npm, los navegadores de Playwright y las capas de Docker van en caché
 
 **`.github/workflows/deploy.yml`** en cada push a `main`:
 
-1. Construye la imagen y la publica en GHCR como `ghcr.io/dmarsal90/matchly:sha-<commit>` y `:latest`, con SBOM y procedencia.
+1. Construye la imagen para `amd64` y `arm64`, cada una en su propio runner (sin emulación), y la publica en GHCR como `ghcr.io/dmarsal90/matchly:sha-<commit>` y `:latest`. Así vale para servidores x86 y para ARM, como los gratuitos de Oracle. No lleva SBOM ni atestaciones de procedencia, porque complican la unión de las dos arquitecturas.
 2. La escanea con Trivy (CRITICAL y HIGH con parche disponible). El resultado va a la pestaña *Security* y no bloquea el despliegue.
 3. Despliega en el entorno `staging`.
 
@@ -61,6 +61,8 @@ Dependabot (`.github/dependabot.yml`) abre cada lunes los PR de Composer, npm, G
 
 ## VPS con Docker Compose
 
+Para probarlo sin gastar nada, la guía [Staging gratis en Oracle Cloud](oracle-free-staging.md) lo monta de principio a fin en una máquina ARM del plan Always Free, con un script de arranque (`deploy/oracle/bootstrap.sh`) y el despliegue automático desde GitHub.
+
 `docker-compose.prod.yml` levanta toda la plataforma en un solo servidor:
 
 - Caddy, con HTTPS automático de Let's Encrypt y HTTP/3.
@@ -78,7 +80,7 @@ cp deploy/env.production.example .env && chmod 600 .env
 # Rellena APP_KEY, APP_DOMAIN, ACME_EMAIL, contraseñas, claves de Reverb y correo
 echo "$GHCR_TOKEN" | docker login ghcr.io -u <usuario> --password-stdin   # si el paquete es privado
 APP_TAG=latest sh deploy/vps/deploy.sh
-docker compose -f docker-compose.prod.yml exec web php artisan users:admin tu@correo.com   # tras registrarte
+docker compose -f docker-compose.prod.yml exec web php artisan users:admin tu@correo.com --verify   # tras registrarte; --verify si aún no hay correo
 ```
 
 `deploy/vps/deploy.sh` hace estos pasos:
