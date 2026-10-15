@@ -11,6 +11,7 @@ use App\Modules\Jobs\Infrastructure\Models\JobListing;
 use App\Modules\Matching\Application\Actions\ScoreJobsForUser;
 use App\Modules\Matching\Infrastructure\Models\JobMatch;
 use App\Modules\Matching\Infrastructure\Queue\RecalculateMatchesJob;
+use App\Modules\Matching\Infrastructure\Queue\RefineJobRequirementsJob;
 use App\Modules\Profiles\Application\Events\ProfileChanged;
 use App\Modules\Profiles\Domain\Enums\SkillSource;
 use Illuminate\Support\Facades\Queue;
@@ -164,7 +165,7 @@ it('queues the AI refinement lazily when a job is opened', function (): void {
     $job = laravelJob();
 
     $this->get("/jobs/{$job->id}");
-    Queue::assertPushedOn('ai', App\Modules\Matching\Infrastructure\Queue\RefineJobRequirementsJob::class);
+    Queue::assertPushedOn('ai', RefineJobRequirementsJob::class);
 
     config(['ai.job_requirements' => 'off']);
     Queue::fake();
@@ -180,4 +181,22 @@ it('queues a rescore for everyone from the console', function (): void {
     $this->artisan('matching:recalculate')->assertSuccessful();
 
     Queue::assertPushed(RecalculateMatchesJob::class, 2);
+});
+
+it('extracts missing requirements from the console, optionally queueing the AI pass', function (): void {
+    Queue::fake();
+    $pending = laravelJob();
+    $pending->forceFill(['requirements' => null])->save();
+    $closed = laravelJob(['title' => 'Closed Laravel role']);
+    $closed->forceFill(['requirements' => null, 'status' => 'closed', 'closed_at' => now()])->save();
+
+    $this->artisan('jobs:extract-requirements')->expectsOutputToContain('Processed 1 jobs.')->assertSuccessful();
+
+    expect($pending->refresh()->requirements)->not->toBeNull()
+        ->and($closed->refresh()->requirements)->toBeNull();
+    Queue::assertNotPushed(RefineJobRequirementsJob::class);
+
+    // With --ai, rule-based requirements are refined too.
+    $this->artisan('jobs:extract-requirements --ai --limit=10')->expectsOutputToContain('Processed 1 jobs.')->assertSuccessful();
+    Queue::assertPushed(RefineJobRequirementsJob::class, fn (RefineJobRequirementsJob $job): bool => $job->jobId === $pending->id);
 });

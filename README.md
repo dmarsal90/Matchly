@@ -33,6 +33,8 @@ make up / make down      # arrancar / parar
 make shell               # shell en el contenedor app
 make migrate             # migraciones
 make test                # Pest + Vitest
+make e2e                 # Playwright: flujos clave de punta a punta (ver «Tests»)
+make coverage            # cobertura de PHP; falla por debajo del 90 %
 make check               # lo mismo que la CI: Pint, ESLint, Prettier, Larastan, vue-tsc y tests
 make logs s=horizon      # logs de un servicio
 make horizon-restart     # recargar workers tras cambiar código de jobs
@@ -50,6 +52,26 @@ composer dev             # servidor, cola, logs y Vite
 ```
 
 Los tests usan SQLite en memoria (`phpunit.xml`) y no necesitan servicios.
+
+## Tests
+
+| Capa | Herramienta | Qué cubre |
+| --- | --- | --- |
+| Unitarios y de feature | Pest (`tests/Unit`, `tests/Feature`) | Normalizadores de proveedores, clasificador, puntuación, ZIP de LinkedIn con fixtures, Actions y endpoints. IA, GitHub y HTTP externo con `Http::fake`. SQLite en memoria. |
+| Arquitectura | Pest (`tests/Architecture`) | Fronteras entre módulos, `strict_types`, marca solo desde `APP_NAME`, sin texto fijo en las plantillas Vue y mismas claves en es/en/pt. |
+| Frontend | Vitest | Composables y utilidades de `resources/js`. |
+| End-to-end | Playwright (`tests/e2e`) | Registro con verificación por correo, cuestionario, importación de LinkedIn, búsqueda (texto completo de PostgreSQL) y filtros en escritorio y móvil, recomendaciones, solicitud rápida con PDF, alertas con resumen por correo y baja en un clic, y WCAG 2.2 AA con axe en modo claro y oscuro. |
+
+Los E2E corren contra su propia base de datos (`app_e2e`) y un servidor aparte en el puerto 8001 (`docker/scripts/e2e.sh`), así que nunca tocan los datos de desarrollo. Antes de cada ejecución se rehace la base con `E2eSeeder`, y los correos se leen de Mailpit. Playwright corre en el host:
+
+```sh
+make e2e-install         # una vez: descarga Chromium
+make e2e                 # compila los assets, levanta el servidor y ejecuta la suite
+make e2e a="--ui"        # modo interactivo (o --headed, --project=mobile, -g "alertas")
+npx playwright show-report
+```
+
+Con un servidor ya levantado en otro sitio: `E2E_BASE_URL=http://… npx playwright test`. `E2E_RESET_COMMAND`, `E2E_ARTISAN_COMMAND` y `E2E_SERVER_COMMAND` permiten ejecutarla sin Docker (por ejemplo en CI).
 
 ## Imagen Docker
 

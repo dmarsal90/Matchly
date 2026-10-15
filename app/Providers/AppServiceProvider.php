@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Middleware\TrustProxies;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Vite;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Validation\Rules\Password;
 
@@ -56,5 +57,10 @@ class AppServiceProvider extends ServiceProvider
                 ->uncompromised()
             : null,
         );
+
+        // The end-to-end suite always runs on built assets, even with a Vite dev server up.
+        if (app()->environment('e2e')) {
+            Vite::useHotFile(storage_path('framework/vite-e2e.hot'));
+        }
     }
 }

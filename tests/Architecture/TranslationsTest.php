@@ -103,6 +103,18 @@ it('has no literal text in Vue templates', function (): void {
             }
         }
 
+        // String literals inside bound attributes (:aria-label="open ? 'Hide' : 'Show'").
+        // Translation keys are lowercase without spaces, so anything else is copy.
+        preg_match_all('/\s:(?:placeholder|title|aria-label|alt|label|description|loading-label|separator)="([^"]*)"/', $markup, $bound);
+        foreach ($bound[1] as $expression) {
+            preg_match_all("/'([^']*)'/", $expression, $literals);
+            foreach ($literals[1] as $literal) {
+                if (preg_match('/\p{Lu}|\p{L}\s+\p{L}/u', $literal) === 1) {
+                    $offenders[] = str_replace(resource_path('js').'/', '', $path).": {$literal}";
+                }
+            }
+        }
+
         // Text between tags (tags matched with quoted attribute values, which may contain ">").
         foreach (preg_split('/<(?:"[^"]*"|\'[^\']*\'|[^\'">])*>/', $markup) ?: [] as $text) {
             $text = trim($text);

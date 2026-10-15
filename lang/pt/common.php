@@ -13,4 +13,6 @@ return [
     'navigation_menu' => 'Menu de navegação',
     'platform' => 'Plataforma',
     'skip_to_content' => 'Saltar para o conteúdo',
+    'show_password' => 'Mostrar palavra-passe',
+    'hide_password' => 'Ocultar palavra-passe',
 ];

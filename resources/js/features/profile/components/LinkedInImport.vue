@@ -36,7 +36,9 @@ function submit(): void {
     form.post(importLinkedin.url(), {
         forceFormData: true,
         preserveScroll: true,
-        onFinish: () => {
+        // Keep the chosen file after a validation error (e.g. consent not
+        // ticked) so the person does not have to pick it again.
+        onSuccess: () => {
             form.reset('file');
             if (fileInput.value) fileInput.value.value = '';
         },
