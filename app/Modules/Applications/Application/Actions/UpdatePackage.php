@@ -5,10 +5,12 @@ declare(strict_types=1);
 namespace App\Modules\Applications\Application\Actions;
 
 use App\Modules\Applications\Application\Generators\CoverLetterWriter;
+use App\Modules\Applications\Application\Generators\DraftReviewer;
 use App\Modules\Applications\Domain\Data\ResumeData;
 use App\Modules\Applications\Domain\Enums\ContentSource;
 use App\Modules\Applications\Domain\Enums\PackageStatus;
 use App\Modules\Applications\Infrastructure\Models\ApplicationPackage;
+use App\Modules\Matching\Application\Actions\ResolveJobRequirements;
 use Illuminate\Validation\ValidationException;
 
 /**
@@ -18,7 +20,11 @@ use Illuminate\Validation\ValidationException;
  */
 final readonly class UpdatePackage
 {
-    public function __construct(private CoverLetterWriter $letters) {}
+    public function __construct(
+        private CoverLetterWriter $letters,
+        private DraftReviewer $reviewer,
+        private ResolveJobRequirements $requirements,
+    ) {}
 
     /**
      * @param  array<string, mixed>|null  $resume
@@ -48,11 +54,16 @@ final readonly class UpdatePackage
 
         $master = $package->masterResumeData();
         $text = (string) ($changes['cover_letter'] ?? $package->cover_letter);
-        $kept = array_values(array_filter((array) $package->warnings, fn (array $warning): bool => ! in_array($warning['key'], ['unbacked_skills', 'years_claim'], true)));
+        $kept = array_values(array_filter((array) $package->warnings, fn (array $warning): bool => ! in_array($warning['key'], ['unbacked_skills', 'years_claim', ...DraftReviewer::KEYS], true)));
+        $job = $package->job;
+        $resumeNow = $edited ?? $current;
+        $reviewed = $job !== null && $resumeNow !== null
+            ? $this->reviewer->review($resumeNow, $text, $job, $this->requirements->handle($job), $package->language ?? app()->getLocale(), $package->length)
+            : [];
 
         $package->fill([
             ...$changes,
-            'warnings' => [...$kept, ...($master !== null ? $this->letters->warnings($text, $master, $package->user?->profile?->years_experience) : [])],
+            'warnings' => [...$kept, ...($master !== null ? $this->letters->warnings($text, $master, $package->user?->profile?->years_experience) : []), ...$reviewed],
             'status' => PackageStatus::Draft,
             'approved_at' => null,
         ])->save();

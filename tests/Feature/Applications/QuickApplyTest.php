@@ -2,8 +2,11 @@
 
 declare(strict_types=1);
 
+use App\Modules\Applications\Application\Generators\DraftReviewer;
 use App\Modules\Applications\Domain\Contracts\ApplicationAssistant;
+use App\Modules\Applications\Domain\Data\ResumeData;
 use App\Modules\Applications\Domain\Enums\ApplicationStatus;
+use App\Modules\Applications\Domain\Enums\LetterLength;
 use App\Modules\Applications\Domain\Enums\PackageStatus;
 use App\Modules\Applications\Infrastructure\Models\Application;
 use App\Modules\Applications\Infrastructure\Models\ApplicationPackage;
@@ -11,11 +14,18 @@ use App\Modules\Identity\Domain\Enums\ConsentPurpose;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Jobs\Domain\Enums\JobStatus;
 use App\Modules\Jobs\Infrastructure\Models\JobListing;
+use App\Modules\Matching\Application\Actions\ResolveJobRequirements;
 use App\Modules\Profiles\Domain\Enums\ImportStatus;
 use App\Modules\Profiles\Domain\Enums\SkillSource;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Inertia\Testing\AssertableInertia as Assert;
+
+/** What the draft reviewer adds is covered on its own; these tests look at the rest. */
+function withoutReview(array $warnings): array
+{
+    return array_values(array_filter($warnings, fn (array $warning): bool => ! in_array($warning['key'], DraftReviewer::KEYS, true)));
+}
 
 function candidateWithProfile(): User
 {
@@ -107,7 +117,7 @@ it('prepares a package without AI: tailored CV and a template letter in the post
         // Kubernetes is asked for but not in the profile: never claimed.
         ->and($package->cover_letter)->not->toContain('Kubernetes')
         ->and($package->cover_letter)->toEndWith("Atentamente,\nAna García")
-        ->and($package->warnings)->toBe([])
+        ->and(withoutReview($package->warnings))->toBe([])
         ->and(Application::query()->sole()->status)->toBe(ApplicationStatus::Prepared);
 
     $this->get(route('applications.packages.show', $package))->assertInertia(fn (Assert $page) => $page
@@ -133,7 +143,7 @@ it('keeps later tracking statuses when preparing again', function (): void {
 it('warns when the profile is too thin for a good CV', function (): void {
     $package = prepare(User::factory()->create(), spanishLaravelJob());
 
-    expect(array_column($package->warnings, 'key'))->toBe(['empty_profile']);
+    expect(array_column(withoutReview($package->warnings), 'key'))->toBe(['empty_profile']);
 });
 
 it('refuses jobs held for moderation or closed', function (): void {
@@ -187,7 +197,7 @@ describe('with AI', function (): void {
             ->and($package->letter_source->value)->toBe('ai')
             ->and($package->cover_letter)->toEndWith("Un saludo,\nAna García")
             // jsonb does not keep key order (PostgreSQL): compare key/value pairs.
-            ->and($package->warnings)->toEqual([
+            ->and(withoutReview($package->warnings))->toEqual([
                 ['key' => 'unbacked_skills', 'params' => ['skills' => 'Go, Kubernetes']],
                 ['key' => 'years_claim', 'params' => ['claimed' => '10', 'have' => '6']],
             ]);
@@ -206,7 +216,7 @@ it('falls back to rules and the template when the AI fails', function (): void {
     $package = prepare($user, spanishLaravelJob(), ['use_ai' => true]);
 
     expect($package->letter_source->value)->toBe('rules')
-        ->and($package->warnings)->toBe([['key' => 'ai_unavailable', 'params' => ['reason' => 'failed']]]);
+        ->and(withoutReview($package->warnings))->toBe([['key' => 'ai_unavailable', 'params' => ['reason' => 'failed']]]);
 });
 
 it('saves edits, recomputes warnings and sends approved packages back to draft', function (): void {
@@ -227,7 +237,7 @@ it('saves edits, recomputes warnings and sends approved packages back to draft',
         ->and($package->resume_source->value)->toBe('user')
         ->and($package->resumeData()->skills)->toBe(['PHP', 'Laravel'])
         ->and($package->resumeData()->contact['name'])->toBe('Ana García')
-        ->and(array_column($package->warnings, 'key'))->toBe(['unbacked_skills', 'years_claim']);
+        ->and(array_column(withoutReview($package->warnings), 'key'))->toBe(['unbacked_skills', 'years_claim']);
 });
 
 it('exports the CV as a PDF only once approved', function (): void {
@@ -315,4 +325,50 @@ it('stores letters and CVs encrypted and exports them with the personal data', f
     $data = json_decode((string) $zip->getFromName('data.json'), true);
 
     expect($data['sections']['applications']['prepared_applications'][0]['cover_letter'])->toBe($package->cover_letter);
+});
+
+it('reviews the draft: letter length, company, placeholders, uncovered requirements', function (): void {
+    $job = spanishLaravelJob(['company' => 'Globex']);
+    $requirements = app(ResolveJobRequirements::class)->handle($job);
+    $resume = ResumeData::fromArray(['contact' => ['name' => 'Ana García'], 'skills' => ['PHP']]);
+    $reviewer = app(DraftReviewer::class);
+
+    $keys = fn (string $letter): array => array_column(array_filter(
+        $reviewer->review($resume, $letter, $job, $requirements, 'es', LetterLength::Short),
+        fn (array $warning): bool => ! str_starts_with($warning['key'], 'ats_'),
+    ), 'key');
+
+    expect($keys('Hola [Nombre de la empresa], me interesa el puesto.'))
+        ->toContain('letter_placeholder', 'letter_length', 'letter_company')
+        ->and($keys(str_repeat('Trabajo con Laravel en Globex. ', 60)))
+        ->not->toContain('letter_company', 'letter_placeholder')
+        ->toContain('letter_length');
+
+    $wellSized = implode(' ', array_fill(0, 150, 'palabra')).' Globex';
+    expect($keys($wellSized))->not->toContain('letter_length', 'letter_company', 'letter_placeholder');
+});
+
+it('flags required skills the CV never mentions and recomputes them after edits', function (): void {
+    $user = candidateWithProfile();
+    $package = prepare($user, spanishLaravelJob(['description' => '<p>Requisitos: experiencia con Laravel, PostgreSQL y Kubernetes.</p>']));
+    $keys = fn (): array => array_column($package->fresh()->warnings, 'key');
+
+    $this->put(route('applications.packages.update', $package), [
+        'resume' => ['summary' => 'Ingeniera backend.', 'skills' => ['PHP']],
+    ])->assertSessionHasNoErrors();
+
+    expect(collect($package->fresh()->warnings)->firstWhere('key', 'cv_missing_required')['params']['skills'])->toContain('Kubernetes');
+
+    $this->put(route('applications.packages.update', $package), [
+        'resume' => ['summary' => 'Ingeniera backend.', 'skills' => ['PHP', 'Kubernetes']],
+    ])->assertSessionHasNoErrors();
+
+    expect($keys())->not->toContain('cv_missing_required');
+});
+
+it('reads the CV PDF back like an ATS and reports nothing lost for a complete CV', function (): void {
+    $user = candidateWithProfile();
+    $package = prepare($user, spanishLaravelJob());
+
+    expect(array_column($package->warnings, 'key'))->not->toContain('ats_unreadable', 'ats_missing');
 });

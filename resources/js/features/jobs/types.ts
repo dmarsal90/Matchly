@@ -133,6 +133,12 @@ export type JobFilters = {
     per_page: number;
     tab: 'recommended' | null;
     min_score: number | null;
+    ineligible: boolean;
+};
+
+export type IneligibleSummary = {
+    total: number;
+    reasons: Record<string, number>;
 };
 
 export type MultiFilterKey =

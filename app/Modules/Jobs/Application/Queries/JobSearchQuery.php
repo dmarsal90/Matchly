@@ -186,7 +186,7 @@ final readonly class JobSearchQuery
             $query->whereIn('id', $this->db->table('job_matches')
                 ->select('job_listing_id')
                 ->where('user_id', $filters->viewerId)
-                ->when($filters->recommended, fn ($matches) => $matches->where('eligible', true))
+                ->when($filters->recommended && ! $filters->showIneligible, fn ($matches) => $matches->where('eligible', true))
                 ->when($filters->minScore !== null, fn ($matches) => $matches->where('score', '>=', $filters->minScore)));
         }
 

@@ -22,6 +22,7 @@ const empty: JobFilters = {
     per_page: 20,
     tab: null,
     min_score: null,
+    ineligible: false,
 };
 
 describe('toQuery', () => {

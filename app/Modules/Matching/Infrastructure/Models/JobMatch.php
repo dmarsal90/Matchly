@@ -17,6 +17,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $score
  * @property string $level
  * @property bool $eligible
+ * @property string|null $ineligible_reason
  * @property array<string, mixed> $result
  * @property CarbonImmutable $computed_at
  */
