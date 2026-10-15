@@ -125,6 +125,26 @@ it('shows scores on cards and offers a recommended tab ordered by score', functi
     $this->get('/jobs?sort=match')->assertInertia(fn (Assert $page) => $page->where('jobs.data.0.match.score', fn (int $score) => $score === JobMatch::query()->max('score')));
 });
 
+it('tells the recommended tab how many jobs it hides and why, and can show them', function (): void {
+    $user = laravelDeveloper();
+    laravelJob();
+    $usOnly = laravelJob(['remote_scope' => RemoteScope::CountryRestricted, 'allowed_regions' => ['US'], 'description' => '<p>US residents only. PHP and Laravel.</p>']);
+    app(ScoreJobsForUser::class)->handle($user);
+
+    expect(JobMatch::query()->where('job_listing_id', $usOnly->id)->value('ineligible_reason'))->toBe('location');
+
+    $this->actingAs($user)->get('/jobs?tab=recommended')->assertInertia(fn (Assert $page) => $page
+        ->where('jobs.meta.total', 1)
+        ->where('ineligible', ['total' => 1, 'reasons' => ['location' => 1]])
+        ->where('filters.ineligible', false));
+
+    $this->get('/jobs?tab=recommended&ineligible=1')->assertInertia(fn (Assert $page) => $page
+        ->where('jobs.meta.total', 2)
+        ->where('filters.ineligible', true));
+
+    $this->get('/jobs')->assertInertia(fn (Assert $page) => $page->where('ineligible', null));
+});
+
 it('ignores score features for guests', function (): void {
     laravelJob();
 
