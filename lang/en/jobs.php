@@ -157,6 +157,19 @@ return [
         'all' => 'All',
         'recommended' => 'Recommended for you',
     ],
+    'hidden_by_fit' => [
+        'summary' => '{1} :count job is hidden because your profile rules it out|[2,*] :count jobs are hidden because your profile rules them out',
+        'show' => 'Show them',
+        'hide' => 'Hide them again',
+        'reasons' => [
+            'location' => 'only open to other countries',
+            'remote_only' => 'not fully remote',
+            'region_strict' => 'outside your regions',
+            'salary_disclosed' => 'no salary stated',
+            'salary_floor' => 'salary below your minimum',
+            'employment_type' => 'other contract type',
+        ],
+    ],
     'recommended_empty' => [
         'title' => 'No recommendations yet',
         'description' => 'Complete your skills profile and we will compute how well you match each job.',

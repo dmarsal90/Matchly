@@ -45,6 +45,7 @@ export function toQuery(
         query.sort = filters.sort;
     if (filters.tab) query.tab = filters.tab;
     if (filters.min_score) query.min_score = String(filters.min_score);
+    if (filters.tab && filters.ineligible) query.ineligible = '1';
     if (filters.group) query.group = filters.group;
     if (filters.per_page !== defaultPerPage)
         query.per_page = String(filters.per_page);
@@ -69,7 +70,7 @@ export function useJobFilters(server: Ref<JobFilters>, defaultPerPage: number) {
             preserveState: true,
             preserveScroll: page === 1,
             replace: true,
-            only: ['jobs', 'groups', 'filters'],
+            only: ['jobs', 'groups', 'filters', 'ineligible'],
             onStart: () => (loading.value = true),
             onFinish: () => (loading.value = false),
         });
@@ -122,6 +123,7 @@ export function useJobFilters(server: Ref<JobFilters>, defaultPerPage: number) {
     /** Switching tabs resets the order to that tab's default. */
     function setTab(tab: JobFilters['tab']): void {
         state.tab = tab;
+        state.ineligible = false;
         state.sort = defaultSort(state);
         visit();
     }

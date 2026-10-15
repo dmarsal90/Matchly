@@ -59,12 +59,13 @@ final readonly class ScoreJobsForUser
                         'score' => $result->score,
                         'level' => $result->level,
                         'eligible' => $result->eligible,
+                        'ineligible_reason' => $result->ineligibleReasons[0]['key'] ?? null,
                         'result' => json_encode($result->toArray(), JSON_THROW_ON_ERROR),
                         'computed_at' => $now,
                     ];
                 }
 
-                JobMatch::query()->upsert($rows, ['user_id', 'job_listing_id'], ['score', 'level', 'eligible', 'result', 'computed_at']);
+                JobMatch::query()->upsert($rows, ['user_id', 'job_listing_id'], ['score', 'level', 'eligible', 'ineligible_reason', 'result', 'computed_at']);
                 $scored += count($rows);
             });
 

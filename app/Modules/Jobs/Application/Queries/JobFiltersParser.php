@@ -68,6 +68,7 @@ final class JobFiltersParser
             viewerId: $viewerId,
             recommended: $recommended,
             minScore: $minScore !== null && $minScore > 0 ? $minScore : null,
+            showIneligible: $recommended && $string('ineligible') === '1',
         );
     }
 

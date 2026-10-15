@@ -157,6 +157,19 @@ return [
         'all' => 'Todas',
         'recommended' => 'Recomendadas para ti',
     ],
+    'hidden_by_fit' => [
+        'summary' => '{1} :count oferta está oculta porque tu perfil la descarta|[2,*] :count ofertas están ocultas porque tu perfil las descarta',
+        'show' => 'Mostrarlas',
+        'hide' => 'Ocultarlas de nuevo',
+        'reasons' => [
+            'location' => 'solo abiertas a otros países',
+            'remote_only' => 'no son 100 % remotas',
+            'region_strict' => 'fuera de tus regiones',
+            'salary_disclosed' => 'sin sueldo indicado',
+            'salary_floor' => 'sueldo por debajo de tu mínimo',
+            'employment_type' => 'otro tipo de contrato',
+        ],
+    ],
     'recommended_empty' => [
         'title' => 'Aún no hay recomendaciones',
         'description' => 'Completa tu perfil de habilidades y calcularemos tu compatibilidad con cada oferta.',

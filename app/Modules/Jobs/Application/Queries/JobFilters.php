@@ -52,6 +52,7 @@ final readonly class JobFilters
         public ?int $viewerId = null,
         public bool $recommended = false,
         public ?int $minScore = null,
+        public bool $showIneligible = false,
     ) {}
 
     /** Whether scores of the viewer take part in filtering or ordering. */

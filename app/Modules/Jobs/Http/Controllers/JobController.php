@@ -25,6 +25,7 @@ use App\Modules\Jobs\Domain\Enums\WorkMode;
 use App\Modules\Jobs\Http\Requests\JobSearchRequest;
 use App\Modules\Jobs\Http\Resources\JobListingResource;
 use App\Modules\Jobs\Infrastructure\Models\JobListing;
+use App\Modules\Matching\Application\Queries\IneligibleSummary;
 use App\Modules\Matching\Application\Queries\JobMatchDetails;
 use App\Modules\Matching\Infrastructure\Models\JobMatch;
 use App\Modules\Providers\Infrastructure\Models\Source;
@@ -41,7 +42,7 @@ use Inertia\Response;
  */
 final class JobController
 {
-    public function index(JobSearchRequest $request, JobSearchQuery $search, ViewerJobState $viewerState, AiGateway $ai, #[CurrentUser] ?User $user): Response
+    public function index(JobSearchRequest $request, JobSearchQuery $search, ViewerJobState $viewerState, AiGateway $ai, IneligibleSummary $ineligible, #[CurrentUser] ?User $user): Response
     {
         $filters = $request->toFilters($user?->id);
         $jobs = $search->paginate($filters, $request->page());
@@ -65,6 +66,7 @@ final class JobController
             ],
             'groups' => $filters->groupBy !== null ? $search->groupCounts($filters) : null,
             'filters' => $this->echo($filters),
+            'ineligible' => $user !== null && $filters->recommended ? $ineligible->for($user->id) : null,
             'options' => Inertia::once(fn (): array => $this->options($search)),
             'viewer' => $user !== null ? [
                 'onboarding_completed' => $user->profile?->onboarding_completed_at !== null,
@@ -147,6 +149,7 @@ final class JobController
             'per_page' => $filters->perPage,
             'tab' => $filters->recommended ? 'recommended' : null,
             'min_score' => $filters->minScore,
+            'ineligible' => $filters->showIneligible,
         ];
     }
 

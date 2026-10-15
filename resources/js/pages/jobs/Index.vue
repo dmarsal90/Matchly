@@ -25,6 +25,7 @@ import type {
     Job,
     JobFilters,
     JobOptions,
+    IneligibleSummary,
     JobPage,
     MultiFilterKey,
 } from '@/features/jobs/types';
@@ -45,6 +46,7 @@ const props = defineProps<{
     jobs: JobPage;
     groups: Record<string, number> | null;
     filters: JobFilters;
+    ineligible: IneligibleSummary | null;
     options: JobOptions;
     viewer: {
         onboarding_completed: boolean;
@@ -102,6 +104,18 @@ const sortOptions = computed(() =>
     props.options.sort.filter((sort) => sort !== 'match' || props.viewer),
 );
 const TABS = [null, 'recommended'] as const;
+
+/** "only open to other countries: 1.576, not fully remote: 311", most frequent first. */
+const hiddenReasons = computed(() =>
+    Object.entries(props.ineligible?.reasons ?? {})
+        .filter(([reason]) => reason !== '')
+        .slice(0, 3)
+        .map(
+            ([reason, total]) =>
+                `${trans(`jobs.hidden_by_fit.reasons.${reason}`)}: ${total.toLocaleString()}`,
+        )
+        .join(', '),
+);
 
 const savingSearch = ref(false);
 const currentSearch = computed(() => {
@@ -355,6 +369,40 @@ function onSet(key: keyof JobFilters, value: string | number | null): void {
                             {{ size }}
                         </option>
                     </NativeSelect>
+                </div>
+
+                <div
+                    v-if="
+                        state.tab === 'recommended' &&
+                        ineligible &&
+                        ineligible.total > 0
+                    "
+                    class="flex flex-wrap items-center gap-x-3 gap-y-1 rounded-lg border bg-muted/40 px-3 py-2 text-sm"
+                >
+                    <p class="mr-auto text-muted-foreground">
+                        {{
+                            transChoice(
+                                'jobs.hidden_by_fit.summary',
+                                ineligible.total,
+                                { count: ineligible.total.toLocaleString() },
+                            )
+                        }}
+                        <span v-if="hiddenReasons">({{ hiddenReasons }})</span>
+                    </p>
+                    <Button
+                        variant="link"
+                        size="sm"
+                        class="h-auto p-0"
+                        @click="set('ineligible', !state.ineligible)"
+                    >
+                        {{
+                            trans(
+                                state.ineligible
+                                    ? 'jobs.hidden_by_fit.hide'
+                                    : 'jobs.hidden_by_fit.show',
+                            )
+                        }}
+                    </Button>
                 </div>
 
                 <JobListSkeleton v-if="loading && jobs.data.length === 0" />
