@@ -54,7 +54,7 @@ it('lists the pipeline with job details', function (): void {
         ->has('applications', 1)
         ->where('applications.0.job.title', 'Staff Engineer')
         ->where('applications.0.status', 'saved')
-        ->where('statuses', ['saved', 'prepared', 'applied', 'interview', 'rejected']));
+        ->where('statuses', ['saved', 'prepared', 'applied', 'interview', 'offer', 'accepted', 'declined', 'rejected', 'no_response']));
 });
 
 it('moves an application through the pipeline and keeps private notes encrypted', function (): void {

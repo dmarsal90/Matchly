@@ -24,7 +24,7 @@ use Carbon\CarbonImmutable;
  */
 final readonly class StartQuickApply
 {
-    public function __construct(private GrantConsent $grantConsent) {}
+    public function __construct(private GrantConsent $grantConsent, private RecordApplicationEvent $record) {}
 
     public function handle(User $user, JobListing $job, LetterTone $tone, LetterLength $length, bool $useAi): ApplicationPackage
     {
@@ -41,6 +41,7 @@ final readonly class StartQuickApply
                 'status' => ApplicationStatus::Prepared,
                 'status_changed_at' => CarbonImmutable::now(),
             ])->save();
+            $this->record->statusChanged($application, ApplicationStatus::Prepared, $application->status_changed_at);
         }
 
         $package = new ApplicationPackage([
