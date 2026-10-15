@@ -1,5 +1,6 @@
 # Continuous delivery.
-#   push to main      build the image, publish it to GHCR (sha-<commit> and latest),
+#   push to main      build the image for amd64 and arm64, publish it to GHCR
+#                     (sha-<commit> and latest),
 #                     scan it with Trivy and deploy it to staging
 #   manual run        deploy any published tag to staging or production; running it
 #                     with an older tag is the rollback
@@ -33,24 +34,27 @@ permissions:
   contents: read
 
 jobs:
-  image:
-    name: Build and publish
+  # One native runner per architecture (no emulation): amd64 for CI and most
+  # servers, arm64 for Oracle Ampere, AWS Graviton and Apple-silicon hosts.
+  build:
+    name: Build ${{ matrix.arch }}
     if: github.event_name == 'push'
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 40
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - { arch: amd64, platform: linux/amd64, runner: ubuntu-24.04 }
+          - { arch: arm64, platform: linux/arm64, runner: ubuntu-24.04-arm }
     permissions:
       contents: read
       packages: write
-    outputs:
-      tag: ${{ steps.tag.outputs.tag }}
     steps:
       - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
 
-      - name: Image name and tag
-        id: tag
-        run: |
-          echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
-          echo "tag=sha-${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+      - name: Image name
+        run: echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
 
       - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
 
@@ -64,23 +68,86 @@ jobs:
         id: meta
         uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
         with:
-          images: ${{ steps.tag.outputs.image }}
-          tags: |
-            type=raw,value=${{ steps.tag.outputs.tag }}
-            type=raw,value=latest
+          images: ${{ env.IMAGE }}
 
+      # Pushed by digest only; the "image" job below puts the tags on the pair.
       - name: Build and push
+        id: build
         uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
         with:
           context: .
           target: prod
-          push: true
-          tags: ${{ steps.meta.outputs.tags }}
+          platforms: ${{ matrix.platform }}
           labels: ${{ steps.meta.outputs.labels }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
-          provenance: true
-          sbom: true
+          outputs: type=image,name=${{ env.IMAGE }},push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=${{ matrix.arch }}
+          cache-to: type=gha,scope=${{ matrix.arch }},mode=max
+          # Attestations would nest an index inside each platform digest.
+          provenance: false
+          sbom: false
+
+      - name: Export digest
+        env:
+          DIGEST: ${{ steps.build.outputs.digest }}
+        run: |
+          mkdir -p "$RUNNER_TEMP/digests"
+          touch "$RUNNER_TEMP/digests/${DIGEST#sha256:}"
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        with:
+          name: digest-${{ matrix.arch }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  image:
+    name: Publish multi-arch image
+    needs: build
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - name: Image name and tag
+        id: tag
+        run: |
+          echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_ENV"
+          echo "tag=sha-${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digest-*
+          merge-multiple: true
+
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag the manifest list
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          # shellcheck disable=SC2046
+          docker buildx imagetools create -t "$IMAGE:$TAG" -t "$IMAGE:latest" \
+            $(printf "$IMAGE@sha256:%s " *)
+
+      - name: Inspect
+        env:
+          TAG: ${{ steps.tag.outputs.tag }}
+        run: |
+          docker buildx imagetools inspect "$IMAGE:$TAG"
+          # Both architectures must be there, or the deploy would fail on one of them.
+          docker buildx imagetools inspect "$IMAGE:$TAG" | grep -q 'linux/amd64'
+          docker buildx imagetools inspect "$IMAGE:$TAG" | grep -q 'linux/arm64'
 
   scan:
     name: Trivy

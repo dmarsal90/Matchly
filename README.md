@@ -128,7 +128,7 @@ Más detalle en [docs/architecture.md](docs/architecture.md): módulos, flujos (
 ## CI/CD y despliegue
 
 - **CI** (`.github/workflows/ci.yml`, en cada PR): Pint, Larastan, Pest en SQLite y en PostgreSQL (con cobertura mínima del 90 %), ESLint, Prettier, vue-tsc, Vitest, build del frontend, Playwright y build de la imagen de producción.
-- **CD** (`.github/workflows/deploy.yml`, en `main`): publica la imagen en GHCR (`sha-<commit>` y `latest`), la escanea con Trivy y despliega en staging. Producción y los rollbacks se lanzan a mano con la etiqueta que quieras desplegar.
+- **CD** (`.github/workflows/deploy.yml`, en `main`): publica la imagen en GHCR para amd64 y arm64 (`sha-<commit>` y `latest`), la escanea con Trivy y despliega en staging. Producción y los rollbacks se lanzan a mano con la etiqueta que quieras desplegar.
 - **Dependabot** para Composer, npm, GitHub Actions y Docker.
 
 La misma imagen sirve para todos los procesos y entornos. [docs/deployment.md](docs/deployment.md) explica cada destino:
@@ -136,6 +136,7 @@ La misma imagen sirve para todos los procesos y entornos. [docs/deployment.md](d
 | Destino | Ficheros |
 | --- | --- |
 | VPS con Docker Compose (Caddy + HTTPS, backups diarios, rotación de logs) | `docker-compose.prod.yml`, `deploy/vps/`, `deploy/env.production.example` |
+| Staging gratis en Oracle Cloud (Always Free, ARM) | [docs/oracle-free-staging.md](docs/oracle-free-staging.md), `deploy/oracle/` |
 | Laravel Cloud · Laravel Forge | pasos en la guía |
 | Render | `deploy/render.yaml` (Blueprint) |
 | Fly.io | `deploy/fly.toml` |

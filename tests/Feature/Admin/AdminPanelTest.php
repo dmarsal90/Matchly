@@ -86,3 +86,18 @@ it('grants admin rights from the console', function (): void {
 
     expect($user->refresh()->is_admin)->toBeTrue();
 });
+
+it('leaves the e-mail unverified unless asked, and can verify it for servers without mail', function (): void {
+    $user = User::factory()->unverified()->create();
+
+    $this->artisan('users:admin', ['email' => $user->email])->assertSuccessful();
+    expect($user->refresh()->is_admin)->toBeTrue()->and($user->email_verified_at)->toBeNull();
+
+    $this->artisan('users:admin', ['email' => $user->email, '--verify' => true])->assertSuccessful();
+    expect($user->refresh()->email_verified_at)->not->toBeNull();
+
+    $verifiedAt = $user->email_verified_at;
+    $this->travel(1)->days();
+    $this->artisan('users:admin', ['email' => $user->email, '--verify' => true])->assertSuccessful();
+    expect($user->refresh()->email_verified_at->equalTo($verifiedAt))->toBeTrue();
+});

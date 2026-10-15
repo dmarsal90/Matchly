@@ -260,9 +260,16 @@ jobs:
           retention-days: 7
 
   image:
-    name: Production image
-    runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    name: Production image (${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 40
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { arch: amd64, runner: ubuntu-24.04 }
+          # The published image is multi-arch: catch arm64-only build breaks in the PR.
+          - { arch: arm64, runner: ubuntu-24.04-arm }
     # main builds and publishes the image in deploy.yml.
     if: github.event_name == 'pull_request'
     steps:
@@ -278,8 +285,8 @@ jobs:
           push: false
           load: true
           tags: matchly:ci
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-from: type=gha,scope=${{ matrix.arch }}
+          cache-to: type=gha,scope=${{ matrix.arch }},mode=max
 
       - name: Smoke test
         run: |
