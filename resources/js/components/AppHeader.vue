@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { useNavigation } from '@/composables/useNavigation';
 import { Link, usePage } from '@inertiajs/vue3';
 import { Menu, Search } from '@lucide/vue';
@@ -33,6 +34,8 @@ import {
     TooltipTrigger,
 } from '@/components/ui/tooltip';
 import UserMenuContent from '@/components/UserMenuContent.vue';
+import LanguageSwitcher from '@/components/LanguageSwitcher.vue';
+import ThemeToggle from '@/components/ThemeToggle.vue';
 import NotificationBell from '@/features/alerts/components/NotificationBell.vue';
 import { useCurrentUrl } from '@/composables/useCurrentUrl';
 import { getInitials } from '@/composables/useInitials';
@@ -75,9 +78,9 @@ const { main: mainNavItems, secondary: rightNavItems } = useNavigation();
                             </Button>
                         </SheetTrigger>
                         <SheetContent side="left" class="w-[300px] p-6">
-                            <SheetTitle class="sr-only"
-                                >Navigation menu</SheetTitle
-                            >
+                            <SheetTitle class="sr-only">{{
+                                trans('common.navigation_menu')
+                            }}</SheetTitle>
                             <SheetHeader class="flex justify-start text-left">
                                 <AppLogoIcon
                                     class="size-6 fill-current text-black dark:text-white"
@@ -221,6 +224,8 @@ const { main: mainNavItems, secondary: rightNavItems } = useNavigation();
                         </div>
                     </div>
 
+                    <LanguageSwitcher class="hidden sm:flex" />
+                    <ThemeToggle />
                     <NotificationBell v-if="auth.user" />
                     <DropdownMenu v-if="auth.user">
                         <DropdownMenuTrigger :as-child="true">

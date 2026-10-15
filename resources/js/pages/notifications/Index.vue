@@ -20,7 +20,7 @@ const props = defineProps<{
 }>();
 
 defineOptions({
-    layout: { breadcrumbs: [{ title: 'Notifications', href: index() }] },
+    layout: { breadcrumbs: [{ title: 'nav.notifications', href: index() }] },
 });
 
 const hasUnread = computed(() =>

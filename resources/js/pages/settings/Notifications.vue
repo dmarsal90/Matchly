@@ -14,7 +14,7 @@ const props = defineProps<{
 }>();
 
 defineOptions({
-    layout: { breadcrumbs: [{ title: 'Notifications', href: edit() }] },
+    layout: { breadcrumbs: [{ title: 'nav.notifications', href: edit() }] },
 });
 
 const form = useForm({ email: props.email, realtime: props.realtime });

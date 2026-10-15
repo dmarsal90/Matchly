@@ -23,7 +23,7 @@ const props = defineProps<{
 
 defineOptions({
     layout: {
-        breadcrumbs: [{ title: 'Skills', href: index() }],
+        breadcrumbs: [{ title: 'nav.skills', href: index() }],
     },
 });
 

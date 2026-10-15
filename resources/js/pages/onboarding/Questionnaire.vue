@@ -20,7 +20,7 @@ defineProps<{
 
 defineOptions({
     layout: {
-        breadcrumbs: [{ title: 'Skills questionnaire', href: show() }],
+        breadcrumbs: [{ title: 'onboarding.title', href: show() }],
     },
 });
 </script>

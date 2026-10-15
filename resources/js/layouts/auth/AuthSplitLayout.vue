@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// Titles arrive as translation keys (page layout options are static).
+import { trans } from 'laravel-vue-i18n';
 import { Link, usePage } from '@inertiajs/vue3';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import { home } from '@/routes';
@@ -34,10 +36,10 @@ defineProps<{
             >
                 <div class="flex flex-col space-y-2 text-center">
                     <h1 v-if="title" class="text-xl font-medium tracking-tight">
-                        {{ title }}
+                        {{ trans(title ?? '') }}
                     </h1>
                     <p v-if="description" class="text-sm text-muted-foreground">
-                        {{ description }}
+                        {{ trans(description ?? '') }}
                     </p>
                 </div>
                 <slot />

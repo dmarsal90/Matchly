@@ -14,7 +14,7 @@ defineProps<{ consents: Consent[]; policyVersion: string }>();
 
 defineOptions({
     layout: {
-        breadcrumbs: [{ title: 'Privacy', href: edit() }],
+        breadcrumbs: [{ title: 'nav.privacy', href: edit() }],
     },
 });
 

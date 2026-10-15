@@ -3,5 +3,5 @@
 declare(strict_types=1);
 
 return [
-    'description' => ':app reúne vagas de trabalho remoto do mundo todo, calcula sua compatibilidade com cada uma e ajuda você a se candidatar com cartas e currículos adaptados.',
+    'description' => ':app reúne ofertas de trabalho remoto de todo o mundo, calcula a sua compatibilidade com cada uma e ajuda-o a candidatar-se com cartas e currículos adaptados.',
 ];

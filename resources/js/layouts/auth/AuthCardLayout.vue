@@ -1,4 +1,6 @@
 <script setup lang="ts">
+// Titles arrive as translation keys (page layout options are static).
+import { trans } from 'laravel-vue-i18n';
 import { Link } from '@inertiajs/vue3';
 import AppLogoIcon from '@/components/AppLogoIcon.vue';
 import {
@@ -35,9 +37,11 @@ defineProps<{
             <div class="flex flex-col gap-6">
                 <Card class="rounded-xl">
                     <CardHeader class="px-10 pt-8 pb-0 text-center">
-                        <CardTitle class="text-xl">{{ title }}</CardTitle>
+                        <CardTitle class="text-xl">{{
+                            trans(title ?? '')
+                        }}</CardTitle>
                         <CardDescription>
-                            {{ description }}
+                            {{ trans(description ?? '') }}
                         </CardDescription>
                     </CardHeader>
                     <CardContent class="px-10 py-8">

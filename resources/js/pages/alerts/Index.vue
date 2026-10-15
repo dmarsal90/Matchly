@@ -22,7 +22,7 @@ const props = defineProps<{
 }>();
 
 defineOptions({
-    layout: { breadcrumbs: [{ title: 'Alerts', href: index() }] },
+    layout: { breadcrumbs: [{ title: 'nav.alerts', href: index() }] },
 });
 
 function change(

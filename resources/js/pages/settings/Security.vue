@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { trans } from 'laravel-vue-i18n';
 import { Form, Head } from '@inertiajs/vue3';
 import SecurityController from '@/actions/App/Modules/Identity/Http/Controllers/Settings/SecurityController';
 import Heading from '@/components/Heading.vue';
@@ -24,7 +25,7 @@ defineOptions({
     layout: {
         breadcrumbs: [
             {
-                title: 'Security settings',
+                title: 'account.settings.security.head',
                 href: edit(),
             },
         ],
@@ -33,15 +34,17 @@ defineOptions({
 </script>
 
 <template>
-    <Head title="Security settings" />
+    <Head :title="trans('account.settings.security.head')" />
 
-    <h1 class="sr-only">Security settings</h1>
+    <h1 class="sr-only">{{ trans('account.settings.security.head') }}</h1>
 
     <div class="space-y-6">
         <Heading
             variant="small"
-            title="Update password"
-            description="Ensure your account is using a long, random password to stay secure"
+            :title="trans('account.settings.security.password_title')"
+            :description="
+                trans('account.settings.security.password_description')
+            "
         />
 
         <Form
@@ -59,38 +62,48 @@ defineOptions({
             class="space-y-6"
         >
             <div class="grid gap-2">
-                <Label for="current_password">Current password</Label>
+                <Label for="current_password">{{
+                    trans('account.settings.security.current_password')
+                }}</Label>
                 <PasswordInput
                     id="current_password"
                     name="current_password"
                     class="mt-1 block w-full"
                     autocomplete="current-password"
-                    placeholder="Current password"
+                    :placeholder="
+                        trans('account.settings.security.current_password')
+                    "
                 />
                 <InputError :message="errors.current_password" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="password">New password</Label>
+                <Label for="password">{{
+                    trans('account.settings.security.new_password')
+                }}</Label>
                 <PasswordInput
                     id="password"
                     name="password"
                     class="mt-1 block w-full"
                     autocomplete="new-password"
-                    placeholder="New password"
+                    :placeholder="
+                        trans('account.settings.security.new_password')
+                    "
                     :passwordrules="props.passwordRules"
                 />
                 <InputError :message="errors.password" />
             </div>
 
             <div class="grid gap-2">
-                <Label for="password_confirmation">Confirm password</Label>
+                <Label for="password_confirmation">{{
+                    trans('account.auth.confirm_password')
+                }}</Label>
                 <PasswordInput
                     id="password_confirmation"
                     name="password_confirmation"
                     class="mt-1 block w-full"
                     autocomplete="new-password"
-                    placeholder="Confirm password"
+                    :placeholder="trans('account.auth.confirm_password')"
                     :passwordrules="props.passwordRules"
                 />
                 <InputError :message="errors.password_confirmation" />
@@ -101,7 +114,7 @@ defineOptions({
                     :disabled="processing"
                     data-test="update-password-button"
                 >
-                    Save
+                    {{ trans('common.save') }}
                 </Button>
             </div>
         </Form>

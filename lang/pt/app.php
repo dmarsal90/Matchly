@@ -3,9 +3,9 @@
 declare(strict_types=1);
 
 return [
-    'tagline' => 'Trabalho remoto que combina com você',
-    'hero_title' => 'Encontre trabalho remoto que combina com o seu perfil',
-    'hero_subtitle' => ':app reúne vagas de fontes públicas, calcula sua compatibilidade e ajuda a preparar cada candidatura.',
+    'tagline' => 'Trabalho remoto à sua medida',
+    'hero_title' => 'Encontre trabalho remoto à medida do seu perfil',
+    'hero_subtitle' => ':app reúne ofertas de fontes públicas, calcula a sua compatibilidade e ajuda a preparar cada candidatura.',
     'get_started' => 'Começar',
     'log_in' => 'Entrar',
     'register' => 'Criar conta',
