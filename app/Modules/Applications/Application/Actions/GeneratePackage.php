@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Applications\Application\Actions;
 
 use App\Modules\Applications\Application\Generators\CoverLetterWriter;
+use App\Modules\Applications\Application\Generators\DraftReviewer;
 use App\Modules\Applications\Application\Generators\ResumeTailor;
 use App\Modules\Applications\Application\ResumeBuilder;
 use App\Modules\Applications\Domain\Enums\PackageStatus;
@@ -26,6 +27,7 @@ final readonly class GeneratePackage
         private ResolveJobRequirements $requirements,
         private ResumeTailor $tailor,
         private CoverLetterWriter $letters,
+        private DraftReviewer $reviewer,
         private LoggerInterface $logger,
     ) {}
 
@@ -46,7 +48,7 @@ final readonly class GeneratePackage
             $tailored = $this->tailor->tailor($user, $master, $job, $requirements, $language, $useAi);
             $letter = $this->letters->write($user, $tailored->resume, $job, $requirements, $language, $package->tone, $package->length, $user->profile?->years_experience, $useAi);
 
-            $warnings = $letter->warnings;
+            $warnings = [...$letter->warnings, ...$this->reviewer->review($tailored->resume, $letter->text, $job, $requirements, $language, $package->length)];
             $aiError = $tailored->aiError ?? $letter->aiError;
             if ($aiError !== null) {
                 $warnings[] = ['key' => 'ai_unavailable', 'params' => ['reason' => $aiError]];

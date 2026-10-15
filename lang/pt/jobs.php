@@ -157,6 +157,19 @@ return [
         'all' => 'Todas',
         'recommended' => 'Recomendadas para si',
     ],
+    'hidden_by_fit' => [
+        'summary' => '{1} :count vaga está oculta porque o teu perfil a exclui|[2,*] :count vagas estão ocultas porque o teu perfil as exclui',
+        'show' => 'Mostrá-las',
+        'hide' => 'Ocultá-las de novo',
+        'reasons' => [
+            'location' => 'só abertas a outros países',
+            'remote_only' => 'não são 100 % remotas',
+            'region_strict' => 'fora das tuas regiões',
+            'salary_disclosed' => 'sem salário indicado',
+            'salary_floor' => 'salário abaixo do teu mínimo',
+            'employment_type' => 'outro tipo de contrato',
+        ],
+    ],
     'recommended_empty' => [
         'title' => 'Ainda não há recomendações',
         'description' => 'Complete o seu perfil de competências e calcularemos a sua compatibilidade com cada oferta.',
