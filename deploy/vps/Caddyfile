@@ -1,0 +1,24 @@
+# Caddy obtains and renews the Let's Encrypt certificate for {$DOMAIN}.
+{
+	email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	# Browsers reach Reverb on the same domain: wss://{$DOMAIN}/app/<key>.
+	# Set REVERB_PUBLIC_HOST={$DOMAIN}, REVERB_PUBLIC_PORT=443, REVERB_PUBLIC_SCHEME=https.
+	@reverb path /app/*
+	reverse_proxy @reverb reverb:8080
+
+	reverse_proxy web:8080 {
+		# Health-checked by the load balancer as well (Laravel's /up).
+		health_uri /up
+		health_interval 30s
+	}
+
+	log {
+		output stdout
+		format json
+	}
+}
