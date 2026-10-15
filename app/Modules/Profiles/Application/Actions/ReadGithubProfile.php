@@ -22,6 +22,7 @@ final readonly class ReadGithubProfile
 {
     public function __construct(
         private GitHubProfileReader $reader,
+        private SummarizeGithubWithAi $summarize,
         private LoggerInterface $logger,
     ) {}
 
@@ -41,6 +42,11 @@ final readonly class ReadGithubProfile
 
         try {
             $payload = $this->reader->read((string) $import->reference, $this->tokenFor($user->id, (string) $import->reference));
+
+            // The AI summary is opt-in (its own consent) and optional: the import never depends on it.
+            if ($user->hasConsented(ConsentPurpose::AiProcessing)) {
+                $payload['summary'] = $this->summarize->handle($user, $payload['repositories']);
+            }
 
             $import->fill(['status' => ImportStatus::PendingReview, 'payload' => $payload, 'reference' => $payload['username'], 'error' => null])->save();
         } catch (ImportFailed $exception) {

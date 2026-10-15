@@ -17,12 +17,12 @@ final readonly class ViewerJobState
 
     /**
      * @param  list<int>  $jobIds
-     * @return array{0: array<int, string>, 1: array<int, true>}
+     * @return array{0: array<int, string>, 1: array<int, true>, 2: array<int, array{score: int, level: string, eligible: bool}>}
      */
     public function for(?User $user, array $jobIds): array
     {
         if ($user === null || $jobIds === []) {
-            return [[], []];
+            return [[], [], []];
         }
 
         /** @var array<int, string> $tracked */
@@ -38,6 +38,11 @@ final readonly class ViewerJobState
             true,
         );
 
-        return [$tracked, $viewed];
+        $matches = [];
+        foreach ($this->db->table('job_matches')->where('user_id', $user->id)->whereIn('job_listing_id', $jobIds)->get(['job_listing_id', 'score', 'level', 'eligible']) as $row) {
+            $matches[(int) $row->job_listing_id] = ['score' => (int) $row->score, 'level' => (string) $row->level, 'eligible' => (bool) $row->eligible];
+        }
+
+        return [$tracked, $viewed, $matches];
     }
 }

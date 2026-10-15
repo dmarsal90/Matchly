@@ -20,16 +20,21 @@ final class JobListingResource extends JsonResource
     /** @var array<int, true> */
     private array $viewed = [];
 
+    /** @var array<int, array{score: int, level: string, eligible: bool}> job id => viewer's compatibility */
+    private array $matches = [];
+
     private bool $withDescription = false;
 
     /**
      * @param  array<int, string>  $tracked
      * @param  array<int, true>  $viewed
+     * @param  array<int, array{score: int, level: string, eligible: bool}>  $matches
      */
-    public function withViewerState(array $tracked, array $viewed): self
+    public function withViewerState(array $tracked, array $viewed, array $matches = []): self
     {
         $this->tracked = $tracked;
         $this->viewed = $viewed;
+        $this->matches = $matches;
 
         return $this;
     }
@@ -79,6 +84,7 @@ final class JobListingResource extends JsonResource
             ],
             'tracking_status' => $this->tracked[$this->id] ?? null,
             'viewed' => isset($this->viewed[$this->id]),
+            'match' => $this->matches[$this->id] ?? null,
             'description' => $this->when($this->withDescription, fn (): string => $this->description),
         ];
     }

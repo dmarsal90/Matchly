@@ -189,6 +189,65 @@ const sourceLabel = computed(() =>
         </div>
 
         <form class="space-y-10" @submit.prevent="submit">
+            <p
+                v-if="data.ai_error"
+                class="rounded-lg border bg-muted/40 p-3 text-sm text-muted-foreground"
+            >
+                {{
+                    trans('skills.review.ai_fallback', {
+                        reason: trans(`ai.errors.${data.ai_error}`),
+                    })
+                }}
+            </p>
+            <p
+                v-else-if="data.ai"
+                class="rounded-lg border bg-muted/40 p-3 text-sm text-muted-foreground"
+            >
+                {{ trans('skills.review.ai_note') }}
+            </p>
+
+            <!-- AI summary (GitHub) -->
+            <section
+                v-if="data.summary"
+                class="space-y-2"
+                aria-labelledby="review-summary"
+            >
+                <h2 id="review-summary" class="text-base font-medium">
+                    {{ trans('skills.review.ai_summary') }}
+                </h2>
+                <p v-if="data.summary.summary" class="text-sm">
+                    {{ data.summary.summary }}
+                </p>
+                <p
+                    v-if="data.summary.technologies.length"
+                    class="text-sm text-muted-foreground"
+                >
+                    {{ trans('skills.review.technologies') }}:
+                    {{ data.summary.technologies.join(', ') }}
+                </p>
+                <p
+                    v-if="data.summary.project_types.length"
+                    class="text-sm text-muted-foreground"
+                >
+                    {{ trans('skills.review.project_types') }}:
+                    {{ data.summary.project_types.join(', ') }}
+                </p>
+                <ul
+                    v-if="data.summary.highlights.length"
+                    class="list-disc space-y-0.5 pl-6 text-sm text-muted-foreground"
+                >
+                    <li
+                        v-for="item in data.summary.highlights"
+                        :key="item.repository"
+                    >
+                        <span class="font-medium text-foreground">{{
+                            item.repository
+                        }}</span
+                        >: {{ item.note }}
+                    </li>
+                </ul>
+            </section>
+
             <!-- Headline (LinkedIn) -->
             <section
                 v-if="data.profile?.headline"

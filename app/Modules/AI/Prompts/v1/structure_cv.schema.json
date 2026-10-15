@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["headline", "positions", "education", "certifications", "projects", "skills"],
+  "properties": {
+    "headline": {"type": ["string", "null"], "maxLength": 200},
+    "positions": {
+      "type": "array",
+      "maxItems": 30,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title", "company", "description", "started_on", "finished_on"],
+        "properties": {
+          "title": {"type": "string", "minLength": 1, "maxLength": 150},
+          "company": {"type": ["string", "null"], "maxLength": 150},
+          "description": {"type": ["string", "null"], "maxLength": 1500},
+          "started_on": {"type": ["string", "null"], "pattern": "^(19|20)\\d{2}(-(0[1-9]|1[0-2]))?$"},
+          "finished_on": {"type": ["string", "null"], "pattern": "^(19|20)\\d{2}(-(0[1-9]|1[0-2]))?$"}
+        }
+      }
+    },
+    "education": {
+      "type": "array",
+      "maxItems": 15,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["school", "degree", "started_on", "finished_on"],
+        "properties": {
+          "school": {"type": "string", "minLength": 1, "maxLength": 150},
+          "degree": {"type": ["string", "null"], "maxLength": 150},
+          "started_on": {"type": ["string", "null"], "pattern": "^(19|20)\\d{2}(-(0[1-9]|1[0-2]))?$"},
+          "finished_on": {"type": ["string", "null"], "pattern": "^(19|20)\\d{2}(-(0[1-9]|1[0-2]))?$"}
+        }
+      }
+    },
+    "certifications": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["name", "authority"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1, "maxLength": 200},
+          "authority": {"type": ["string", "null"], "maxLength": 150}
+        }
+      }
+    },
+    "projects": {
+      "type": "array",
+      "maxItems": 20,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title", "description"],
+        "properties": {
+          "title": {"type": "string", "minLength": 1, "maxLength": 200},
+          "description": {"type": ["string", "null"], "maxLength": 1000}
+        }
+      }
+    },
+    "skills": {"type": "array", "maxItems": 60, "items": {"type": "string", "minLength": 1, "maxLength": 60}}
+  }
+}

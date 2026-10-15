@@ -21,9 +21,12 @@ final readonly class StartGithubImport
         private PendingImports $imports,
     ) {}
 
-    public function handle(User $user, GitHubUsername $username): ProfileImport
+    public function handle(User $user, GitHubUsername $username, bool $aiSummary = false): ProfileImport
     {
         $this->grantConsent->handle($user, ConsentPurpose::GithubImport);
+        if ($aiSummary) {
+            $this->grantConsent->handle($user, ConsentPurpose::AiProcessing);
+        }
 
         $import = $this->imports->start($user, SkillSource::Github, $username->value);
 

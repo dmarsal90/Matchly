@@ -20,6 +20,8 @@ const empty: JobFilters = {
     sort: 'newest',
     group: null,
     per_page: 20,
+    tab: null,
+    min_score: null,
 };
 
 describe('toQuery', () => {
@@ -61,5 +63,17 @@ describe('toQuery', () => {
 
     it('drops the currency when there is no salary filter', () => {
         expect(toQuery({ ...empty, currency: 'USD' }, 20)).toEqual({});
+    });
+
+    it('keeps the recommended tab and its score order implicit', () => {
+        expect(
+            toQuery({ ...empty, tab: 'recommended', sort: 'match' }, 20),
+        ).toEqual({ tab: 'recommended' });
+        expect(
+            toQuery({ ...empty, tab: 'recommended', sort: 'newest' }, 20),
+        ).toEqual({ tab: 'recommended', sort: 'newest' });
+        expect(toQuery({ ...empty, sort: 'match', min_score: 70 }, 20)).toEqual(
+            { sort: 'match', min_score: '70' },
+        );
     });
 });

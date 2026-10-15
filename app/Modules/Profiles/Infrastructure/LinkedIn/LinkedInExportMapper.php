@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace App\Modules\Profiles\Infrastructure\LinkedIn;
 
 use App\Modules\Profiles\Domain\Enums\LanguageLevel;
-use App\Modules\Profiles\Domain\Services\EvidenceLevel;
 use App\Modules\Profiles\Domain\Services\SkillCatalog;
+use App\Modules\Profiles\Infrastructure\Imports\PositionSkills;
 use App\Modules\Shared\Infrastructure\Localization\Languages;
-use Carbon\CarbonImmutable;
 
 /**
  * Maps the whitelisted CSVs of a LinkedIn export to structured profile data.
@@ -29,8 +28,6 @@ final readonly class LinkedInExportMapper
         'certifications' => ['Name', 'Url', 'Authority', 'Started On', 'Finished On'],
         'projects' => ['Title', 'Description', 'Url', 'Started On', 'Finished On'],
     ];
-
-    private const int MAX_SAMPLE_POSITIONS = 5;
 
     public function __construct(
         private SkillCatalog $catalog,
@@ -85,7 +82,7 @@ final readonly class LinkedInExportMapper
 
     /**
      * @param  list<array<string, string>>  $rows
-     * @return list<array<string, mixed>>
+     * @return list<array{title: string, company: string|null, description: string|null, location: string|null, started_on: string|null, finished_on: string|null}>
      */
     private function positions(array $rows): array
     {
@@ -136,55 +133,20 @@ final readonly class LinkedInExportMapper
 
     /**
      * @param  list<array<string, string>>  $rows
-     * @param  list<array<string, mixed>>  $positions
+     * @param  list<array{title: string, company: string|null, description: string|null, location: string|null, started_on: string|null, finished_on: string|null}>  $positions
      * @return list<array<string, mixed>>
      */
     private function skills(array $rows, array $positions): array
     {
-        $currentYear = CarbonImmutable::now()->year;
-        $skills = [];
-
+        $listed = [];
         foreach ($rows as $row) {
             $skill = $this->catalog->normalize($row['name']);
             if ($skill !== null) {
-                $skills[$skill->slug] ??= ['skill' => $skill->slug, 'name' => $skill->label, 'level' => null, 'years' => null, 'last_used_year' => null, 'evidence' => ['listed' => true, 'positions' => []]];
+                $listed[$skill->slug] ??= ['name' => $skill->label, 'evidence' => ['listed' => true]];
             }
         }
 
-        // Known skills named in a position: years of use and recency.
-        $usage = [];
-        foreach ($positions as $position) {
-            $mentioned = $this->catalog->detectIn($position['title'].' '.($position['description'] ?? ''));
-            if ($mentioned === []) {
-                continue;
-            }
-
-            [$years, $endYear] = LinkedInDate::span($position['started_on'], $position['finished_on']);
-            foreach (array_keys($mentioned) as $slug) {
-                $usage[$slug]['years'] = ($usage[$slug]['years'] ?? 0.0) + $years;
-                $usage[$slug]['last'] = max($usage[$slug]['last'] ?? 0, $endYear ?? 0);
-                $usage[$slug]['positions'][] = trim($position['title'].($position['company'] !== null ? ' · '.$position['company'] : ''));
-            }
-        }
-
-        foreach ($usage as $slug => $used) {
-            $years = min(25.0, round($used['years'] * 2) / 2);
-            $lastUsed = $used['last'] > 0 ? $used['last'] : null;
-
-            $skills[$slug] = [
-                'skill' => $slug,
-                'name' => $skills[$slug]['name'] ?? $this->catalog->label($slug, $slug),
-                'level' => EvidenceLevel::fromYears($years, $lastUsed, $currentYear),
-                'years' => $years > 0 ? $years : null,
-                'last_used_year' => $lastUsed,
-                'evidence' => [
-                    'listed' => isset($skills[$slug]),
-                    'positions' => array_slice(array_values(array_unique($used['positions'])), 0, self::MAX_SAMPLE_POSITIONS),
-                ],
-            ];
-        }
-
-        return array_values($skills);
+        return (new PositionSkills($this->catalog))->combine($listed, $positions, ['listed' => false]);
     }
 
     /**

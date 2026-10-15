@@ -40,12 +40,13 @@ use Laravel\Fortify\TwoFactorAuthenticatable;
  * @property string|null $two_factor_recovery_codes
  * @property CarbonImmutable|null $two_factor_confirmed_at
  * @property string|null $remember_token
+ * @property string|null $anthropic_api_key
  * @property CarbonImmutable|null $created_at
  * @property CarbonImmutable|null $updated_at
  * @property-read Profile|null $profile
  */
 #[Fillable(['name', 'email', 'password', 'locale', 'timezone'])]
-#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token'])]
+#[Hidden(['password', 'two_factor_secret', 'two_factor_recovery_codes', 'remember_token', 'anthropic_api_key'])]
 #[UseFactory(UserFactory::class)]
 final class User extends Authenticatable implements FilamentUser, MustVerifyEmail, PasskeyUser
 {
@@ -59,6 +60,7 @@ final class User extends Authenticatable implements FilamentUser, MustVerifyEmai
         'timezone' => null,
         'last_active_at' => null,
         'two_factor_confirmed_at' => null,
+        'anthropic_api_key' => null,
     ];
 
     public function canAccessPanel(Panel $panel): bool
@@ -135,6 +137,7 @@ final class User extends Authenticatable implements FilamentUser, MustVerifyEmai
             'is_admin' => 'boolean',
             'last_active_at' => 'immutable_datetime',
             'two_factor_confirmed_at' => 'immutable_datetime',
+            'anthropic_api_key' => 'encrypted',
         ];
     }
 }

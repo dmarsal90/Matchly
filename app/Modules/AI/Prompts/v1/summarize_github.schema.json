@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["summary", "technologies", "project_types", "highlights"],
+  "properties": {
+    "summary": {"type": "string", "maxLength": 800},
+    "technologies": {"type": "array", "maxItems": 25, "items": {"type": "string", "minLength": 1, "maxLength": 60}},
+    "project_types": {"type": "array", "maxItems": 8, "items": {"type": "string", "minLength": 1, "maxLength": 60}},
+    "highlights": {
+      "type": "array",
+      "maxItems": 5,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["repository", "note"],
+        "properties": {
+          "repository": {"type": "string", "minLength": 1, "maxLength": 100},
+          "note": {"type": "string", "maxLength": 300}
+        }
+      }
+    }
+  }
+}

@@ -38,11 +38,21 @@ const props = defineProps<{
     viewer: {
         onboarding_completed: boolean;
         search_query: Record<string, string> | null;
+        has_matches: boolean;
     } | null;
 }>();
 
-const { state, loading, setSearch, toggle, set, clear, goToPage, activeCount } =
-    useJobFilters(toRef(props, 'filters'), props.options.default_per_page);
+const {
+    state,
+    loading,
+    setSearch,
+    toggle,
+    set,
+    clear,
+    setTab,
+    goToPage,
+    activeCount,
+} = useJobFilters(toRef(props, 'filters'), props.options.default_per_page);
 
 /** Consecutive jobs of the same group, in server order (largest group first). */
 const grouped = computed(() => {
@@ -73,6 +83,12 @@ function groupLabel(key: string): string {
 
     return trans(`jobs.${props.filters.group}.${key}`);
 }
+
+// Ordering by match needs a signed-in viewer with scores.
+const sortOptions = computed(() =>
+    props.options.sort.filter((sort) => sort !== 'match' || props.viewer),
+);
+const TABS = [null, 'recommended'] as const;
 
 function onToggle(key: MultiFilterKey, value: string): void {
     toggle(key, value);
@@ -141,6 +157,30 @@ function onSet(key: keyof JobFilters, value: string | number | null): void {
                     @update:model-value="setSearch(String($event ?? ''))"
                 />
             </form>
+
+            <div
+                v-if="viewer"
+                role="tablist"
+                :aria-label="trans('jobs.tabs.label')"
+                class="inline-flex rounded-lg border bg-muted/40 p-1"
+            >
+                <button
+                    v-for="tab in TABS"
+                    :key="tab ?? 'all'"
+                    type="button"
+                    role="tab"
+                    :aria-selected="state.tab === tab"
+                    class="rounded-md px-3 py-1.5 text-sm font-medium transition-colors focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none"
+                    :class="
+                        state.tab === tab
+                            ? 'bg-background shadow-sm'
+                            : 'text-muted-foreground hover:text-foreground'
+                    "
+                    @click="setTab(tab)"
+                >
+                    {{ trans(`jobs.tabs.${tab ?? 'all'}`) }}
+                </button>
+            </div>
         </header>
 
         <div class="grid gap-8 lg:grid-cols-[16rem_1fr]">
@@ -150,6 +190,7 @@ function onSet(key: keyof JobFilters, value: string | number | null): void {
                         :filters="state"
                         :options="options"
                         :active-count="activeCount"
+                        :can-match="!!viewer"
                         @toggle="onToggle"
                         @set="onSet"
                         @clear="clear"
@@ -217,6 +258,7 @@ function onSet(key: keyof JobFilters, value: string | number | null): void {
                                 :filters="state"
                                 :options="options"
                                 :active-count="activeCount"
+                                :can-match="!!viewer"
                                 @toggle="onToggle"
                                 @set="onSet"
                                 @clear="clear"
@@ -231,7 +273,7 @@ function onSet(key: keyof JobFilters, value: string | number | null): void {
                         @update:model-value="onSet('sort', $event ?? 'newest')"
                     >
                         <option
-                            v-for="sort in options.sort"
+                            v-for="sort in sortOptions"
                             :key="sort"
                             :value="sort"
                             :disabled="sort === 'relevance' && !state.q"
@@ -273,6 +315,31 @@ function onSet(key: keyof JobFilters, value: string | number | null): void {
                 </div>
 
                 <JobListSkeleton v-if="loading && jobs.data.length === 0" />
+
+                <EmptyState
+                    v-else-if="
+                        jobs.data.length === 0 &&
+                        state.tab === 'recommended' &&
+                        !viewer?.has_matches
+                    "
+                    :icon="Sparkles"
+                    :title="trans('jobs.recommended_empty.title')"
+                    :description="
+                        viewer?.onboarding_completed
+                            ? trans('jobs.recommended_empty.pending')
+                            : trans('jobs.recommended_empty.description')
+                    "
+                >
+                    <Button
+                        v-if="!viewer?.onboarding_completed"
+                        size="sm"
+                        as-child
+                    >
+                        <Link :href="questionnaire()">{{
+                            trans('jobs.recommended_empty.action')
+                        }}</Link>
+                    </Button>
+                </EmptyState>
 
                 <EmptyState
                     v-else-if="jobs.data.length === 0"

@@ -12,6 +12,7 @@ use App\Modules\Profiles\Application\Actions\StartGithubImport;
 use App\Modules\Profiles\Domain\Enums\ImportStatus;
 use App\Modules\Profiles\Domain\Enums\LanguageLevel;
 use App\Modules\Profiles\Domain\Exceptions\ImportFailed;
+use App\Modules\Profiles\Http\Requests\AnalyzeCvRequest;
 use App\Modules\Profiles\Http\Requests\ConfirmImportRequest;
 use App\Modules\Profiles\Http\Requests\StartGithubImportRequest;
 use App\Modules\Profiles\Http\Requests\UploadLinkedInExportRequest;
@@ -28,7 +29,7 @@ final class ProfileImportController
 {
     public function github(StartGithubImportRequest $request, #[CurrentUser] User $user, StartGithubImport $start): RedirectResponse
     {
-        $start->handle($user, $request->username());
+        $start->handle($user, $request->username(), $request->boolean('ai_summary'));
 
         Inertia::flash('toast', ['type' => 'info', 'message' => __('skills.github.started')]);
 
@@ -46,12 +47,18 @@ final class ProfileImportController
         return to_route('skills.imports.show', $result);
     }
 
-    public function cv(#[CurrentUser] User $user, AnalyzeCvSkills $analyze): RedirectResponse
+    public function cv(AnalyzeCvRequest $request, #[CurrentUser] User $user, AnalyzeCvSkills $analyze): RedirectResponse
     {
         try {
-            $result = $analyze->handle($user);
+            $result = $analyze->handle($user, $request->boolean('use_ai'));
         } catch (ImportFailed $exception) {
             throw ValidationException::withMessages(['cv' => __('skills.errors.'.$exception->reason)]);
+        }
+
+        if ($result->status === ImportStatus::Processing) {
+            Inertia::flash('toast', ['type' => 'info', 'message' => __('skills.sources.cv.started')]);
+
+            return back();
         }
 
         return to_route('skills.imports.show', $result);

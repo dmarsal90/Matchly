@@ -120,3 +120,11 @@ function linkedinExportZip(): string
 
     return makeZip($entries);
 }
+
+/** The real skill catalog from config/skills.php, without booting the app. */
+function catalog(): App\Modules\Profiles\Domain\Services\SkillCatalog
+{
+    $config = require __DIR__.'/../config/skills.php';
+
+    return new App\Modules\Profiles\Domain\Services\SkillCatalog($config['catalog'], $config['packages']);
+}

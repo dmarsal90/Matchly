@@ -13,6 +13,7 @@ return [
     'account' => 'Conta',
     'security' => 'Segurança',
     'appearance' => 'Aparência',
+    'ai' => 'IA',
     'privacy' => 'Privacidade',
     'admin' => 'Administração',
     'log_out' => 'Sair',

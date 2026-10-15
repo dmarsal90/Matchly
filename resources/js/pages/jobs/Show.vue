@@ -2,17 +2,27 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import ApplyButton from '@/features/jobs/components/ApplyButton.vue';
+import JobRequirementsPanel from '@/features/jobs/components/JobRequirementsPanel.vue';
+import MatchBreakdown from '@/features/jobs/components/MatchBreakdown.vue';
 import SalaryLabel from '@/features/jobs/components/SalaryLabel.vue';
 import SaveJobButton from '@/features/jobs/components/SaveJobButton.vue';
 import { relativeTime } from '@/features/jobs/lib/format';
-import type { Job } from '@/features/jobs/types';
+import type { Job, JobMatch, JobRequirements } from '@/features/jobs/types';
 import { index } from '@/routes/jobs';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import { AlertTriangle, ArrowLeft } from '@lucide/vue';
 import { getActiveLanguage, trans } from 'laravel-vue-i18n';
 import { computed } from 'vue';
 
-const props = defineProps<{ job: Job; isOpen: boolean }>();
+const props = defineProps<{
+    job: Job;
+    isOpen: boolean;
+    requirements: JobRequirements;
+    match: JobMatch | null;
+}>();
+
+// Public page: guests see the requirements, signed-in users their score too.
+const signedIn = computed(() => usePage().props.auth.user !== null);
 
 const posted = computed(() =>
     relativeTime(props.job.posted_at, getActiveLanguage()),
@@ -155,6 +165,10 @@ const description = computed(() => `${props.job.title} · ${props.job.company}`)
                 </li>
             </ul>
         </section>
+
+        <MatchBreakdown :match="match" :signed-in="signedIn" />
+
+        <JobRequirementsPanel :requirements="requirements" />
 
         <section class="space-y-3">
             <h2 class="text-lg font-semibold">

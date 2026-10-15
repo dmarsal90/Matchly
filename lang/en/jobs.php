@@ -31,12 +31,15 @@ return [
         'custom_range' => 'Custom range',
         'any_date' => 'Any time',
         'active' => ':count active filters',
+        'min_score' => 'Minimum match',
+        'any_score' => 'Any',
     ],
     'sort' => [
         'label' => 'Sort by',
         'newest' => 'Newest',
         'relevance' => 'Relevance',
         'salary' => 'Salary',
+        'match' => 'Best match',
     ],
     'group' => [
         'label' => 'Group by',
@@ -149,6 +152,17 @@ return [
         'action' => 'Start',
     ],
     'my_search' => 'Apply my search profile',
+    'tabs' => [
+        'label' => 'Listing view',
+        'all' => 'All',
+        'recommended' => 'Recommended for you',
+    ],
+    'recommended_empty' => [
+        'title' => 'No recommendations yet',
+        'description' => 'Complete your skills profile and we will compute how well you match each job.',
+        'action' => 'Complete profile',
+        'pending' => 'We are computing your matches. Come back in a few minutes.',
+    ],
     'card' => [
         'apply' => 'Apply',
         'apply_hint' => 'Opens the original posting in a new tab',

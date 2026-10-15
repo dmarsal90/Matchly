@@ -43,6 +43,25 @@
         <server name="MAIL_MAILER" value="array" force="true"/>
         <env name="QUEUE_CONNECTION" value="sync" force="true"/>
         <server name="QUEUE_CONNECTION" value="sync" force="true"/>
+        <!-- External AI and APIs are never called from tests: they are faked where needed. -->
+        <env name="AI_ENABLED" value="false" force="true"/>
+        <server name="AI_ENABLED" value="false" force="true"/>
+        <env name="AI_RETRY_DELAY_MS" value="0" force="true"/>
+        <server name="AI_RETRY_DELAY_MS" value="0" force="true"/>
+        <env name="ANTHROPIC_API_KEY" value="" force="true"/>
+        <server name="ANTHROPIC_API_KEY" value="" force="true"/>
+        <env name="GEMINI_API_KEY" value="" force="true"/>
+        <server name="GEMINI_API_KEY" value="" force="true"/>
+        <env name="GROQ_API_KEY" value="" force="true"/>
+        <server name="GROQ_API_KEY" value="" force="true"/>
+        <env name="OPENROUTER_API_KEY" value="" force="true"/>
+        <server name="OPENROUTER_API_KEY" value="" force="true"/>
+        <env name="MISTRAL_API_KEY" value="" force="true"/>
+        <server name="MISTRAL_API_KEY" value="" force="true"/>
+        <env name="OLLAMA_BASE_URL" value="" force="true"/>
+        <server name="OLLAMA_BASE_URL" value="" force="true"/>
+        <env name="GITHUB_API_TOKEN" value="" force="true"/>
+        <server name="GITHUB_API_TOKEN" value="" force="true"/>
         <env name="SESSION_DRIVER" value="array" force="true"/>
         <server name="SESSION_DRIVER" value="array" force="true"/>
         <env name="REDIS_CLIENT" value="phpredis" force="true"/>

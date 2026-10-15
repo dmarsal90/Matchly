@@ -22,6 +22,8 @@ use App\Modules\Jobs\Domain\Enums\WorkMode;
 use App\Modules\Jobs\Http\Requests\JobSearchRequest;
 use App\Modules\Jobs\Http\Resources\JobListingResource;
 use App\Modules\Jobs\Infrastructure\Models\JobListing;
+use App\Modules\Matching\Application\Queries\JobMatchDetails;
+use App\Modules\Matching\Infrastructure\Models\JobMatch;
 use App\Modules\Providers\Infrastructure\Models\Source;
 use BackedEnum;
 use Illuminate\Container\Attributes\CurrentUser;
@@ -38,15 +40,15 @@ final class JobController
 {
     public function index(JobSearchRequest $request, JobSearchQuery $search, ViewerJobState $viewerState, #[CurrentUser] ?User $user): Response
     {
-        $filters = $request->toFilters();
+        $filters = $request->toFilters($user?->id);
         $jobs = $search->paginate($filters, $request->page());
         $ids = array_values(array_map(fn (JobListing $job): int => $job->id, $jobs->items()));
-        [$tracked, $viewed] = $viewerState->for($user, $ids);
+        [$tracked, $viewed, $matches] = $viewerState->for($user, $ids);
 
         return Inertia::render('jobs/Index', [
             'jobs' => [
                 'data' => array_map(
-                    fn (JobListing $job): array => (new JobListingResource($job))->withViewerState($tracked, $viewed)->resolve($request),
+                    fn (JobListing $job): array => (new JobListingResource($job))->withViewerState($tracked, $viewed, $matches)->resolve($request),
                     $jobs->items(),
                 ),
                 'meta' => [
@@ -64,11 +66,12 @@ final class JobController
             'viewer' => $user !== null ? [
                 'onboarding_completed' => $user->profile?->onboarding_completed_at !== null,
                 'search_query' => $user->profile?->searchProfile()?->toListingQuery() ?: null,
+                'has_matches' => JobMatch::query()->where('user_id', $user->id)->exists(),
             ] : null,
         ]);
     }
 
-    public function show(Request $request, JobListing $job, RecordJobView $recordView, ViewerJobState $viewerState, #[CurrentUser] ?User $user): Response|RedirectResponse
+    public function show(Request $request, JobListing $job, RecordJobView $recordView, ViewerJobState $viewerState, JobMatchDetails $fit, #[CurrentUser] ?User $user): Response|RedirectResponse
     {
         if ($job->duplicate_of_id !== null) {
             return to_route('jobs.show', ['job' => $job->duplicate_of_id], 301);
@@ -83,11 +86,14 @@ final class JobController
             $recordView->handle($user, $job);
         }
 
-        [$tracked, $viewed] = $viewerState->for($user, [$job->id]);
+        [$tracked, $viewed, $matches] = $viewerState->for($user, [$job->id]);
+        $details = $fit->for($job, $user);
 
         return Inertia::render('jobs/Show', [
-            'job' => (new JobListingResource($job))->withViewerState($tracked, $viewed)->withDescription()->resolve($request),
+            'job' => (new JobListingResource($job))->withViewerState($tracked, $viewed, $matches)->withDescription()->resolve($request),
             'isOpen' => $job->status === JobStatus::Open,
+            'requirements' => $details['requirements'],
+            'match' => $details['match'],
         ]);
     }
 
@@ -116,6 +122,8 @@ final class JobController
             'sort' => $filters->effectiveSort()->value,
             'group' => $filters->groupBy?->value,
             'per_page' => $filters->perPage,
+            'tab' => $filters->recommended ? 'recommended' : null,
+            'min_score' => $filters->minScore,
         ];
     }
 

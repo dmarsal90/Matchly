@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Modules\AI\Http\Controllers\AiSettingsController;
 use App\Modules\Identity\Http\Controllers\PrivacyController;
 use App\Modules\Identity\Http\Controllers\Settings\ProfileController;
 use App\Modules\Identity\Http\Controllers\Settings\SecurityController;
@@ -30,6 +31,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('settings/privacy', [PrivacyController::class, 'edit'])->name('privacy.edit');
     Route::put('settings/privacy/consent', [PrivacyController::class, 'updateConsent'])->name('privacy.consent');
+    Route::get('settings/ai', [AiSettingsController::class, 'edit'])->name('ai.edit');
+    Route::put('settings/ai/key', [AiSettingsController::class, 'update'])->middleware('throttle:10,1')->name('ai.key.update');
+    Route::delete('settings/ai/key', [AiSettingsController::class, 'destroy'])->name('ai.key.destroy');
+
     Route::get('settings/privacy/export', [PrivacyController::class, 'export'])->middleware('throttle:exports')->name('privacy.export');
 });
 

@@ -2,6 +2,8 @@
 import Heading from '@/components/Heading.vue';
 import InputError from '@/components/InputError.vue';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 import GithubConnect from '@/features/profile/components/GithubConnect.vue';
 import LinkedInImport from '@/features/profile/components/LinkedInImport.vue';
 import MergedSkillList from '@/features/profile/components/MergedSkillList.vue';
@@ -47,15 +49,19 @@ defineOptions({
 });
 
 const page = usePage();
-const cvError = computed(
-    () => (page.props.errors as Record<string, string>).cv,
-);
+const cvError = computed(() => {
+    const errors = page.props.errors as Record<string, string>;
+
+    return errors.cv ?? errors.ai_consent;
+});
 const analyzing = ref(false);
+const useAi = ref(false);
+const aiConsent = ref(false);
 
 function analyze(): void {
     router.post(
         analyzeCv.url(),
-        {},
+        { use_ai: useAi.value, ai_consent: aiConsent.value },
         {
             preserveScroll: true,
             onStart: () => (analyzing.value = true),
@@ -145,19 +151,49 @@ watch(processing, (value) => (value ? start() : stop()), { immediate: true });
 
                 <SourceCard source="cv" :state="sources.cv" :icon="FileText">
                     <div class="grid gap-2">
-                        <div v-if="cv.ready">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                :disabled="analyzing"
-                                @click="analyze"
-                            >
-                                {{
-                                    sources.cv.confirmed
-                                        ? trans('skills.sources.reimport')
-                                        : trans('skills.sources.cv.analyze')
-                                }}
-                            </Button>
+                        <div v-if="cv.ready" class="grid gap-3">
+                            <div class="flex items-start gap-2">
+                                <Checkbox
+                                    id="cv-use-ai"
+                                    v-model="useAi"
+                                    class="mt-0.5"
+                                />
+                                <Label
+                                    for="cv-use-ai"
+                                    class="leading-snug font-normal"
+                                    >{{
+                                        trans('skills.sources.cv.use_ai')
+                                    }}</Label
+                                >
+                            </div>
+                            <div v-if="useAi" class="flex items-start gap-2">
+                                <Checkbox
+                                    id="cv-ai-consent"
+                                    v-model="aiConsent"
+                                    class="mt-0.5"
+                                />
+                                <Label
+                                    for="cv-ai-consent"
+                                    class="text-xs leading-snug font-normal text-muted-foreground"
+                                    >{{
+                                        trans('skills.sources.cv.ai_consent')
+                                    }}</Label
+                                >
+                            </div>
+                            <div>
+                                <Button
+                                    variant="outline"
+                                    size="sm"
+                                    :disabled="analyzing"
+                                    @click="analyze"
+                                >
+                                    {{
+                                        sources.cv.confirmed
+                                            ? trans('skills.sources.reimport')
+                                            : trans('skills.sources.cv.analyze')
+                                    }}
+                                </Button>
+                            </div>
                         </div>
                         <p v-else class="text-sm text-muted-foreground">
                             {{ trans('skills.sources.cv.missing') }}

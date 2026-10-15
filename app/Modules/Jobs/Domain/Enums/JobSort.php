@@ -10,4 +10,6 @@ enum JobSort: string
     /** Full-text rank; only meaningful with a search query. */
     case Relevance = 'relevance';
     case Salary = 'salary';
+    /** Compatibility score, best first; only for signed-in users. */
+    case Match = 'match';
 }
