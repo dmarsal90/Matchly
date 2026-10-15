@@ -127,7 +127,7 @@ services:
         limits: { cpus: '1.00', memory: 1G }
 
   redis:
-    image: redis:7.4.6-alpine
+    image: redis:8.10.2-alpine
     restart: unless-stopped
     logging: *logging
     command: [redis-server, --appendonly, 'yes', --requirepass, '${REDIS_PASSWORD:?Set REDIS_PASSWORD in .env}'] # ggignore: read from .env
