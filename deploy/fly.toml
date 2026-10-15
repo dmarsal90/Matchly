@@ -1,0 +1,88 @@
+# Fly.io: one app, four process groups from the same image (docs/deployment.md#flyio).
+#   fly launch --no-deploy --copy-config --config deploy/fly.toml
+#   fly secrets set APP_KEY=... DB_URL=... REDIS_URL=... REVERB_APP_KEY=... (see deploy/env.production.example)
+#   fly deploy --config deploy/fly.toml --image ghcr.io/dmarsal90/matchly:sha-<commit>
+# Scale workers on their own: fly scale count worker=2 --config deploy/fly.toml
+# Roll back: fly deploy --config deploy/fly.toml --image ghcr.io/dmarsal90/matchly:<previous tag>
+
+app = 'matchly'
+primary_region = 'mad'
+
+[build]
+  image = 'ghcr.io/dmarsal90/matchly:latest'
+
+[deploy]
+  strategy = 'rolling'
+  # Migrations run once per release, before any machine is replaced.
+  release_command = 'php artisan migrate --force'
+
+[env]
+  APP_ENV = 'production'
+  APP_DEBUG = 'false'
+  RUN_MIGRATIONS = 'false'
+  LOG_CHANNEL = 'stderr'
+  TRUSTED_PROXIES = '*'
+  SECURITY_CSP_ENABLED = 'true'
+  SECURITY_HSTS_ENABLED = 'true'
+  CACHE_STORE = 'redis'
+  QUEUE_CONNECTION = 'redis'
+  SESSION_DRIVER = 'redis'
+  SESSION_SECURE_COOKIE = 'true'
+  BROADCAST_CONNECTION = 'reverb'
+  # PHP reaches Reverb over Fly's private network; browsers on port 6001.
+  REVERB_HOST = 'reverb.process.matchly.internal'
+  REVERB_PORT = '8080'
+  REVERB_SCHEME = 'http'
+  REVERB_PUBLIC_HOST = 'matchly.fly.dev'
+  REVERB_PUBLIC_PORT = '6001'
+  REVERB_PUBLIC_SCHEME = 'https'
+  SECURITY_CSP_CONNECT_SRC = 'wss://matchly.fly.dev:6001'
+  # Fly volumes attach to one machine: keep user files on S3 (Tigris works).
+  USER_FILES_DISK = 's3'
+
+# Process names are the entrypoint roles (docker/entrypoint.sh).
+[processes]
+  app = 'web'
+  worker = 'horizon'
+  scheduler = 'scheduler'
+  reverb = 'reverb'
+
+[http_service]
+  processes = ['app']
+  internal_port = 8080
+  force_https = true
+  auto_stop_machines = 'off'
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = '60s'
+    interval = '30s'
+    method = 'GET'
+    path = '/up'
+    timeout = '5s'
+
+[[services]]
+  processes = ['reverb']
+  internal_port = 8080
+  protocol = 'tcp'
+  auto_stop_machines = 'off'
+  min_machines_running = 1
+
+  [[services.ports]]
+    port = 6001
+    handlers = ['tls', 'http']
+
+[[vm]]
+  processes = ['app']
+  memory = '1gb'
+  cpus = 1
+
+[[vm]]
+  processes = ['worker']
+  memory = '1gb'
+  cpus = 1
+
+[[vm]]
+  processes = ['scheduler', 'reverb']
+  memory = '512mb'
+  cpus = 1

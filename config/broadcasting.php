@@ -46,6 +46,13 @@ return [
             'client_options' => [
                 // Guzzle client options: https://docs.guzzlephp.org/en/stable/request-options.html
             ],
+            // Where the browser connects. Sent at runtime (Inertia "reverb" prop), so one
+            // image serves every environment; VITE_REVERB_* stay as fallbacks for dev.
+            'public' => [
+                'host' => env('REVERB_PUBLIC_HOST', env('VITE_REVERB_HOST')),
+                'port' => (int) env('REVERB_PUBLIC_PORT', env('VITE_REVERB_PORT', 443)),
+                'scheme' => env('REVERB_PUBLIC_SCHEME', env('VITE_REVERB_SCHEME', 'https')),
+            ],
         ],
 
         'pusher' => [

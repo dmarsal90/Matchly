@@ -53,6 +53,7 @@ blob-report
 .phpunit.cache
 .phpunit.result.cache
 
-# Docker files that are not needed in the build context
+# Deployment files and Docker files that are not needed in the build context
+deploy
 docker-compose*.yml
 Makefile

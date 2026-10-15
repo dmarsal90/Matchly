@@ -23,6 +23,13 @@ declare module '@inertiajs/core' {
             notifications: { unread: number } | null;
             auth: Auth;
             sidebarOpen: boolean;
+            /** Public Reverb settings, sent at runtime; null when real time is off. */
+            reverb: {
+                key: string;
+                host: string;
+                port: number;
+                scheme: 'http' | 'https';
+            } | null;
             [key: string]: unknown;
         };
     }

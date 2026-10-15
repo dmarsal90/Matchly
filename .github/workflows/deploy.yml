@@ -1,0 +1,186 @@
+# Continuous delivery.
+#   push to main      build the image, publish it to GHCR (sha-<commit> and latest),
+#                     scan it with Trivy and deploy it to staging
+#   manual run        deploy any published tag to staging or production; running it
+#                     with an older tag is the rollback
+#
+# Deployment targets (configure the one you use in the GitHub environment):
+#   DEPLOY_HOOK_URL   secret: deploy hook of Render, Railway, Laravel Cloud or Forge
+#   DEPLOY_SSH_HOST   variable + DEPLOY_SSH_USER, DEPLOY_SSH_KEY (secret), DEPLOY_PATH:
+#                     a VPS running docker-compose.prod.yml
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Where to deploy
+        type: choice
+        options: [staging, production]
+        default: staging
+      tag:
+        description: Image tag to deploy (sha-<commit>, or latest)
+        type: string
+        default: latest
+
+concurrency:
+  group: deploy-${{ github.event.inputs.environment || 'staging' }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  image:
+    name: Build and publish
+    if: github.event_name == 'push'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: write
+    outputs:
+      tag: ${{ steps.tag.outputs.tag }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Image name and tag
+        id: tag
+        run: |
+          echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+          echo "tag=sha-${GITHUB_SHA::12}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@v3
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Labels
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.tag.outputs.image }}
+          tags: |
+            type=raw,value=${{ steps.tag.outputs.tag }}
+            type=raw,value=latest
+
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          target: prod
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          provenance: true
+          sbom: true
+
+  scan:
+    name: Trivy
+    needs: image
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    permissions:
+      contents: read
+      packages: read
+      security-events: write
+    steps:
+      - name: Image reference
+        id: ref
+        env:
+          TAG: ${{ needs.image.outputs.tag }}
+        run: echo "ref=ghcr.io/${GITHUB_REPOSITORY,,}:${TAG}" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Report only: findings land in the Security tab and do not block the deploy.
+      - name: Scan
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: ${{ steps.ref.outputs.ref }}
+          format: sarif
+          output: trivy.sarif
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: '0'
+
+      - uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: trivy.sarif
+          category: trivy
+
+  deploy:
+    name: Deploy to ${{ github.event.inputs.environment || 'staging' }}
+    needs: [image]
+    # Manual runs skip the build and deploy an existing tag.
+    if: always() && (needs.image.result == 'success' || github.event_name == 'workflow_dispatch')
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    environment:
+      name: ${{ github.event.inputs.environment || 'staging' }}
+      url: ${{ vars.APP_URL }}
+    env:
+      IMAGE_TAG: ${{ needs.image.outputs.tag || github.event.inputs.tag }}
+      DEPLOY_HOOK_URL: ${{ secrets.DEPLOY_HOOK_URL }}
+      DEPLOY_SSH_HOST: ${{ vars.DEPLOY_SSH_HOST }}
+      DEPLOY_SSH_USER: ${{ vars.DEPLOY_SSH_USER }}
+      DEPLOY_PATH: ${{ vars.DEPLOY_PATH || '/opt/matchly' }}
+      APP_URL: ${{ vars.APP_URL }}
+    steps:
+      - name: Validate tag
+        run: |
+          # The tag ends up in a remote shell command: only our own tag formats.
+          if ! printf '%s' "$IMAGE_TAG" | grep -Eqx 'latest|sha-[0-9a-f]{7,40}'; then
+            echo "::error::Unexpected image tag: $IMAGE_TAG"
+            exit 1
+          fi
+          echo "Deploying ghcr.io/${GITHUB_REPOSITORY,,}:$IMAGE_TAG"
+
+      - name: Deploy hook (PaaS)
+        if: env.DEPLOY_HOOK_URL != ''
+        run: |
+          # Render, Railway and Forge accept a plain POST; the image tag is passed
+          # for hooks that support it and ignored by the rest.
+          curl -fsS -X POST --retry 3 --data-urlencode "imgURL=ghcr.io/${GITHUB_REPOSITORY,,}:$IMAGE_TAG" "$DEPLOY_HOOK_URL" >/dev/null
+
+      - name: SSH key (VPS)
+        if: env.DEPLOY_HOOK_URL == '' && env.DEPLOY_SSH_HOST != ''
+        env:
+          DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY }}
+          DEPLOY_SSH_KNOWN_HOSTS: ${{ vars.DEPLOY_SSH_KNOWN_HOSTS }}
+        run: |
+          install -m 700 -d ~/.ssh
+          printf '%s\n' "$DEPLOY_SSH_KEY" > ~/.ssh/id_deploy
+          chmod 600 ~/.ssh/id_deploy
+          printf '%s\n' "$DEPLOY_SSH_KNOWN_HOSTS" > ~/.ssh/known_hosts
+
+      - name: Deploy over SSH (VPS)
+        if: env.DEPLOY_HOOK_URL == '' && env.DEPLOY_SSH_HOST != ''
+        run: |
+          ssh -i ~/.ssh/id_deploy "$DEPLOY_SSH_USER@$DEPLOY_SSH_HOST" \
+            "cd '$DEPLOY_PATH' && APP_TAG='$IMAGE_TAG' sh deploy/vps/deploy.sh"
+
+      - name: Nothing configured
+        if: env.DEPLOY_HOOK_URL == '' && env.DEPLOY_SSH_HOST == ''
+        run: echo "::warning::No DEPLOY_HOOK_URL secret or DEPLOY_SSH_HOST variable in this environment; the image is published but not deployed."
+
+      - name: Health check
+        if: env.APP_URL != '' && (env.DEPLOY_HOOK_URL != '' || env.DEPLOY_SSH_HOST != '')
+        run: |
+          for _ in $(seq 1 30); do
+            if curl -fsS -o /dev/null "$APP_URL/up"; then echo "Healthy"; exit 0; fi
+            sleep 10
+          done
+          echo "::error::$APP_URL/up did not answer 200 within 5 minutes"
+          exit 1

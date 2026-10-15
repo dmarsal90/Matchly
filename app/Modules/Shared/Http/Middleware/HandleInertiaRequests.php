@@ -8,6 +8,7 @@ use App\Modules\Identity\Http\Controllers\OAuthController;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Shared\Infrastructure\Localization\SupportedLocales;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Inertia\Middleware;
 
 final class HandleInertiaRequests extends Middleware
@@ -43,6 +44,29 @@ final class HandleInertiaRequests extends Middleware
             // Unread count for the header bell; live updates come over the broadcast channel.
             'notifications' => fn (): ?array => $request->user() instanceof User ? ['unread' => $request->user()->unreadNotifications()->count()] : null,
             'sidebarOpen' => ! $request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
+            'reverb' => Inertia::once(fn (): ?array => $this->reverb()),
+        ];
+    }
+
+    /**
+     * Public websocket settings for Echo, or null when real time is off.
+     *
+     * @return array{key: string, host: string, port: int, scheme: string}|null
+     */
+    private function reverb(): ?array
+    {
+        $key = config('broadcasting.connections.reverb.key');
+        $host = config('broadcasting.connections.reverb.public.host');
+
+        if (config('broadcasting.default') !== 'reverb' || ! is_string($key) || $key === '' || ! is_string($host) || $host === '') {
+            return null;
+        }
+
+        return [
+            'key' => $key,
+            'host' => $host,
+            'port' => (int) config('broadcasting.connections.reverb.public.port'),
+            'scheme' => (string) config('broadcasting.connections.reverb.public.scheme'),
         ];
     }
 

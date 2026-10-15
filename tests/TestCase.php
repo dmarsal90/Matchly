@@ -19,6 +19,9 @@ abstract class TestCase extends BaseTestCase
         if (! $this->app->environment('testing')) {
             throw new RuntimeException('Tests must run with APP_ENV=testing; check phpunit.xml <server> overrides.');
         }
+
+        // Feature tests assert on responses, not on built assets: no Vite manifest needed.
+        $this->withoutVite();
     }
 
     protected function skipUnlessFortifyHas(string $feature, ?string $message = null): void
