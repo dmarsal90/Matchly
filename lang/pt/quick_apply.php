@@ -48,6 +48,8 @@ return [
         'save' => 'Guardar alterações',
         'saved' => 'Alterações guardadas.',
         'approved' => 'Candidatura aprovada.',
+        'view_job' => 'Ver a oferta',
+        'open_original' => 'Abrir o anúncio original',
         'open_job' => 'Ir para a oferta',
         'mark_applied' => 'Já a enviei',
         'marked_applied' => 'Marcada como enviada em As minhas ofertas.',

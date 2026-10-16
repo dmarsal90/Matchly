@@ -48,6 +48,8 @@ return [
         'save' => 'Save changes',
         'saved' => 'Changes saved.',
         'approved' => 'Application approved.',
+        'view_job' => 'View the job',
+        'open_original' => 'Open the original posting',
         'open_job' => 'Go to the job',
         'mark_applied' => 'I have sent it',
         'marked_applied' => 'Marked as sent in My jobs.',
