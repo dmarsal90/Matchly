@@ -123,3 +123,107 @@ describe('with AI', function (): void {
             ->and($prep->warnings[0]['key'])->toBe('ai_unavailable');
     });
 });
+
+describe('practising answers', function (): void {
+    function practiceKey(Application $application, string $skill = 'Laravel'): string
+    {
+        $question = collect($application->refresh()->interviewPrep->content['questions'])->firstWhere('skill', $skill);
+
+        return App\Modules\Applications\Application\Actions\SaveInterviewAnswer::keyOf($question['question']);
+    }
+
+    function preparedFor(User $user): Application
+    {
+        $application = appliedFor($user);
+        test()->actingAs($user)->post(route('applications.interview-prep.store', $application), []);
+
+        return $application;
+    }
+
+    it('saves an answer encrypted, sends it back with the pack and drops it when emptied', function (): void {
+        $user = candidateWithProfile();
+        $application = preparedFor($user);
+        $key = practiceKey($application);
+
+        $this->actingAs($user)->put(route('applications.interview-prep.answer', $application), ['key' => $key, 'answer' => '  I built the API with Laravel.  '])->assertRedirect()->assertSessionHasNoErrors();
+
+        expect(DB::table('interview_answers')->value('answer'))->not->toContain('Laravel')
+            ->and($application->interviewAnswers()->sole()->answer)->toBe('I built the API with Laravel.');
+        $this->get(route('applications.interview-prep.show', $application))->assertInertia(fn (Assert $page) => $page
+            ->where("answers.{$key}.answer", 'I built the API with Laravel.')
+            ->where('prep.content.questions.0.key', fn (string $value): bool => strlen($value) === 40));
+
+        $this->put(route('applications.interview-prep.answer', $application), ['key' => $key, 'answer' => ''])->assertRedirect();
+        expect($application->interviewAnswers()->count())->toBe(0);
+    });
+
+    it('only accepts questions of the pack and only from its owner', function (): void {
+        $user = candidateWithProfile();
+        $application = preparedFor($user);
+        $key = practiceKey($application);
+
+        $this->actingAs($user)->put(route('applications.interview-prep.answer', $application), ['key' => sha1('not a question'), 'answer' => 'x'])->assertNotFound();
+        $this->put(route('applications.interview-prep.answer', $application), ['key' => 'nonsense', 'answer' => 'x'])->assertSessionHasErrors('key');
+        $this->put(route('applications.interview-prep.answer', $application), ['key' => $key, 'answer' => str_repeat('a', 4001)])->assertSessionHasErrors('answer');
+
+        $this->actingAs(User::factory()->create())->put(route('applications.interview-prep.answer', $application), ['key' => $key, 'answer' => 'x'])->assertForbidden();
+    });
+
+    it('checks the answer with plain rules and forgets the feedback when the text changes', function (): void {
+        $user = candidateWithProfile();
+        $application = preparedFor($user);
+        $key = practiceKey($application);
+        $long = 'At Acme I used Laravel to build a billing API: '.str_repeat('we designed the endpoints, wrote the tests and shipped it step by step. ', 4).'It cut invoice errors by 40%.';
+
+        $this->actingAs($user)->put(route('applications.interview-prep.answer', $application), ['key' => $key, 'answer' => 'Laravel.']);
+        $this->post(route('applications.interview-prep.feedback', $application), ['key' => $key])->assertRedirect();
+        $short = $application->interviewAnswers()->sole();
+        expect($short->feedback_source->value)->toBe('rules')
+            ->and(array_column($short->feedback['improvements'], 'key'))->toBe(['too_short', 'add_result'])
+            ->and(array_column($short->feedback['strengths'], 'key'))->toBe(['names_skill']);
+
+        $this->put(route('applications.interview-prep.answer', $application), ['key' => $key, 'answer' => $long]);
+        expect($application->interviewAnswers()->sole()->feedback)->toBeNull();
+
+        $this->post(route('applications.interview-prep.feedback', $application), ['key' => $key]);
+        $good = $application->interviewAnswers()->sole();
+        expect(array_column($good->feedback['strengths'], 'key'))->toBe(['good_length', 'has_numbers', 'names_skill'])
+            ->and($good->feedback['improvements'])->toBe([]);
+
+        $this->post(route('applications.interview-prep.feedback', $application), ['key' => sha1('nope')])->assertNotFound();
+    });
+
+    it('asks the AI only to comment, never sends more than the answer and the skills, and falls back to the rules', function (): void {
+        config(['ai.enabled' => true, 'ai.fallback_order' => ['anthropic'], 'ai.providers.anthropic.api_key' => 'server-key']);
+        Http::fake(['api.anthropic.com/*' => Http::sequence()->push(['content' => [['type' => 'tool_use', 'name' => 'submit_result', 'input' => [
+            'strengths' => ['You open with a concrete project.'],
+            'improvements' => ['Say what the measurable result was.'],
+        ]]], 'usage' => ['input_tokens' => 200, 'output_tokens' => 80]])->whenEmpty(Http::response('boom', 500))]);
+
+        $user = candidateWithProfile();
+        $application = preparedFor($user);
+        $key = practiceKey($application);
+        $this->actingAs($user)->put(route('applications.interview-prep.answer', $application), ['key' => $key, 'answer' => 'I built an API with Laravel.']);
+
+        $this->post(route('applications.interview-prep.feedback', $application), ['key' => $key, 'use_ai' => true])->assertSessionHasErrors('ai_consent');
+        $this->post(route('applications.interview-prep.feedback', $application), ['key' => $key, 'use_ai' => true, 'ai_consent' => '1'])->assertSessionHasNoErrors();
+
+        $feedback = $application->interviewAnswers()->sole();
+        expect($feedback->feedback_source->value)->toBe('ai')
+            ->and($feedback->feedback)->toBe(['strengths' => [['text' => 'You open with a concrete project.']], 'improvements' => [['text' => 'Say what the measurable result was.']]]);
+        Http::assertSent(fn (Request $request): bool => str_contains((string) json_encode($request->data()), 'candidate_skills') && ! str_contains((string) json_encode($request->data()), 'company_facts'));
+
+        $this->post(route('applications.interview-prep.feedback', $application), ['key' => $key, 'use_ai' => true])->assertSessionHasNoErrors();
+        expect($application->interviewAnswers()->sole()->feedback_source->value)->toBe('rules');
+    });
+
+    it('includes the practised answers in the personal data export', function (): void {
+        $user = candidateWithProfile();
+        $application = preparedFor($user);
+        $this->actingAs($user)->put(route('applications.interview-prep.answer', $application), ['key' => practiceKey($application), 'answer' => 'My practised answer']);
+
+        $export = app(App\Modules\Applications\Application\Privacy\ApplicationDataContributor::class)->export($user->id);
+
+        expect(json_encode($export->data))->toContain('My practised answer');
+    });
+});

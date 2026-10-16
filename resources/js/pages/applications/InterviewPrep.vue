@@ -6,9 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import InterviewPractice from '@/features/applications/components/InterviewPractice.vue';
 import type {
     InterviewPrepData,
     PackageWarning,
+    PracticeAnswer,
 } from '@/features/applications/types';
 import { index as applicationsIndex } from '@/routes/applications';
 import { store } from '@/routes/applications/interview-prep';
@@ -22,6 +24,7 @@ const props = defineProps<{
     application: { id: number; status: string };
     job: { id: number; slug: string; title: string; company: string };
     prep: InterviewPrepData | null;
+    answers: Record<string, PracticeAnswer>;
     options: { ai_available: boolean; ai_consented: boolean };
 }>();
 
@@ -216,6 +219,13 @@ const STAR = ['situation', 'task', 'action', 'result'] as const;
                             </div>
                         </dl>
                     </details>
+                    <InterviewPractice
+                        :application-id="application.id"
+                        :question-key="item.key"
+                        :saved="answers[item.key]"
+                        :ai-available="options.ai_available"
+                        :ai-consented="options.ai_consented"
+                    />
                 </article>
             </section>
 
