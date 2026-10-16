@@ -103,6 +103,8 @@ return [
                 'fast' => env('GEMINI_MODEL_FAST', 'gemini-flash-lite-latest'),
                 'quality' => env('GEMINI_MODEL_QUALITY', 'gemini-3.6-flash'),
             ],
+            // Tried in order when the model above is rate limited or overloaded (separate quotas).
+            'fallback_models' => $list((string) env('GEMINI_FALLBACK_MODELS', 'gemini-3.5-flash,gemini-flash-lite-latest')),
         ],
         'groq' => [
             'driver' => 'openai',
@@ -156,6 +158,7 @@ return [
         'gpt-4o' => ['input' => 2.50, 'output' => 10.00],
         'deepseek-chat' => ['input' => 0.27, 'output' => 1.10],
         'gemini-3.6-flash' => ['input' => 0.30, 'output' => 2.50],
+        'gemini-3.5-flash' => ['input' => 0.30, 'output' => 2.50],
         'gemini-flash-lite-latest' => ['input' => 0.10, 'output' => 0.40],
         'llama-3.1-8b-instant' => ['input' => 0.05, 'output' => 0.08],
         'llama-3.3-70b-versatile' => ['input' => 0.59, 'output' => 0.79],
