@@ -1,0 +1,67 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'title' => 'Preparar la entrevista',
+    'description' => 'Preguntas, esquemas de respuesta y carencias para :title en :company, construidos con tu propio CV. Son notas para ti: no se envía nada a nadie.',
+    'back' => 'Volver a mis ofertas',
+    'open' => 'Preparar entrevista',
+    'start' => [
+        'title' => 'Genera tu pack',
+        'description' => 'Elegimos las preguntas que probablemente te harán, esbozamos tus respuestas con el método STAR a partir de lo que dice tu CV y te damos respuestas honestas para las tecnologías que aún no tienes.',
+        'submit' => 'Generar el pack',
+        'regenerate' => 'Generarlo de nuevo',
+        'use_ai' => 'Mejorarlo con IA',
+        'ai_consent' => 'Acepto enviar mi perfil y la oferta a un proveedor de IA para preparar este pack.',
+        'no_ai_hint' => 'Sin IA, el pack se construye con plantillas y tu CV.',
+    ],
+    'generating' => 'Preparando tu pack…',
+    'failed' => 'No se pudo preparar el pack. Inténtalo de nuevo.',
+    'source' => ['ai' => 'Escrito con IA y contrastado con tu CV', 'rules' => 'Construido con plantillas y tu CV'],
+    'questions' => [
+        'title' => 'Preguntas probables',
+        'categories' => ['technical' => 'Técnica', 'behavioral' => 'Comportamiento', 'motivation' => 'Motivación'],
+        'star_title' => 'Esquema de respuesta (STAR)',
+        'situation' => 'Situación',
+        'task' => 'Tarea',
+        'action' => 'Acción',
+        'result' => 'Resultado',
+        'fill_in' => 'Completa esto con un ejemplo real tuyo.',
+    ],
+    'gaps' => [
+        'title' => 'Tecnologías que aún no tienes',
+        'description' => 'Dilo con claridad y muestra cómo cerrarías la brecha. Nunca digas que dominas algo que no dominas.',
+        'required' => 'Obligatoria',
+        'nice' => 'Deseable',
+    ],
+    'ask' => ['title' => 'Preguntas para hacerles'],
+    'warnings' => [
+        'empty_profile' => 'Tu perfil está casi vacío, así que los esquemas tienen poco que citar. Completa tu perfil de skills para un pack mejor.',
+        'ai_unavailable' => 'La IA no estaba disponible (:reason), así que el pack se construyó con plantillas.',
+        'star_removed' => '{1} Se eliminó :count esquema porque mencionaba una tecnología que tu CV no respalda.|[2,*] Se eliminaron :count esquemas porque mencionaban tecnologías que tu CV no respalda.',
+    ],
+    'template' => [
+        'and' => 'y',
+        'situation_at' => 'Como :title en :company',
+        'technical' => 'Cuéntame una ocasión en la que usaste :skill para resolver un problema real.',
+        'behavioral' => [
+            'conflict' => 'Cuéntame un desacuerdo con un compañero y cómo lo gestionaste.',
+            'failure' => 'Cuéntame algo que salió mal en un proyecto y qué aprendiste.',
+            'deadline' => 'Cuéntame una vez que tuviste que entregar con un plazo muy ajustado.',
+        ],
+        'motivation' => [
+            'company' => '¿Por qué quieres trabajar en :company?',
+            'role' => '¿Por qué te interesa el puesto de :title?',
+        ],
+        'gap' => [
+            'close' => 'Todavía no he trabajado con :skill de forma profesional y prefiero decirlo abiertamente. Mi experiencia más cercana es con :closest. Me pondría al día con la documentación y un pequeño proyecto práctico en mis primeras semanas.',
+            'none' => 'Todavía no he trabajado con :skill de forma profesional y prefiero decirlo abiertamente. Me pondría al día con la documentación y un pequeño proyecto práctico en mis primeras semanas.',
+        ],
+        'ask' => [
+            'team' => '¿Cómo se organiza el equipo y con quién trabajaría día a día?',
+            'success' => '¿Qué significaría tener éxito en los primeros seis meses como :title?',
+            'process' => '¿Cuáles son los siguientes pasos del proceso en :company?',
+        ],
+    ],
+];

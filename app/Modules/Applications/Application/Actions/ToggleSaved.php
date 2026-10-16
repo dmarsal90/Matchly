@@ -13,8 +13,10 @@ use Carbon\CarbonImmutable;
 /**
  * The listing's star: starts tracking a job as "saved", or stops tracking it.
  */
-final class ToggleSaved
+final readonly class ToggleSaved
 {
+    public function __construct(private RecordApplicationEvent $record) {}
+
     /**
      * @return bool whether the job is tracked afterwards
      */
@@ -32,6 +34,7 @@ final class ToggleSaved
         $application->user()->associate($user);
         $application->job()->associate($job);
         $application->save();
+        $this->record->statusChanged($application, ApplicationStatus::Saved, $application->status_changed_at);
 
         return true;
     }

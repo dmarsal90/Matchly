@@ -60,7 +60,7 @@ Los tests usan SQLite en memoria (`phpunit.xml`) y no necesitan servicios.
 | Unitarios y de feature | Pest (`tests/Unit`, `tests/Feature`) | Normalizadores de proveedores, clasificador, puntuación, ZIP de LinkedIn con fixtures, Actions y endpoints. IA, GitHub y HTTP externo con `Http::fake`. SQLite en memoria y, en CI, también PostgreSQL (`make test-pgsql`). |
 | Arquitectura | Pest (`tests/Architecture`) | Fronteras entre módulos, `strict_types`, marca solo desde `APP_NAME`, sin texto fijo en las plantillas Vue y mismas claves en es/en/pt. |
 | Frontend | Vitest | Composables y utilidades de `resources/js`. |
-| End-to-end | Playwright (`tests/e2e`) | Registro con verificación por correo, cuestionario, importación de LinkedIn, búsqueda (texto completo de PostgreSQL) y filtros en escritorio y móvil, recomendaciones, solicitud rápida con PDF, alertas con resumen por correo y baja en un clic, y WCAG 2.2 AA con axe en modo claro y oscuro. |
+| End-to-end | Playwright (`tests/e2e`) | Registro con verificación por correo, cuestionario, importación de LinkedIn, búsqueda (texto completo de PostgreSQL) y filtros en escritorio y móvil, recomendaciones, solicitud rápida con PDF, alertas con resumen por correo y baja en un clic, historial de candidaturas, recordatorios de seguimiento, preparación de entrevista, panorama y WCAG 2.2 AA con axe en modo claro y oscuro. |
 
 Los E2E corren contra su propia base de datos (`app_e2e`) y un servidor aparte en el puerto 8001 (`docker/scripts/e2e.sh`), así que nunca tocan los datos de desarrollo. Antes de cada ejecución se rehace la base con `E2eSeeder`, y los correos se leen de Mailpit. Playwright corre en el host:
 
@@ -115,11 +115,20 @@ php artisan jobs:sources                   # estado de cada fuente
 
 Cómo añadir una fuente: [docs/adding-a-job-provider.md](docs/adding-a-job-provider.md).
 
+## Seguimiento y preparación de entrevistas
+
+Además de la solicitud rápida, Matchly acompaña la candidatura hasta el final. Todo es para ti: nunca se contacta con una empresa en tu nombre.
+
+- **Historial** en cada tarjeta de «Mis ofertas»: cambios de estado (incluidos oferta, aceptada, declinada y sin respuesta), rondas de entrevista, seguimientos y notas privadas.
+- **Recordatorios de seguimiento**: `php artisan applications:follow-up` (programado a diario) avisa de las candidaturas sin respuesta tras `FOLLOW_UP_DAYS` días (10 por defecto) y adjunta un borrador que puedes copiar.
+- **Preparar entrevista**: preguntas probables con esquemas STAR sacados de tu CV, respuestas honestas para lo que aún no sabes y preguntas para la empresa. Funciona sin IA; con IA se redacta mejor, pero nunca se inventa experiencia.
+- **Panorama** (`/insights`): qué habilidades te abrirían más ofertas y cómo van tus candidaturas (conversión por etapa, tiempos de respuesta, resultados por fuente y área).
+
 ## Estructura
 
 El código de negocio vive en `app/Modules/<Dominio>/{Domain,Application,Infrastructure,Http}`. Los tests de `tests/Architecture` hacen cumplir las fronteras: `Domain` no depende del framework, los controladores no tocan la base de datos y todo archivo declara `strict_types`.
 
-Más detalle en [docs/architecture.md](docs/architecture.md): módulos, flujos (ingesta, compatibilidad, solicitud rápida, alertas), colas y privacidad.
+Más detalle en [docs/architecture.md](docs/architecture.md): módulos, flujos (ingesta, compatibilidad, solicitud rápida, seguimiento y entrevistas, alertas), colas y privacidad.
 
 - [Añadir una fuente de ofertas](docs/adding-a-job-provider.md)
 - [Añadir un proveedor de IA](docs/adding-an-ai-provider.md)

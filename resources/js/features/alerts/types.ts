@@ -28,9 +28,17 @@ export type JobAlertData = {
     }[];
 };
 
+export type FollowUpData = {
+    type: 'follow_up';
+    application_id: number;
+    title: string | null;
+    company: string | null;
+    days: number;
+};
+
 export type AppNotification = {
     id: string;
-    data: JobAlertData;
+    data: JobAlertData | FollowUpData;
     read_at: string | null;
     created_at: string | null;
 };

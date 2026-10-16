@@ -12,6 +12,8 @@ use Carbon\CarbonImmutable;
 use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property int $id
@@ -21,8 +23,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property string|null $notes
  * @property CarbonImmutable $status_changed_at
  * @property CarbonImmutable|null $applied_at
+ * @property CarbonImmutable|null $follow_up_reminded_at
  * @property CarbonImmutable $created_at
  * @property-read JobListing $job
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, ApplicationEvent> $events
  */
 #[UsePolicy(ApplicationPolicy::class)]
 final class Application extends Model
@@ -51,6 +55,22 @@ final class Application extends Model
         return $this->belongsTo(JobListing::class, 'job_listing_id');
     }
 
+    /**
+     * @return HasMany<ApplicationEvent, $this>
+     */
+    public function events(): HasMany
+    {
+        return $this->hasMany(ApplicationEvent::class)->orderBy('occurred_at')->orderBy('id');
+    }
+
+    /**
+     * @return HasOne<InterviewPrep, $this>
+     */
+    public function interviewPrep(): HasOne
+    {
+        return $this->hasOne(InterviewPrep::class);
+    }
+
     protected function casts(): array
     {
         return [
@@ -58,6 +78,7 @@ final class Application extends Model
             'notes' => 'encrypted',
             'status_changed_at' => 'immutable_datetime',
             'applied_at' => 'immutable_datetime',
+            'follow_up_reminded_at' => 'immutable_datetime',
         ];
     }
 }

@@ -8,11 +8,15 @@ use App\Modules\Applications\Domain\Enums\ApplicationStatus;
 use App\Modules\Applications\Infrastructure\Models\Application;
 use Carbon\CarbonImmutable;
 
-final class UpdateApplication
+final readonly class UpdateApplication
 {
+    public function __construct(private RecordApplicationEvent $record) {}
+
     public function handle(Application $application, ApplicationStatus $status, ?string $notes): Application
     {
-        if ($application->status !== $status) {
+        $changed = $application->status !== $status;
+
+        if ($changed) {
             $application->status = $status;
             $application->status_changed_at = CarbonImmutable::now();
 
@@ -23,6 +27,10 @@ final class UpdateApplication
 
         $application->notes = $notes;
         $application->save();
+
+        if ($changed) {
+            $this->record->statusChanged($application, $status, $application->status_changed_at);
+        }
 
         return $application;
     }
