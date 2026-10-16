@@ -6,6 +6,9 @@ namespace Database\Seeders;
 
 use App\Modules\Alerts\Application\Actions\MatchNewJobsToAlerts;
 use App\Modules\Alerts\Domain\Enums\AlertFrequency;
+use App\Modules\Applications\Domain\Enums\ApplicationEventType;
+use App\Modules\Applications\Domain\Enums\ApplicationStatus;
+use App\Modules\Applications\Infrastructure\Models\Application;
 use App\Modules\Identity\Application\Actions\GrantConsent;
 use App\Modules\Identity\Domain\Enums\ConsentPurpose;
 use App\Modules\Identity\Infrastructure\Models\User;
@@ -53,7 +56,40 @@ final class E2eSeeder extends Seeder
         ]);
         $matchAlerts->handle(array_values(array_map(intval(...), JobListing::query()->visible()->pluck('id')->all())));
 
+        $this->applications($candidate);
+
         User::factory()->create(['name' => 'Nora Newcomer', 'email' => self::NEWCOMER, 'locale' => 'es']);
+    }
+
+    /**
+     * Applications at different points: one waiting (the timeline spec adds to
+     * it), one waiting for the follow-up reminder and one rejected after an
+     * interview, so the funnel has something to show.
+     */
+    private function applications(User $candidate): void
+    {
+        $now = CarbonImmutable::now();
+        $track = function (string $company, ApplicationStatus $status, int $appliedDaysAgo, array $events = []) use ($candidate, $now): void {
+            $application = new Application;
+            $application->forceFill([
+                'user_id' => $candidate->id,
+                'job_listing_id' => JobListing::query()->where('company', $company)->value('id'),
+                'status' => $status,
+                'status_changed_at' => $now->subDays($appliedDaysAgo),
+                'applied_at' => $now->subDays($appliedDaysAgo),
+            ])->save();
+            $application->events()->create(['type' => ApplicationEventType::StatusChanged, 'status' => ApplicationStatus::Applied, 'occurred_at' => $now->subDays($appliedDaysAgo)]);
+            foreach ($events as $event) {
+                $application->events()->create($event);
+            }
+        };
+
+        $track('Initech', ApplicationStatus::Applied, 3);
+        $track('Umbrella', ApplicationStatus::Applied, 15);
+        $track('Hooli', ApplicationStatus::Rejected, 25, [
+            ['type' => ApplicationEventType::Interview, 'round' => 1, 'occurred_at' => $now->subDays(18)],
+            ['type' => ApplicationEventType::StatusChanged, 'status' => ApplicationStatus::Rejected, 'occurred_at' => $now->subDays(10)],
+        ]);
     }
 
     private function seedJobs(): void

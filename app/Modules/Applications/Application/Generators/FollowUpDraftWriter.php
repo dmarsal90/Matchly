@@ -28,7 +28,7 @@ final readonly class FollowUpDraftWriter
         $t = fn (string $key, array $params = []): string => (string) __("follow_up.draft.{$key}", $params, $locale);
 
         $job = $application->job;
-        $params = ['title' => $job->title, 'company' => $job->company, 'date' => $application->applied_at?->settings(['locale' => $locale])->translatedFormat('j F Y') ?? ''];
+        $params = ['title' => $job->title, 'company' => $job->company, 'date' => $application->applied_at?->settings(['locale' => $locale])->isoFormat('LL') ?? ''];
 
         return implode("\n\n", [
             $t("greeting.{$tone}"),

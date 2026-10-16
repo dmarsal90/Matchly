@@ -7,6 +7,8 @@ use App\Modules\Applications\Application\Generators\FollowUpDraftWriter;
 use App\Modules\Applications\Domain\Enums\ApplicationEventType;
 use App\Modules\Applications\Domain\Enums\ApplicationStatus;
 use App\Modules\Applications\Infrastructure\Models\Application;
+use App\Modules\Identity\Application\Actions\GrantConsent;
+use App\Modules\Identity\Domain\Enums\ConsentPurpose;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Jobs\Infrastructure\Models\JobListing;
 use App\Modules\Notifications\Application\Notifications\FollowUpReminderNotification;
@@ -95,4 +97,21 @@ it('shows the history and a follow-up draft on the board for applied application
     expect($byId[$applied->id]['follow_up_draft'])->toBeString()
         ->and($byId[$applied->id]['events'][0]['note'])->toBe('Spoke to HR')
         ->and($byId->except($applied->id)->first()['follow_up_draft'])->toBeNull();
+});
+
+it('e-mails the reminder with the draft only to people who consented', function (): void {
+    $user = User::factory()->create(['name' => 'Ana Ruiz', 'locale' => 'es']);
+    $application = appliedApplication($user, 12);
+    $notification = new FollowUpReminderNotification($application->id, 10);
+
+    expect($notification->via($user))->not->toContain('mail');
+
+    app(GrantConsent::class)->handle($user, ConsentPurpose::EmailAlerts);
+    $mail = $notification->toMail($user);
+    $html = (string) $mail->render();
+
+    expect($notification->via($user))->toContain('mail')
+        ->and($mail->subject)->toContain($application->job->company)
+        ->and($html)->toContain('Me presenté')->toContain('Ana Ruiz')->toContain('nunca contactamos')
+        ->and($notification->toBroadcast($user)->data['type'])->toBe('follow_up');
 });
