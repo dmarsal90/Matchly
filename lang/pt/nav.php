@@ -16,6 +16,7 @@ return [
     'account' => 'Conta',
     'security' => 'Segurança',
     'appearance' => 'Aparência',
+    'extension' => 'Extensão do navegador',
     'ai' => 'IA',
     'privacy' => 'Privacidade',
     'admin' => 'Administração',

@@ -7,6 +7,7 @@ namespace App\Modules\Identity\Application\Privacy;
 use App\Modules\Identity\Domain\Contracts\PersonalDataContributor;
 use App\Modules\Identity\Domain\Data\PersonalData;
 use App\Modules\Identity\Infrastructure\Models\Consent;
+use App\Modules\Identity\Infrastructure\Models\ExtensionToken;
 use App\Modules\Identity\Infrastructure\Models\SocialAccount;
 use App\Modules\Identity\Infrastructure\Models\User;
 
@@ -14,7 +15,7 @@ final class AccountDataContributor implements PersonalDataContributor
 {
     public function export(int $userId): PersonalData
     {
-        $user = User::query()->with(['consents', 'socialAccounts'])->findOrFail($userId);
+        $user = User::query()->with(['consents', 'socialAccounts', 'extensionTokens'])->findOrFail($userId);
 
         return new PersonalData('account', [
             'name' => $user->name,
@@ -29,6 +30,12 @@ final class AccountDataContributor implements PersonalDataContributor
                 'policy_version' => $consent->policy_version,
                 'granted_at' => $consent->granted_at->toIso8601String(),
                 'revoked_at' => $consent->revoked_at?->toIso8601String(),
+            ])->values()->all(),
+            // Only the names and dates of extension tokens: the tokens themselves are never kept.
+            'extension_access' => $user->extensionTokens->map(fn (ExtensionToken $token): array => [
+                'name' => $token->name,
+                'created_at' => $token->created_at->toIso8601String(),
+                'last_used_at' => $token->last_used_at?->toIso8601String(),
             ])->values()->all(),
             // Tokens are credentials, never exported.
             'linked_accounts' => $user->socialAccounts->map(fn (SocialAccount $account): array => [
