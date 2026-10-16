@@ -35,6 +35,13 @@ test('prepares, reviews and approves a quick application', async ({ page }) => {
             name: 'Solicitud para Desarrollador Backend Senior',
         }),
     ).toBeVisible();
+    // The job stays one click away, in the app and on the original site.
+    await expect(
+        page.getByRole('link', { name: 'Ver la oferta' }),
+    ).toHaveAttribute('href', /\/jobs\/\d+/);
+    await expect(
+        page.getByRole('link', { name: /Abrir el anuncio original/ }),
+    ).toHaveAttribute('target', '_blank');
     await expect(page.getByText('Carta de presentación').first()).toBeVisible();
     await expect(page.getByText('CV adaptado').first()).toBeVisible();
     await expect(page.getByText('Ana García').first()).toBeVisible();
