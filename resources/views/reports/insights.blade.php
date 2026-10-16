@@ -108,6 +108,15 @@
         @endif
     @endif
 
+    @if (count($experiments) > 0)
+        <h2>{{ __('insights.experiments.title') }}</h2>
+        <ul>
+            @foreach ($experiments as $idea)
+                <li>{{ __("insights.experiments.{$idea['key']}", $idea['params']) }}</li>
+            @endforeach
+        </ul>
+    @endif
+
     <h2>{{ __('insights.skill_gaps.title') }}</h2>
     @if (count($gaps['skills']) === 0)
         <p>{{ __('insights.skill_gaps.empty') }}</p>

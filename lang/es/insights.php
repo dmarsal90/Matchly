@@ -66,6 +66,17 @@ return [
         'paid' => 'De pago',
         'search' => '(resultados de búsqueda)',
     ],
+    'experiments' => [
+        'title' => 'Qué probar a continuación',
+        'description' => 'Ideas basadas solo en tus propias cifras, con un mínimo de candidaturas detrás. Son sugerencias para probar, no reglas.',
+        'lower_scores' => 'Las ofertas que te llevaron a entrevista puntuaban :interview / 100 de media, igual o menos que las que no (:closed / 100). Prueba a enviar también a ofertas de afinidad algo menor.',
+        'aim_high' => 'Las ofertas que te llevaron a entrevista puntuaban :interview / 100 de media frente a :closed / 100 de las que no. Sigue priorizando las afinidades altas.',
+        'more_source' => 'Con «:name» sacas más entrevistas (:rate % de :applied candidaturas). Prueba a dedicarle más esfuerzo.',
+        'more_category' => 'En el área «:name» sacas más entrevistas (:rate % de :applied candidaturas). Prueba a buscar más ahí.',
+        'rethink_source' => 'Has enviado :applied candidaturas desde «:name» sin ninguna entrevista. Prueba a reducirlas o a cambiar cómo te presentas allí.',
+        'follow_up_sooner' => 'Las empresas tardan :days días en responder de media. Prueba a hacer el primer seguimiento antes y a usar la fecha límite para no perder el hilo.',
+        'more_volume' => 'Llevas :count candidaturas: aún son pocas para sacar conclusiones. Prueba a enviar más antes de cambiar de estrategia.',
+    ],
     'report' => [
         'title' => 'Mi informe de búsqueda',
         'generated' => 'Generado el :date',

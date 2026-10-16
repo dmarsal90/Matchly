@@ -11,6 +11,7 @@ import {
     ChartNoAxesColumn,
     Download,
     ExternalLink,
+    FlaskConical,
     Lightbulb,
     Target,
 } from '@lucide/vue';
@@ -85,6 +86,7 @@ const props = defineProps<{
         closest: ClosestJob[];
     };
     funnel: Funnel;
+    experiments: { key: string; params: Record<string, string> }[];
 }>();
 
 const stageLabel = (key: string): string =>
@@ -128,6 +130,34 @@ const stageMax = computed(() => Math.max(1, props.funnel.applied));
                 trans('insights.report.download_hint')
             }}</span>
         </div>
+
+        <section
+            v-if="experiments.length"
+            class="space-y-3"
+            aria-labelledby="experiments"
+        >
+            <div>
+                <h2 id="experiments" class="text-lg font-semibold">
+                    {{ trans('insights.experiments.title') }}
+                </h2>
+                <p class="text-sm text-muted-foreground">
+                    {{ trans('insights.experiments.description') }}
+                </p>
+            </div>
+            <ul class="space-y-2">
+                <li
+                    v-for="idea in experiments"
+                    :key="idea.key"
+                    class="flex items-start gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4 text-sm"
+                >
+                    <FlaskConical
+                        class="mt-0.5 size-4 shrink-0 text-primary"
+                        aria-hidden="true"
+                    />
+                    {{ trans(`insights.experiments.${idea.key}`, idea.params) }}
+                </li>
+            </ul>
+        </section>
 
         <section class="space-y-4" aria-labelledby="funnel">
             <div>
