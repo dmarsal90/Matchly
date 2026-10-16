@@ -13,19 +13,25 @@ final class GeminiProvider extends HttpAiProvider
 {
     public function complete(AiCompletion $completion): AiResult
     {
+        $generation = [
+            'responseMimeType' => 'application/json',
+            'maxOutputTokens' => $completion->maxOutputTokens,
+            'temperature' => 0.2,
+        ];
+        // Gemini 3 "thinks" by default and the thinking eats the output budget: keep it light.
+        if (! str_starts_with($completion->model, 'gemini-2')) {
+            $generation['thinkingConfig'] = ['thinkingLevel' => 'low'];
+        }
+
         $json = $this->post($this->url('/models/'.rawurlencode($completion->model).':generateContent'), [
             'systemInstruction' => ['parts' => [['text' => $this->systemWithSchema($completion)]]],
             'contents' => [['role' => 'user', 'parts' => [['text' => $completion->input]]]],
-            'generationConfig' => [
-                'responseMimeType' => 'application/json',
-                'maxOutputTokens' => $completion->maxOutputTokens,
-                'temperature' => 0.2,
-            ],
+            'generationConfig' => $generation,
         ], fn (PendingRequest $request): PendingRequest => $request->withHeaders(['x-goog-api-key' => $this->key($completion)]));
 
         $text = '';
         foreach ((array) ($json['candidates'][0]['content']['parts'] ?? []) as $part) {
-            $text .= is_array($part) ? (string) ($part['text'] ?? '') : '';
+            $text .= is_array($part) && empty($part['thought']) ? (string) ($part['text'] ?? '') : '';
         }
 
         $usage = (array) ($json['usageMetadata'] ?? []);
