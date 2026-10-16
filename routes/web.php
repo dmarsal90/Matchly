@@ -15,6 +15,7 @@ use App\Modules\Applications\Http\Controllers\QuickApplyController;
 use App\Modules\Applications\Http\Controllers\SavedJobController;
 use App\Modules\Identity\Http\Controllers\OAuthController;
 use App\Modules\Jobs\Http\Controllers\JobController;
+use App\Modules\Matching\Http\Controllers\MarketController;
 use App\Modules\Notifications\Http\Controllers\NotificationController;
 use App\Modules\Profiles\Domain\Enums\QuestionnaireStep;
 use App\Modules\Profiles\Domain\Enums\SkillSource;
@@ -100,6 +101,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('profile/cv/{cv}', [CvDocumentController::class, 'destroy'])->name('career.cv.destroy');
 
     // Saved-search alerts and the notification centre.
+    Route::get('market', [MarketController::class, 'index'])->name('market.index');
     Route::get('radar', [CompanyRadarController::class, 'index'])->name('radar.index');
     Route::post('radar', [CompanyRadarController::class, 'store'])->middleware('throttle:30,1')->name('radar.store');
     Route::delete('radar/{follow}', [CompanyRadarController::class, 'destroy'])->whereNumber('follow')->name('radar.destroy');

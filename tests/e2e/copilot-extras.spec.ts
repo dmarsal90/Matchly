@@ -199,3 +199,37 @@ test('plans four weeks of study and offers it as a calendar', async ({
     expect(download.suggestedFilename()).toMatch(/-study-plan\.ics$/);
     await expectNoViolations(page);
 });
+
+test('shows demand and pay for the technologies that matter', async ({
+    page,
+}) => {
+    await page.goto('/market');
+
+    await expect(
+        page.getByRole('heading', { name: 'Mercado por tecnología' }),
+    ).toBeVisible();
+    const table = page.getByRole('table', {
+        name: 'Demanda, tendencia y sueldo por tecnología',
+    });
+    await expect(table.getByRole('row').nth(1)).toBeVisible();
+    await expect(table.getByText(/Tuya|Te falta/).first()).toBeVisible();
+    await expectNoViolations(page);
+});
+
+test('creates a token for the browser extension and shows it once', async ({
+    page,
+}) => {
+    await page.goto('/settings/extension');
+
+    await page.getByLabel('Nombre del token').fill('E2E portátil');
+    await page.getByRole('button', { name: 'Crear token' }).click();
+    await expect(page.getByText('Copia tu token ahora')).toBeVisible();
+    await expect(page.getByText(/^mtx_/)).toBeVisible();
+
+    await page.reload();
+    await expect(page.getByText('Copia tu token ahora')).toHaveCount(0);
+    await page.getByRole('button', { name: /Revocar: E2E portátil/ }).click();
+    await expect(
+        page.getByText('Aún no has creado ningún token.'),
+    ).toBeVisible();
+});

@@ -17,6 +17,7 @@ return [
     'security' => 'Segurança',
     'appearance' => 'Aparência',
     'extension' => 'Extensão do navegador',
+    'market' => 'Mercado',
     'radar' => 'Radar',
     'ai' => 'IA',
     'privacy' => 'Privacidade',
