@@ -32,6 +32,7 @@ type SkillGap = {
     tracked: number;
     only_gap: number;
     courses: Course[];
+    hours: number;
 };
 
 type ClosestJob = {
@@ -45,6 +46,7 @@ type ClosestJob = {
         name: string;
         required: boolean;
         courses: Course[];
+        hours: number;
     }[];
 };
 
@@ -456,6 +458,14 @@ const stageMax = computed(() => Math.max(1, props.funnel.applied));
                                         ? trans('insights.closest.required')
                                         : trans('insights.closest.nice')
                                 }}</Badge>
+                                <span
+                                    class="text-xs font-normal text-muted-foreground"
+                                    >{{
+                                        trans('insights.courses.hours', {
+                                            hours: String(skill.hours),
+                                        })
+                                    }}</span
+                                >
                             </p>
                             <ul
                                 class="mt-2 space-y-1 text-sm"
@@ -591,6 +601,17 @@ const stageMax = computed(() => Math.max(1, props.funnel.applied));
                                                 trans(
                                                     'insights.courses.learn',
                                                     { skill: item.name },
+                                                )
+                                            }}
+                                            ·
+                                            {{
+                                                trans(
+                                                    'insights.courses.hours',
+                                                    {
+                                                        hours: String(
+                                                            item.hours,
+                                                        ),
+                                                    },
                                                 )
                                             }}
                                         </summary>

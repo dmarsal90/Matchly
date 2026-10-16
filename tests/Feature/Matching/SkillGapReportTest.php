@@ -105,3 +105,17 @@ it('picks the jobs the person is nearest to meeting in full and what each one st
         ->and($closest[0]['missing'][0]['courses'][0]['price'])->toBe('free')
         ->and(array_column($closest[2]['missing'], 'skill'))->toBe(['kubernetes', 'terraform', 'aws']);
 });
+
+it('sizes the study plan with a rough number of hours by skill type', function (): void {
+    $user = User::factory()->create();
+    matchWithGaps($user, 80, [['kubernetes', true], ['cobol-xyz', false], ['php', true]]);
+
+    $skills = collect(app(SkillGapReport::class)->for($user->id)['skills'])->keyBy('skill');
+    $closest = collect(app(SkillGapReport::class)->for($user->id)['closest'][0]['missing'])->keyBy('skill');
+
+    // A language takes longer than a tool; unknown skills get the default.
+    expect($skills['php']['hours'])->toBe(config('courses.hours.language'))
+        ->and($skills['kubernetes']['hours'])->toBe(config('courses.hours.'.app(App\Modules\Profiles\Domain\Services\SkillCatalog::class)->type('kubernetes')))
+        ->and($skills['cobol-xyz']['hours'])->toBe(config('courses.hours.default'))
+        ->and($closest['php']['hours'])->toBe($skills['php']['hours']);
+});
