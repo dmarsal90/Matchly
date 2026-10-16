@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Jobs\Application\Queries;
 
 use App\Modules\Jobs\Infrastructure\Models\JobListing;
+use Illuminate\Support\Collection;
 
 /**
  * What similar open jobs in our own database pay: the same category and
@@ -39,8 +40,19 @@ final readonly class SalaryBenchmark
             ->limit(self::MAX_SAMPLE)
             ->get(['salary_currency', 'salary_annual_min', 'salary_annual_max']);
 
-        // Never mix currencies: the job's own, or else the most common one among the similar listings.
-        $currency = $job->salary_currency ?? (string) $listings->countBy('salary_currency')->sortDesc()->keys()->first();
+        return $this->summarise($listings, $job->salary_currency);
+    }
+
+    /**
+     * The spread of what these listings pay, in one currency: the given one, or else the most common.
+     *
+     * @param  Collection<int, JobListing>  $listings  with salary_currency, salary_annual_min and salary_annual_max
+     * @return array{currency: string, low: int, median: int, high: int, sample: int}|null
+     */
+    public function summarise(Collection $listings, ?string $currency = null): ?array
+    {
+        // Never mix currencies: the given one, or else the most common one among the listings.
+        $currency ??= (string) $listings->countBy('salary_currency')->sortDesc()->keys()->first();
         $pay = $listings
             ->where('salary_currency', $currency)
             // The middle of the stated range; a one-sided range counts as its only figure.
