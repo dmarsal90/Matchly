@@ -32,6 +32,7 @@ type TrackedApplication = {
     job: Job;
     events: ApplicationEventEntry[];
     follow_up_draft: string | null;
+    thank_you_draft: string | null;
     package: { id: number; status: string } | null;
 };
 
@@ -204,6 +205,7 @@ const formatDate = (iso: string): string =>
                         :application-id="item.id"
                         :events="item.events"
                         :follow-up-draft="item.follow_up_draft"
+                        :thank-you-draft="item.thank_you_draft"
                     />
 
                     <div class="flex items-center justify-between gap-2">

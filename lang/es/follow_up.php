@@ -18,6 +18,13 @@ return [
     'draft' => [
         'greeting' => ['formal' => 'Estimado equipo de selección:', 'friendly' => 'Hola:', 'enthusiastic' => '¡Hola!'],
         'body' => 'Me presenté el :date al puesto de :title en :company y quería saber cómo avanza el proceso. Sigo muy interesado en el puesto.',
+        'body_second' => 'Les escribí el :date sobre mi candidatura al puesto de :title en :company y todavía no he tenido respuesta. Entiendo que haya mucho trabajo y sigo muy interesado. ¿Podrían decirme en qué punto está el proceso?',
+        'thanks_body' => 'Gracias por dedicarme su tiempo para hablar del puesto de :title en :company. Me gustó conocer mejor el puesto y al equipo, y sigo muy interesado.',
+        'thanks_close' => [
+            'formal' => 'Quedo a su disposición para lo que necesiten y espero los siguientes pasos.',
+            'friendly' => 'Encantado de enviar lo que necesitéis. ¡Gracias de nuevo!',
+            'enthusiastic' => '¡Me encantaría seguir conversando! ¡Muchas gracias!',
+        ],
         'close' => [
             'formal' => 'Les agradezco su tiempo y quedo a su disposición para ampliar cualquier información.',
             'friendly' => 'Encantado de hablar o de enviar lo que necesitéis. ¡Gracias!',
