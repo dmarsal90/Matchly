@@ -66,6 +66,10 @@ return [
             'title' => 'LinkedIn',
             'description' => 'Carregue o ZIP com a exportação oficial dos seus dados do LinkedIn.',
         ],
+        'portfolio' => [
+            'title' => 'Portefólio',
+            'description' => 'Lemos o teu site público (e algumas páginas habituais como /projects) e listamos as tecnologias que menciona.',
+        ],
     ],
     'github' => [
         'username' => 'Utilizador ou URL do GitHub',
@@ -79,6 +83,14 @@ return [
         'connect_hint' => 'Opcional: ligar a sua conta permite ler mais repositórios (limite da API mais alto).',
         'connected' => 'Conta ligada: :username',
         'ai_summary' => 'Adicionar um resumo com IA dos meus repositórios (aceito que sejam enviados a um fornecedor de IA)',
+    ],
+    'portfolio' => [
+        'url' => 'Endereço do teu portefólio',
+        'url_placeholder' => 'https://oteusite.pt',
+        'consent' => 'Aceito que o meu site público seja lido para detetar as minhas competências.',
+        'consent_hint' => 'Só lemos páginas públicas do teu domínio, respeitando o robots.txt. Não inventamos níveis nem anos: tu decides o que fica guardado. Podes retirar o consentimento em Definições › Privacidade.',
+        'import' => 'Ler o meu portefólio',
+        'started' => 'Estamos a ler o teu portefólio. Demora alguns segundos.',
     ],
     'linkedin' => [
         'file' => 'Ficheiro ZIP do LinkedIn',
@@ -117,6 +129,7 @@ return [
             'cv' => 'Do seu CV',
             'github' => 'Do GitHub (:reference)',
             'linkedin' => 'Da sua exportação do LinkedIn',
+            'portfolio' => 'Do teu portefólio (:reference)',
         ],
         'select_all' => 'Marcar tudo',
         'select_none' => 'Desmarcar tudo',

@@ -48,6 +48,8 @@ return [
         'save' => 'Guardar cambios',
         'saved' => 'Cambios guardados.',
         'approved' => 'Solicitud aprobada.',
+        'view_job' => 'Ver la oferta',
+        'open_original' => 'Abrir el anuncio original',
         'open_job' => 'Ir a la oferta',
         'mark_applied' => 'Ya la he enviado',
         'marked_applied' => 'Marcada como enviada en Mis ofertas.',
@@ -69,6 +71,12 @@ return [
     'copy' => 'Copiar',
     'copied' => 'Copiado',
     'download_letter' => 'Descargar carta (.txt)',
+    'template' => [
+        'label' => 'Plantilla del CV',
+        'classic' => 'Clásica (negro, sobria)',
+        'modern' => 'Moderna (acento azul)',
+        'compact' => 'Compacta (menos páginas)',
+    ],
     'download_resume' => 'Descargar CV (PDF)',
     'download_requires_approval' => 'Aprueba la solicitud para descargar el CV.',
     'editor' => [
@@ -136,6 +144,7 @@ return [
         'years' => '{1} Cuento con :count año de experiencia profesional.|[2,*] Cuento con :count años de experiencia profesional.',
         'headline' => 'Mi perfil: :headline.',
         'skills' => 'Mi experiencia con :skills encaja con lo que buscan para este puesto.',
+        'company_fact' => 'De :company me atrae especialmente lo siguiente: :fact.',
         'and' => 'y',
         'close' => [
             'formal' => 'Quedo a su disposición para ampliar cualquier información y les agradezco su tiempo y consideración.',

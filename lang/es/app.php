@@ -16,4 +16,11 @@ return [
     'theme_dark' => 'Oscuro',
     'theme_system' => 'Sistema',
     'footer_rights' => '© :year :app',
+    'browse_jobs' => 'Ver ofertas',
+    'how_it_works' => 'Cómo funciona',
+    'points' => [
+        'collect' => ['title' => 'Reunimos las ofertas', 'text' => 'Recogemos ofertas de trabajo remoto de fuentes públicas varias veces al día y descartamos las repetidas o caducadas.'],
+        'match' => ['title' => 'Calculamos tu encaje', 'text' => 'Comparamos tu perfil con lo que pide cada oferta y te decimos qué te falta para llegar al 100 %.'],
+        'prepare' => ['title' => 'Preparas la solicitud', 'text' => 'Carta y CV adaptados que revisas y apruebas tú. Nada se envía sin que lo decidas.'],
+    ],
 ];

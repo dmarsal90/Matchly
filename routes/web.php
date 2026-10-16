@@ -3,15 +3,20 @@
 declare(strict_types=1);
 
 use App\Modules\Alerts\Http\Controllers\AlertController;
+use App\Modules\Alerts\Http\Controllers\CompanyRadarController;
 use App\Modules\Alerts\Http\Controllers\UnsubscribeController;
 use App\Modules\Applications\Http\Controllers\ApplicationController;
 use App\Modules\Applications\Http\Controllers\ApplicationEventController;
+use App\Modules\Applications\Http\Controllers\CompanyNoteController;
 use App\Modules\Applications\Http\Controllers\InsightsController;
+use App\Modules\Applications\Http\Controllers\InterviewAnswerController;
 use App\Modules\Applications\Http\Controllers\InterviewPrepController;
 use App\Modules\Applications\Http\Controllers\QuickApplyController;
 use App\Modules\Applications\Http\Controllers\SavedJobController;
+use App\Modules\Applications\Http\Controllers\SharedReportController;
 use App\Modules\Identity\Http\Controllers\OAuthController;
 use App\Modules\Jobs\Http\Controllers\JobController;
+use App\Modules\Matching\Http\Controllers\MarketController;
 use App\Modules\Notifications\Http\Controllers\NotificationController;
 use App\Modules\Profiles\Domain\Enums\QuestionnaireStep;
 use App\Modules\Profiles\Domain\Enums\SkillSource;
@@ -39,7 +44,26 @@ Route::inertia('privacy', 'legal/Privacy', ['retention' => [
     'days' => (string) config('privacy.retention.unverified_account_days'),
     'months' => (string) config('privacy.retention.inactive_cv_text_months'),
 ]])->name('legal.privacy');
+// Lets browsers install the app with its own icon and name.
+Route::get('manifest.webmanifest', fn () => response()->json([
+    'name' => config('app.name'),
+    'short_name' => config('app.name'),
+    'start_url' => '/jobs',
+    'display' => 'standalone',
+    'background_color' => '#0F3D2E',
+    'theme_color' => '#0F3D2E',
+    'icons' => [
+        ['src' => '/icon-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
+        ['src' => '/icon-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
+        ['src' => '/icon-maskable-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'maskable'],
+        ['src' => '/icon-maskable-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable'],
+    ],
+], 200, ['Content-Type' => 'application/manifest+json']))->name('manifest');
+
 Route::inertia('terms', 'legal/Terms')->name('legal.terms');
+
+// A shared insights report: the unguessable token in the link is the only credential.
+Route::get('shared/{token}', [SharedReportController::class, 'show'])->where('token', '[A-Za-z0-9]{48}')->middleware('throttle:60,1')->name('shared-report.show');
 
 // One-click unsubscribe from alert e-mails: signed links, no sign-in needed.
 Route::middleware(['signed', 'throttle:30,1'])->group(function () {
@@ -57,12 +81,25 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', fn () => to_route('jobs.index'))->name('dashboard');
 
     Route::post('jobs/{job}/save', [SavedJobController::class, 'toggle'])->whereNumber('job')->middleware('throttle:60,1')->name('jobs.save');
+    Route::post('company-notes', [CompanyNoteController::class, 'store'])->middleware('throttle:60,1')->name('company-notes.store');
+    Route::post('company-notes/discover', [CompanyNoteController::class, 'discover'])->middleware('throttle:6,60')->name('company-notes.discover');
+    Route::post('company-notes/{note}/approve', [CompanyNoteController::class, 'approve'])->whereNumber('note')->name('company-notes.approve');
+    Route::delete('company-notes/{note}', [CompanyNoteController::class, 'destroy'])->whereNumber('note')->name('company-notes.destroy');
     Route::get('insights', [InsightsController::class, 'index'])->name('insights.index');
+    Route::get('insights/plan.ics', [InsightsController::class, 'plan'])->middleware('throttle:30,1')->name('insights.plan');
+    Route::post('insights/share', [SharedReportController::class, 'store'])->middleware('throttle:10,1')->name('insights.share');
+    Route::delete('insights/share/{report}', [SharedReportController::class, 'destroy'])->whereNumber('report')->name('insights.share.destroy');
+    Route::get('insights/report', [InsightsController::class, 'report'])->middleware('throttle:30,1')->name('insights.report');
     Route::get('applications', [ApplicationController::class, 'index'])->name('applications.index');
     Route::patch('applications/{application}', [ApplicationController::class, 'update'])->name('applications.update');
+    Route::patch('applications/{application}/deadline', [ApplicationController::class, 'deadline'])->whereNumber('application')->name('applications.deadline');
     Route::delete('applications/{application}', [ApplicationController::class, 'destroy'])->name('applications.destroy');
     Route::post('applications/{application}/events', [ApplicationEventController::class, 'store'])->name('applications.events.store');
     Route::get('applications/{application}/interview-prep', [InterviewPrepController::class, 'show'])->whereNumber('application')->name('applications.interview-prep.show');
+    Route::get('applications/{application}/interview-prep/mock', [InterviewAnswerController::class, 'mock'])->whereNumber('application')->name('applications.interview-prep.mock');
+    Route::post('applications/{application}/interview-prep/mock/review', [InterviewAnswerController::class, 'review'])->whereNumber('application')->middleware('throttle:quick-apply')->name('applications.interview-prep.mock.review');
+    Route::put('applications/{application}/interview-prep/answer', [InterviewAnswerController::class, 'update'])->whereNumber('application')->name('applications.interview-prep.answer');
+    Route::post('applications/{application}/interview-prep/feedback', [InterviewAnswerController::class, 'feedback'])->whereNumber('application')->middleware('throttle:quick-apply')->name('applications.interview-prep.feedback');
     Route::post('applications/{application}/interview-prep', [InterviewPrepController::class, 'store'])->whereNumber('application')->middleware('throttle:quick-apply')->name('applications.interview-prep.store');
 
     // Quick apply: a package is prepared for review; the person applies on the employer's site.
@@ -86,6 +123,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('profile/cv/{cv}', [CvDocumentController::class, 'destroy'])->name('career.cv.destroy');
 
     // Saved-search alerts and the notification centre.
+    Route::get('market', [MarketController::class, 'index'])->name('market.index');
+    Route::get('radar', [CompanyRadarController::class, 'index'])->name('radar.index');
+    Route::post('radar', [CompanyRadarController::class, 'store'])->middleware('throttle:30,1')->name('radar.store');
+    Route::delete('radar/{follow}', [CompanyRadarController::class, 'destroy'])->whereNumber('follow')->name('radar.destroy');
     Route::get('alerts', [AlertController::class, 'index'])->name('alerts.index');
     Route::post('alerts', [AlertController::class, 'store'])->middleware('throttle:30,1')->name('alerts.store');
     Route::put('alerts/{alert}', [AlertController::class, 'update'])->name('alerts.update');
@@ -104,6 +145,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Merged skill profile, its sources (GitHub, LinkedIn export, CV) and the search profile.
     Route::get('profile/skills', [SkillsController::class, 'index'])->name('skills.index');
     Route::post('profile/imports/github', [ProfileImportController::class, 'github'])->middleware('throttle:imports')->name('skills.imports.github');
+    Route::post('profile/imports/portfolio', [ProfileImportController::class, 'portfolio'])->middleware('throttle:imports')->name('skills.imports.portfolio');
     Route::post('profile/imports/linkedin', [ProfileImportController::class, 'linkedin'])->middleware('throttle:uploads')->name('skills.imports.linkedin');
     Route::post('profile/imports/cv', [ProfileImportController::class, 'cv'])->middleware('throttle:imports')->name('skills.imports.cv');
     Route::get('profile/imports/{import}', [ProfileImportController::class, 'show'])->name('skills.imports.show');

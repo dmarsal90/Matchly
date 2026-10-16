@@ -14,6 +14,7 @@ enum ConsentPurpose: string
     case CvProcessing = 'cv_processing';
     case GithubImport = 'github_import';
     case LinkedinImport = 'linkedin_import';
+    case PortfolioImport = 'portfolio_import';
     case AiProcessing = 'ai_processing';
     case EmailAlerts = 'email_alerts';
 }

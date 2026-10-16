@@ -27,9 +27,7 @@ const page = usePage();
                         <div
                             class="mb-1 flex h-9 w-9 items-center justify-center rounded-md"
                         >
-                            <AppLogoIcon
-                                class="size-9 fill-current text-[var(--foreground)] dark:text-white"
-                            />
+                            <AppLogoIcon class="size-11 text-primary" />
                         </div>
                         <span class="sr-only">{{ page.props.name }}</span>
                     </Link>

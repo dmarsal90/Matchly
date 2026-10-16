@@ -5,12 +5,16 @@ declare(strict_types=1);
 namespace App\Modules\Jobs\Http\Controllers;
 
 use App\Modules\AI\Application\AiGateway;
+use App\Modules\Alerts\Infrastructure\Models\FollowedCompany;
+use App\Modules\Applications\Domain\Services\CompanyKey;
 use App\Modules\Applications\Infrastructure\Models\ApplicationPackage;
+use App\Modules\Applications\Infrastructure\Models\CompanyNote;
 use App\Modules\Identity\Domain\Enums\ConsentPurpose;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Jobs\Application\Actions\RecordJobView;
 use App\Modules\Jobs\Application\Queries\JobFilters;
 use App\Modules\Jobs\Application\Queries\JobSearchQuery;
+use App\Modules\Jobs\Application\Queries\SalaryBenchmark;
 use App\Modules\Jobs\Application\Queries\ViewerJobState;
 use App\Modules\Jobs\Domain\Enums\DateRange;
 use App\Modules\Jobs\Domain\Enums\EmploymentType;
@@ -78,7 +82,7 @@ final class JobController
         ]);
     }
 
-    public function show(Request $request, JobListing $job, RecordJobView $recordView, ViewerJobState $viewerState, JobMatchDetails $fit, AiGateway $ai, #[CurrentUser] ?User $user): Response|RedirectResponse
+    public function show(Request $request, JobListing $job, RecordJobView $recordView, ViewerJobState $viewerState, JobMatchDetails $fit, SalaryBenchmark $benchmark, AiGateway $ai, #[CurrentUser] ?User $user): Response|RedirectResponse
     {
         if ($job->duplicate_of_id !== null) {
             return to_route('jobs.show', ['job' => $job->duplicate_of_id], 301);
@@ -99,8 +103,17 @@ final class JobController
         return Inertia::render('jobs/Show', [
             'job' => (new JobListingResource($job))->withViewerState($tracked, $viewed, $matches)->withDescription()->resolve($request),
             'isOpen' => $job->status === JobStatus::Open,
+            'salaryBenchmark' => $benchmark->for($job),
+            'followedCompanyId' => $user === null ? null : FollowedCompany::query()->where('user_id', $user->id)->where('company_key', CompanyKey::from($job->company))->value('id'),
             'requirements' => $details['requirements'],
             'match' => $details['match'],
+            'companyNotes' => $user === null ? [] : CompanyNote::query()
+                ->where('user_id', $user->id)
+                ->where('company_key', CompanyKey::from($job->company))
+                ->orderBy('id')
+                ->get()
+                ->map(fn (CompanyNote $note): array => ['id' => $note->id, 'fact' => $note->fact, 'source_url' => $note->source_url, 'origin' => $note->origin->value, 'approved' => $note->approved])
+                ->all(),
             'quickApply' => $user !== null ? [
                 ...$this->quickApplyOptions($user, $ai),
                 'packages' => ApplicationPackage::query()->where('user_id', $user->id)->where('job_listing_id', $job->id)->count(),

@@ -10,6 +10,7 @@ import type { SavedAlert } from '@/features/alerts/types';
 import { relativeTime } from '@/features/jobs/lib/format';
 import { destroy, index, update } from '@/routes/alerts';
 import { index as jobsIndex } from '@/routes/jobs';
+import { index as radarIndex } from '@/routes/radar';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { BellRing, Mail, MailX, Pause, Play, Trash2 } from '@lucide/vue';
 import { getActiveLanguage, trans, transChoice } from 'laravel-vue-i18n';
@@ -57,6 +58,12 @@ function remove(alert: SavedAlert): void {
             :title="trans('alerts.title')"
             :description="trans('alerts.description')"
         />
+
+        <p class="text-sm">
+            <Link :href="radarIndex()" class="underline underline-offset-2">{{
+                trans('radar.manage')
+            }}</Link>
+        </p>
 
         <EmptyState
             v-if="alerts.length === 0"

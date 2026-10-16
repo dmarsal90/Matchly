@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Identity\Infrastructure\Console;
 
+use App\Modules\Applications\Infrastructure\Models\SharedReport;
 use App\Modules\Identity\Application\Actions\DeleteAccount;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Profiles\Domain\Enums\ImportStatus;
@@ -47,6 +48,9 @@ final class PrunePersonalDataCommand extends Command
             ->whereIn('status', [ImportStatus::PendingReview, ImportStatus::Failed, ImportStatus::Processing])
             ->where('updated_at', '<', CarbonImmutable::now()->subDays((int) config('privacy.retention.unreviewed_import_days')))
             ->delete();
+
+        // A shared report that expired is gone for good, not just hidden.
+        SharedReport::query()->where('expires_at', '<', CarbonImmutable::now())->delete();
 
         // Read notifications are kept for a while for reference, then removed.
         $notifications = DatabaseNotification::query()

@@ -9,6 +9,7 @@ use App\Modules\Applications\Application\Actions\MarkApplied;
 use App\Modules\Applications\Application\Actions\StartQuickApply;
 use App\Modules\Applications\Application\Actions\UpdatePackage;
 use App\Modules\Applications\Domain\Enums\PackageStatus;
+use App\Modules\Applications\Domain\Enums\ResumeTemplate;
 use App\Modules\Applications\Http\Requests\StartQuickApplyRequest;
 use App\Modules\Applications\Http\Requests\UpdatePackageRequest;
 use App\Modules\Applications\Http\Resources\PackageResource;
@@ -22,6 +23,7 @@ use App\Modules\Jobs\Infrastructure\Models\JobListing;
 use App\Modules\Matching\Infrastructure\Models\JobMatch;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -133,13 +135,13 @@ final class QuickApplyController
         ]);
     }
 
-    public function resume(ApplicationPackage $package, ResumePdfRenderer $renderer): HttpResponse
+    public function resume(Request $request, ApplicationPackage $package, ResumePdfRenderer $renderer): HttpResponse
     {
         Gate::authorize('view', $package);
         // Only what the person approved is exported.
         abort_unless($package->status === PackageStatus::Approved && $package->resumeData() !== null, 403);
 
-        return response($renderer->render($package->resumeData(), $package->language), 200, [
+        return response($renderer->render($package->resumeData(), $package->language, ResumeTemplate::tryFrom($request->string('template')->toString()) ?? ResumeTemplate::Classic), 200, [
             'Content-Type' => 'application/pdf',
             'Content-Disposition' => 'attachment; filename="'.$this->filename($package, 'pdf').'"',
             'Cache-Control' => 'private, no-store',

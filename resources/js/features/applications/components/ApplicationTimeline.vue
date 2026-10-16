@@ -13,6 +13,7 @@ const props = defineProps<{
     applicationId: number;
     events: ApplicationEventEntry[];
     followUpDraft: string | null;
+    thankYouDraft?: string | null;
 }>();
 
 const type = ref<'interview' | 'note' | 'follow_up'>('interview');
@@ -60,12 +61,12 @@ function add(): void {
     );
 }
 
-async function copyDraft(): Promise<void> {
-    if (!props.followUpDraft) {
+async function copyDraft(text: string | null | undefined): Promise<void> {
+    if (!text) {
         return;
     }
     try {
-        await navigator.clipboard.writeText(props.followUpDraft);
+        await navigator.clipboard.writeText(text);
         toast.success(trans('applications.timeline.copied'));
     } catch {
         // Clipboard blocked: the text stays visible for manual copy.
@@ -109,9 +110,30 @@ async function copyDraft(): Promise<void> {
                 <pre
                     class="max-h-40 overflow-auto rounded-md border bg-muted/40 p-2 text-xs whitespace-pre-wrap"
                     >{{ followUpDraft }}</pre>
-                <Button size="sm" variant="outline" @click="copyDraft">{{
-                    trans('applications.timeline.copy')
-                }}</Button>
+                <Button
+                    size="sm"
+                    variant="outline"
+                    @click="copyDraft(followUpDraft)"
+                    >{{ trans('applications.timeline.copy') }}</Button
+                >
+            </div>
+
+            <div v-if="thankYouDraft" class="space-y-1">
+                <p class="text-xs font-medium">
+                    {{ trans('applications.timeline.thanks') }}
+                </p>
+                <p class="text-xs text-muted-foreground">
+                    {{ trans('applications.timeline.thanks_hint') }}
+                </p>
+                <pre
+                    class="max-h-40 overflow-auto rounded-md border bg-muted/40 p-2 text-xs whitespace-pre-wrap"
+                    >{{ thankYouDraft }}</pre>
+                <Button
+                    size="sm"
+                    variant="outline"
+                    @click="copyDraft(thankYouDraft)"
+                    >{{ trans('applications.timeline.copy') }}</Button
+                >
             </div>
 
             <form class="grid gap-2" @submit.prevent="add">

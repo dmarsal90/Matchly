@@ -11,12 +11,15 @@ use App\Modules\Notifications\Application\Notifications\FollowUpReminderNotifica
 use Carbon\CarbonImmutable;
 
 /**
- * Reminds people about applications still waiting for an answer after N days.
- * Each application is reminded once, and not at all when the person has
- * already followed up or the job was closed.
+ * Reminds people about applications still waiting for an answer after N days:
+ * once for the first follow-up and, if they followed up and still heard
+ * nothing, once more N days after that. Never more than two follow-ups per
+ * application, and nothing for applications that moved on or whose job closed.
  */
 final readonly class SendFollowUpReminders
 {
+    private const int MAX_FOLLOW_UPS = 2;
+
     /**
      * @return int reminders sent
      */
@@ -28,22 +31,38 @@ final readonly class SendFollowUpReminders
 
         Application::query()
             ->where('status', ApplicationStatus::Applied)
-            ->whereNull('follow_up_reminded_at')
             ->where('applied_at', '<=', $now->subDays($days))
-            ->whereDoesntHave('events', fn ($events) => $events->where('type', ApplicationEventType::FollowUp))
             ->whereHas('job', fn ($job) => $job->visible())
-            ->with('user')
+            ->with(['user', 'events' => fn ($events) => $events->where('type', ApplicationEventType::FollowUp)])
             ->each(function (Application $application) use ($days, $now, &$sent): void {
-                $application->forceFill(['follow_up_reminded_at' => $now])->save();
-
-                if ($application->user === null) {
+                $user = $application->user;
+                if ($user === null || ! $this->isDue($application, $days, $now)) {
                     return;
                 }
 
-                $application->user->notify(new FollowUpReminderNotification($application->id, $days));
+                $application->forceFill(['follow_up_reminded_at' => $now])->save();
+                $user->notify(new FollowUpReminderNotification($application->id, $days));
                 $sent++;
             });
 
         return $sent;
+    }
+
+    private function isDue(Application $application, int $days, CarbonImmutable $now): bool
+    {
+        $followUps = $application->events;
+        if ($followUps->count() >= self::MAX_FOLLOW_UPS) {
+            return false;
+        }
+
+        // Waiting since the last thing the person did: applying, or following up.
+        $last = $followUps->max('occurred_at');
+        $since = $last ?? $application->applied_at;
+        if ($since === null || $since->greaterThan($now->subDays($days))) {
+            return false;
+        }
+
+        // One reminder per wait: not again until they have followed up.
+        return $application->follow_up_reminded_at === null || $application->follow_up_reminded_at->lessThan($since);
     }
 }

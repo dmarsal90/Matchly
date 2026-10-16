@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import GithubConnect from '@/features/profile/components/GithubConnect.vue';
+import PortfolioImport from '@/features/profile/components/PortfolioImport.vue';
 import LinkedInImport from '@/features/profile/components/LinkedInImport.vue';
 import MergedSkillList from '@/features/profile/components/MergedSkillList.vue';
 import SearchProfileCard from '@/features/profile/components/SearchProfileCard.vue';
@@ -12,6 +13,7 @@ import SourceCard from '@/features/profile/components/SourceCard.vue';
 import type {
     GithubState,
     MergedSkill,
+    PortfolioState,
     SearchProfile,
     SkillSource,
     SkillsOptions,
@@ -27,6 +29,7 @@ import {
     FileArchive,
     FileText,
     FolderGit2,
+    Globe,
     Sparkles,
 } from '@lucide/vue';
 import { trans } from 'laravel-vue-i18n';
@@ -37,6 +40,7 @@ const props = defineProps<{
     sources: Record<SkillSource, SourceState>;
     onboardingCompleted: boolean;
     github: GithubState;
+    portfolio: PortfolioState;
     cv: { ready: boolean };
     searchProfile: SearchProfile | null;
     options: SkillsOptions;
@@ -218,6 +222,20 @@ watch(processing, (value) => (value ? start() : stop()), { immediate: true });
                         :state="github"
                         :consented="sources.github.consented"
                         :busy="sources.github.pending?.status === 'processing'"
+                    />
+                </SourceCard>
+
+                <SourceCard
+                    source="portfolio"
+                    :state="sources.portfolio"
+                    :icon="Globe"
+                >
+                    <PortfolioImport
+                        :state="portfolio"
+                        :consented="sources.portfolio.consented"
+                        :busy="
+                            sources.portfolio.pending?.status === 'processing'
+                        "
                     />
                 </SourceCard>
 

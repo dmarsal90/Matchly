@@ -108,7 +108,7 @@ function goToPage(page: number): void {
                     </div>
                 </div>
                 <p
-                    v-if="item.data.type === 'follow_up'"
+                    v-if="item.data.type !== 'job_alert'"
                     class="text-sm text-muted-foreground"
                 >
                     {{ notificationSummary(item.data) }}
