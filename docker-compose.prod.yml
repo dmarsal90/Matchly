@@ -107,7 +107,7 @@ services:
         limits: { cpus: '0.50', memory: 256M }
 
   postgres:
-    image: postgres:18.6-alpine
+    image: postgres:17.11-alpine
     restart: unless-stopped
     logging: *logging
     environment:
@@ -148,7 +148,7 @@ services:
   # Nightly pg_dump, kept BACKUP_KEEP_DAYS days. Copy ./backups off the host
   # (rclone, restic, provider snapshots): a backup on the same disk is not enough.
   backup:
-    image: postgres:18.6-alpine
+    image: postgres:17.11-alpine
     restart: unless-stopped
     logging: *logging
     command: [sh, /usr/local/bin/backup.sh]
