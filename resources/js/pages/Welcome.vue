@@ -60,30 +60,14 @@ const points = ['collect', 'match', 'prepare'] as const;
                 <!-- The match: where a profile and a job overlap. Decorative. -->
                 <svg
                     viewBox="0 0 320 240"
-                    class="mx-auto w-full max-w-sm text-primary"
+                    class="mx-auto w-full max-w-sm"
                     fill="none"
                     aria-hidden="true"
                 >
-                    <circle
-                        cx="120"
-                        cy="120"
-                        r="92"
-                        fill="currentColor"
-                        fill-opacity=".08"
-                        stroke="currentColor"
-                        stroke-width="3"
-                    />
-                    <circle
-                        cx="200"
-                        cy="120"
-                        r="92"
-                        fill="currentColor"
-                        fill-opacity=".08"
-                        stroke="currentColor"
-                        stroke-width="3"
-                    />
+                    <circle cx="116" cy="120" r="88" class="fill-brand" />
+                    <circle cx="204" cy="120" r="88" class="fill-brand" />
                     <path
-                        d="M160 41.7A92 92 0 0 1 160 198.3A92 92 0 0 1 160 41.7Z"
+                        d="M160 44.4A88 88 0 0 1 160 195.6A88 88 0 0 1 160 44.4Z"
                         fill="var(--highlight)"
                     />
                 </svg>

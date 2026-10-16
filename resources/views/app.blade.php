@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="application-name" content="{{ config('app.name') }}">
         <meta name="description" content="{{ __('meta.description', ['app' => config('app.name')]) }}">
+        <meta property="og:image" content="{{ url('/og-image.png') }}">
         <meta property="og:site_name" content="{{ config('app.name') }}">
 
         {{-- Applies the dark class before first paint to avoid a flash of the wrong theme --}}
@@ -29,12 +30,12 @@
             }
         </style>
 
-        <link rel="icon" href="/favicon.ico?v=2" sizes="any">
-        <link rel="icon" href="/favicon.svg?v=2" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=2">
+        <link rel="icon" href="/favicon.ico?v=3" sizes="any">
+        <link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
         <link rel="manifest" href="/manifest.webmanifest">
-        <meta name="theme-color" content="#10463F" media="(prefers-color-scheme: light)">
-        <meta name="theme-color" content="#0B1513" media="(prefers-color-scheme: dark)">
+        <meta name="theme-color" content="#0F3D2E" media="(prefers-color-scheme: light)">
+        <meta name="theme-color" content="#0F3D2E" media="(prefers-color-scheme: dark)">
 
         @fonts
 

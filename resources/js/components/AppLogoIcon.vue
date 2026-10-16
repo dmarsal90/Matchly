@@ -16,32 +16,16 @@ defineProps<Props>();
 <template>
     <svg
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="10 14 44 36"
+        viewBox="8 16 48 32"
         fill="none"
         aria-hidden="true"
         :class="className"
         v-bind="$attrs"
     >
-        <circle
-            cx="26"
-            cy="32"
-            r="14"
-            fill="currentColor"
-            fill-opacity=".14"
-            stroke="currentColor"
-            stroke-width="3"
-        />
-        <circle
-            cx="38"
-            cy="32"
-            r="14"
-            fill="currentColor"
-            fill-opacity=".14"
-            stroke="currentColor"
-            stroke-width="3"
-        />
+        <circle cx="22.9" cy="32" r="13" fill="currentColor" />
+        <circle cx="41.1" cy="32" r="13" fill="currentColor" />
         <path
-            d="M32 19.35A14 14 0 0 1 32 44.65A14 14 0 0 1 32 19.35Z"
+            d="M32 22.72A13 13 0 0 1 32 41.28A13 13 0 0 1 32 22.72Z"
             fill="var(--highlight)"
         />
     </svg>
