@@ -1,0 +1,66 @@
+:root {
+    color-scheme: light dark;
+    font-family: system-ui, sans-serif;
+}
+body {
+    width: 320px;
+    margin: 0;
+}
+main {
+    padding: 12px 14px;
+    display: grid;
+    gap: 10px;
+}
+h1 {
+    font-size: 16px;
+    margin: 0;
+}
+label {
+    font-size: 13px;
+    display: block;
+    margin-bottom: 4px;
+}
+label.inline {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+}
+select,
+input[type='url'],
+input[type='password'] {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 6px;
+    font-size: 13px;
+}
+button {
+    padding: 7px 10px;
+    font-size: 13px;
+    cursor: pointer;
+}
+.note {
+    font-size: 12px;
+    opacity: 0.75;
+    margin: 0;
+}
+#status {
+    font-size: 13px;
+    min-height: 1.2em;
+    margin: 0;
+}
+#status.error {
+    color: #b91c1c;
+}
+@media (prefers-color-scheme: dark) {
+    #status.error {
+        color: #fca5a5;
+    }
+}
+details {
+    display: grid;
+    gap: 6px;
+}
+summary {
+    cursor: pointer;
+    font-size: 13px;
+}

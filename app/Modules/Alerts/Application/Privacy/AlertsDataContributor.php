@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Alerts\Application\Privacy;
 
+use App\Modules\Alerts\Infrastructure\Models\FollowedCompany;
 use App\Modules\Alerts\Infrastructure\Models\SavedSearch;
 use App\Modules\Identity\Domain\Contracts\PersonalDataContributor;
 use App\Modules\Identity\Domain\Data\PersonalData;
@@ -25,6 +26,8 @@ final readonly class AlertsDataContributor implements PersonalDataContributor
                     'jobs_matched' => (int) $search->getAttribute('deliveries_count'),
                     'created_at' => $search->created_at->toIso8601String(),
                 ])->values()->all(),
+            'followed_companies' => FollowedCompany::query()->where('user_id', $userId)->orderBy('id')->get()
+                ->map(fn (FollowedCompany $follow): array => ['company' => $follow->company, 'followed_at' => $follow->created_at->toIso8601String(), 'last_notified_at' => $follow->last_notified_at?->toIso8601String()])->values()->all(),
             'notifications' => DatabaseNotification::query()
                 ->where('notifiable_type', (new User)->getMorphClass())
                 ->where('notifiable_id', $userId)

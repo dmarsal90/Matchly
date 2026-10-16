@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Modules\Jobs\Http\Controllers;
 
 use App\Modules\AI\Application\AiGateway;
+use App\Modules\Alerts\Infrastructure\Models\FollowedCompany;
 use App\Modules\Applications\Domain\Services\CompanyKey;
 use App\Modules\Applications\Infrastructure\Models\ApplicationPackage;
 use App\Modules\Applications\Infrastructure\Models\CompanyNote;
@@ -103,6 +104,7 @@ final class JobController
             'job' => (new JobListingResource($job))->withViewerState($tracked, $viewed, $matches)->withDescription()->resolve($request),
             'isOpen' => $job->status === JobStatus::Open,
             'salaryBenchmark' => $benchmark->for($job),
+            'followedCompanyId' => $user === null ? null : FollowedCompany::query()->where('user_id', $user->id)->where('company_key', CompanyKey::from($job->company))->value('id'),
             'requirements' => $details['requirements'],
             'match' => $details['match'],
             'companyNotes' => $user === null ? [] : CompanyNote::query()

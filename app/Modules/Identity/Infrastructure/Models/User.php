@@ -152,6 +152,14 @@ final class User extends Authenticatable implements FilamentUser, HasLocalePrefe
     }
 
     /**
+     * @return HasMany<ExtensionToken, $this>
+     */
+    public function extensionTokens(): HasMany
+    {
+        return $this->hasMany(ExtensionToken::class);
+    }
+
+    /**
      * @return HasMany<SocialAccount, $this>
      */
     public function socialAccounts(): HasMany

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Alerts\Http\Controllers\AlertController;
+use App\Modules\Alerts\Http\Controllers\CompanyRadarController;
 use App\Modules\Alerts\Http\Controllers\UnsubscribeController;
 use App\Modules\Applications\Http\Controllers\ApplicationController;
 use App\Modules\Applications\Http\Controllers\ApplicationEventController;
@@ -12,8 +13,10 @@ use App\Modules\Applications\Http\Controllers\InterviewAnswerController;
 use App\Modules\Applications\Http\Controllers\InterviewPrepController;
 use App\Modules\Applications\Http\Controllers\QuickApplyController;
 use App\Modules\Applications\Http\Controllers\SavedJobController;
+use App\Modules\Applications\Http\Controllers\SharedReportController;
 use App\Modules\Identity\Http\Controllers\OAuthController;
 use App\Modules\Jobs\Http\Controllers\JobController;
+use App\Modules\Matching\Http\Controllers\MarketController;
 use App\Modules\Notifications\Http\Controllers\NotificationController;
 use App\Modules\Profiles\Domain\Enums\QuestionnaireStep;
 use App\Modules\Profiles\Domain\Enums\SkillSource;
@@ -43,6 +46,9 @@ Route::inertia('privacy', 'legal/Privacy', ['retention' => [
 ]])->name('legal.privacy');
 Route::inertia('terms', 'legal/Terms')->name('legal.terms');
 
+// A shared insights report: the unguessable token in the link is the only credential.
+Route::get('shared/{token}', [SharedReportController::class, 'show'])->where('token', '[A-Za-z0-9]{48}')->middleware('throttle:60,1')->name('shared-report.show');
+
 // One-click unsubscribe from alert e-mails: signed links, no sign-in needed.
 Route::middleware(['signed', 'throttle:30,1'])->group(function () {
     Route::get('alerts/{savedSearch}/unsubscribe', [UnsubscribeController::class, 'show'])->name('alerts.unsubscribe');
@@ -64,6 +70,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('company-notes/{note}/approve', [CompanyNoteController::class, 'approve'])->whereNumber('note')->name('company-notes.approve');
     Route::delete('company-notes/{note}', [CompanyNoteController::class, 'destroy'])->whereNumber('note')->name('company-notes.destroy');
     Route::get('insights', [InsightsController::class, 'index'])->name('insights.index');
+    Route::get('insights/plan.ics', [InsightsController::class, 'plan'])->middleware('throttle:30,1')->name('insights.plan');
+    Route::post('insights/share', [SharedReportController::class, 'store'])->middleware('throttle:10,1')->name('insights.share');
+    Route::delete('insights/share/{report}', [SharedReportController::class, 'destroy'])->whereNumber('report')->name('insights.share.destroy');
     Route::get('insights/report', [InsightsController::class, 'report'])->middleware('throttle:30,1')->name('insights.report');
     Route::get('applications', [ApplicationController::class, 'index'])->name('applications.index');
     Route::patch('applications/{application}', [ApplicationController::class, 'update'])->name('applications.update');
@@ -71,6 +80,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('applications/{application}', [ApplicationController::class, 'destroy'])->name('applications.destroy');
     Route::post('applications/{application}/events', [ApplicationEventController::class, 'store'])->name('applications.events.store');
     Route::get('applications/{application}/interview-prep', [InterviewPrepController::class, 'show'])->whereNumber('application')->name('applications.interview-prep.show');
+    Route::get('applications/{application}/interview-prep/mock', [InterviewAnswerController::class, 'mock'])->whereNumber('application')->name('applications.interview-prep.mock');
+    Route::post('applications/{application}/interview-prep/mock/review', [InterviewAnswerController::class, 'review'])->whereNumber('application')->middleware('throttle:quick-apply')->name('applications.interview-prep.mock.review');
     Route::put('applications/{application}/interview-prep/answer', [InterviewAnswerController::class, 'update'])->whereNumber('application')->name('applications.interview-prep.answer');
     Route::post('applications/{application}/interview-prep/feedback', [InterviewAnswerController::class, 'feedback'])->whereNumber('application')->middleware('throttle:quick-apply')->name('applications.interview-prep.feedback');
     Route::post('applications/{application}/interview-prep', [InterviewPrepController::class, 'store'])->whereNumber('application')->middleware('throttle:quick-apply')->name('applications.interview-prep.store');
@@ -96,6 +107,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('profile/cv/{cv}', [CvDocumentController::class, 'destroy'])->name('career.cv.destroy');
 
     // Saved-search alerts and the notification centre.
+    Route::get('market', [MarketController::class, 'index'])->name('market.index');
+    Route::get('radar', [CompanyRadarController::class, 'index'])->name('radar.index');
+    Route::post('radar', [CompanyRadarController::class, 'store'])->middleware('throttle:30,1')->name('radar.store');
+    Route::delete('radar/{follow}', [CompanyRadarController::class, 'destroy'])->whereNumber('follow')->name('radar.destroy');
     Route::get('alerts', [AlertController::class, 'index'])->name('alerts.index');
     Route::post('alerts', [AlertController::class, 'store'])->middleware('throttle:30,1')->name('alerts.store');
     Route::put('alerts/{alert}', [AlertController::class, 'update'])->name('alerts.update');
