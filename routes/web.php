@@ -110,6 +110,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('applications/packages/{package}/applied', [QuickApplyController::class, 'applied'])->name('applications.packages.applied');
     Route::post('applications/packages/{package}/retry', [QuickApplyController::class, 'retry'])->middleware('throttle:quick-apply')->name('applications.packages.retry');
     Route::get('applications/packages/{package}/letter.txt', [QuickApplyController::class, 'letter'])->name('applications.packages.letter');
+    Route::get('applications/packages/{package}/resume-preview.pdf', [QuickApplyController::class, 'resumePreview'])->middleware('throttle:60,1')->name('applications.packages.resume-preview');
     Route::get('applications/packages/{package}/resume.pdf', [QuickApplyController::class, 'resume'])->middleware('throttle:30,1')->name('applications.packages.resume');
     Route::delete('applications/packages/{package}', [QuickApplyController::class, 'destroy'])->name('applications.packages.destroy');
 

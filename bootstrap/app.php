@@ -25,6 +25,12 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Behind a reverse proxy or tunnel (set TRUSTED_PROXIES=* locally) so URLs and cookies use https.
+        // @phpstan-ignore larastan.noEnvCallsOutsideOfConfig (read before the config exists; set locally only)
+        if (is_string($proxies = env('TRUSTED_PROXIES')) && $proxies !== '') {
+            $middleware->trustProxies(at: $proxies === '*' ? '*' : explode(',', $proxies));
+        }
+
         $middleware->encryptCookies(except: ['appearance', 'sidebar_state']);
 
         $middleware->append(SecurityHeaders::class);

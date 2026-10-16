@@ -96,7 +96,8 @@ final class AiGateway
                     $result = $provider->complete($completion);
                 } catch (AiProviderFailed $exception) {
                     $this->log($task, $userId, $provider, $model, $keyOwner, new AiResult(null), false, $exception->getMessage(), $started);
-                    $lastError = $exception->getMessage();
+                    // The most preferred provider's failure is the one worth showing.
+                    $lastError = $lastError === '' ? $exception->getMessage() : $lastError;
 
                     if (! $exception->retryable) {
                         break;

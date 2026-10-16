@@ -19,4 +19,14 @@ enum LetterLength: string
             self::Long => '300-400',
         };
     }
+
+    public function min(): int
+    {
+        return (int) explode('-', $this->words())[0];
+    }
+
+    public function max(): int
+    {
+        return (int) explode('-', $this->words())[1];
+    }
 }
