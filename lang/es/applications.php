@@ -43,6 +43,8 @@ return [
         'save' => 'Añadir entrada',
         'draft' => 'Borrador de seguimiento',
         'draft_hint' => '¿Sin respuesta? Adapta este mensaje y envíalo tú. Nunca contactamos con las empresas por ti.',
+        'thanks' => 'Nota de agradecimiento',
+        'thanks_hint' => '¿Has hecho una ronda de entrevista? Un agradecimiento breve el mismo día suma. Adáptalo y envíalo tú; nunca contactamos con las empresas por ti.',
         'copy' => 'Copiar borrador',
         'copied' => 'Borrador copiado',
     ],

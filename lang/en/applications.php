@@ -43,6 +43,8 @@ return [
         'save' => 'Add entry',
         'draft' => 'Follow-up draft',
         'draft_hint' => 'No answer yet? Adapt this message and send it yourself. We never contact employers for you.',
+        'thanks' => 'Thank-you note',
+        'thanks_hint' => 'Sent an interview round? A short thank-you the same day helps. Adapt it and send it yourself; we never contact employers for you.',
         'copy' => 'Copy draft',
         'copied' => 'Draft copied',
     ],
