@@ -3,7 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Applications\Domain\Services\CompanyFactExtractor;
-use App\Modules\Applications\Domain\Services\RobotsTxt;
+use App\Modules\Shared\Domain\Services\RobotsTxt;
 
 it('follows robots.txt: the group for our agent, else the wildcard, longest rule wins', function (): void {
     $robots = RobotsTxt::parse("User-agent: *\nDisallow: /private\nAllow: /private/open\nDisallow: /tmp*.html$\n\nUser-agent: OtherBot\nDisallow: /\n", 'AcmeBot');

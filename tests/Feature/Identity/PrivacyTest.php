@@ -35,8 +35,8 @@ it('lists every consent purpose with its state', function (): void {
     $this->actingAs($user)->get('/settings/privacy')->assertInertia(fn (Assert $page) => $page
         ->component('settings/Privacy')
         ->has('consents', count(ConsentPurpose::cases()))
-        ->where('consents.4.purpose', 'email_alerts')
-        ->where('consents.4.granted', true)
+        ->where('consents.5.purpose', 'email_alerts')
+        ->where('consents.5.granted', true)
         ->where('consents.0.granted', false));
 });
 
