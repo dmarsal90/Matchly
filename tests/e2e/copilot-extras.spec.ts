@@ -145,3 +145,30 @@ test('runs a mock interview and sees where the answers are weakest', async ({
     await expect(page.getByText(/Es muy corta/)).toBeVisible();
     await expectNoViolations(page);
 });
+
+test('follows a company from a job and finds it in the radar', async ({
+    page,
+}) => {
+    await page.goto('/jobs');
+    await page.getByRole('link', { name: 'Frontend Developer (Vue)' }).click();
+
+    const follow = page.getByRole('button', { name: 'Seguir empresa' });
+    await follow.click();
+    await expect(
+        page.getByRole('button', { name: 'Siguiendo la empresa' }),
+    ).toHaveAttribute('aria-pressed', 'true');
+
+    await page.goto('/radar');
+    await expect(
+        page.getByRole('heading', { name: 'Radar de empresas' }),
+    ).toBeVisible();
+    await expect(
+        page.getByRole('list', { name: 'Empresas que sigues' }),
+    ).toContainText('Umbrella');
+    await expectNoViolations(page);
+
+    await page
+        .getByRole('button', { name: /Dejar de seguir: Umbrella/ })
+        .click();
+    await expect(page.getByText(/Aún no sigues ninguna empresa/)).toBeVisible();
+});

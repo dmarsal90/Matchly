@@ -17,6 +17,7 @@ return [
     'security' => 'Security',
     'appearance' => 'Appearance',
     'extension' => 'Browser extension',
+    'radar' => 'Radar',
     'ai' => 'AI',
     'privacy' => 'Privacy',
     'admin' => 'Admin',

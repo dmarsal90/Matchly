@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Modules\Alerts\Http\Controllers\AlertController;
+use App\Modules\Alerts\Http\Controllers\CompanyRadarController;
 use App\Modules\Alerts\Http\Controllers\UnsubscribeController;
 use App\Modules\Applications\Http\Controllers\ApplicationController;
 use App\Modules\Applications\Http\Controllers\ApplicationEventController;
@@ -98,6 +99,9 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('profile/cv/{cv}', [CvDocumentController::class, 'destroy'])->name('career.cv.destroy');
 
     // Saved-search alerts and the notification centre.
+    Route::get('radar', [CompanyRadarController::class, 'index'])->name('radar.index');
+    Route::post('radar', [CompanyRadarController::class, 'store'])->middleware('throttle:30,1')->name('radar.store');
+    Route::delete('radar/{follow}', [CompanyRadarController::class, 'destroy'])->whereNumber('follow')->name('radar.destroy');
     Route::get('alerts', [AlertController::class, 'index'])->name('alerts.index');
     Route::post('alerts', [AlertController::class, 'store'])->middleware('throttle:30,1')->name('alerts.store');
     Route::put('alerts/{alert}', [AlertController::class, 'update'])->name('alerts.update');
