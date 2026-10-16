@@ -1,0 +1,105 @@
+import { expect, test } from '@playwright/test';
+import { artisan } from './support/artisan';
+import { expectNoViolations } from './support/axe';
+import { CANDIDATE, logIn } from './support/users';
+
+test.beforeEach(async ({ page }) => {
+    await logIn(page, CANDIDATE);
+});
+
+test('warns two days before a deadline the person set', async ({ page }) => {
+    await page.goto('/applications');
+    const card = page.locator('article').filter({ hasText: 'Hooli' });
+    const inTwoDays = new Date(Date.now() + 2 * 86_400_000)
+        .toISOString()
+        .slice(0, 10);
+
+    await card.getByLabel('Fecha límite').fill(inTwoDays);
+    await expect(card.getByLabel('Fecha límite')).toHaveValue(inTwoDays);
+    // Rejected: nothing to warn about. A live application is warned instead.
+    const live = page.locator('article').filter({ hasText: 'Umbrella' });
+    await live.getByLabel('Fecha límite').fill(inTwoDays);
+    await expect(live.getByLabel('Fecha límite')).toHaveValue(inTwoDays);
+
+    artisan('applications:deadlines');
+
+    await page.goto('/notifications');
+    await expect(
+        page.getByText('Se acerca una fecha límite').first(),
+    ).toBeVisible();
+    await expect(page.getByText(/fecha límite en Umbrella/)).toBeVisible();
+    await expect(page.getByText(/fecha límite en Hooli/)).toHaveCount(0);
+});
+
+test('downloads the insights as an offline report', async ({ page }) => {
+    await page.goto('/insights');
+
+    const [download] = await Promise.all([
+        page.waitForEvent('download'),
+        page.getByRole('link', { name: 'Descargar informe' }).click(),
+    ]);
+    expect(download.suggestedFilename()).toMatch(
+        /-report-\d{4}-\d{2}-\d{2}\.html$/,
+    );
+    const stream = await download.createReadStream();
+    const chunks: Buffer[] = [];
+    for await (const chunk of stream) {
+        chunks.push(Buffer.from(chunk));
+    }
+    const html = Buffer.concat(chunks).toString('utf8');
+
+    expect(html).toContain('Mi informe de búsqueda');
+    expect(html).toContain('Cómo van tus candidaturas');
+    // Self-contained: nothing is loaded from outside the file.
+    expect(html).not.toMatch(/<script|<link |src="http|@import/);
+});
+
+test('offers the portfolio as a source of skills, and the study hours', async ({
+    page,
+}) => {
+    await page.goto('/profile/skills');
+    const card = page.getByRole('region', { name: 'Portfolio' });
+    await expect(card.getByLabel('Dirección de tu portfolio')).toBeVisible();
+    await expect(
+        card.getByRole('button', { name: 'Leer mi portfolio' }),
+    ).toBeVisible();
+    await expectNoViolations(page);
+
+    await page.goto('/insights');
+    await page.getByText('Dónde aprender Kubernetes').first().click();
+    await expect(
+        page.getByText(/≈ \d+ h \(estimación orientativa\)/).first(),
+    ).toBeVisible();
+});
+
+test('practises an answer and gets plain feedback on the text', async ({
+    page,
+}) => {
+    await page.goto('/applications');
+    await page
+        .locator('article')
+        .filter({ hasText: 'Umbrella' })
+        .getByRole('link', { name: 'Preparar entrevista' })
+        .click();
+    await page
+        .getByRole('button', { name: /Generar el pack|Generarlo/ })
+        .click();
+    await expect(
+        page.getByRole('heading', { name: 'Preguntas probables' }),
+    ).toBeVisible();
+
+    const question = page.locator('article').first();
+    await question.getByText('Practicar esta respuesta').click();
+    await question.getByLabel('Tu respuesta').fill('Laravel.');
+    await question.getByRole('button', { name: 'Guardar respuesta' }).click();
+    await expect(question.getByText('· guardada')).toBeVisible();
+
+    await question
+        .getByRole('button', { name: 'Comentar mi respuesta' })
+        .click();
+    await expect(
+        question.getByText('Comprobaciones sencillas sobre tu texto'),
+    ).toBeVisible();
+    await expect(question.getByText(/Es muy corta/)).toBeVisible();
+    await expectNoViolations(page);
+});
