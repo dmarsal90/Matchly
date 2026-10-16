@@ -7,6 +7,7 @@ namespace App\Modules\Applications\Application\Generators;
 use App\Modules\AI\Application\AiGateway;
 use App\Modules\AI\Domain\Enums\AiTask;
 use App\Modules\AI\Domain\Exceptions\AiUnavailable;
+use App\Modules\Applications\Application\Queries\ApprovedCompanyFacts;
 use App\Modules\Applications\Domain\Data\ResumeData;
 use App\Modules\Applications\Domain\Enums\ContentSource;
 use App\Modules\Applications\Domain\Enums\LetterLength;
@@ -33,15 +34,18 @@ final readonly class CoverLetterWriter
     public function __construct(
         private AiGateway $ai,
         private SkillCatalog $catalog,
+        private ApprovedCompanyFacts $companyFacts,
     ) {}
 
     public function write(User $user, ResumeData $resume, JobListing $job, JobRequirements $requirements, string $language, LetterTone $tone, LetterLength $length, ?int $yearsExperience, bool $useAi): GeneratedLetter
     {
         $aiError = null;
+        // Only what the person approved about the company; never anything the AI "knows".
+        $facts = $this->companyFacts->for($user->id, $job->company);
 
         if ($useAi) {
             try {
-                $response = $this->ai->run(AiTask::CoverLetter, $this->input($resume, $job, $requirements, $language, $tone, $length, $yearsExperience), $user);
+                $response = $this->ai->run(AiTask::CoverLetter, $this->input($resume, $job, $requirements, $language, $tone, $length, $yearsExperience, $facts), $user);
                 $text = trim(implode("\n\n", [
                     (string) $response->data['greeting'],
                     trim((string) $response->data['body']),
@@ -54,7 +58,7 @@ final readonly class CoverLetterWriter
             }
         }
 
-        return new GeneratedLetter($this->template($resume, $job, $requirements, $language, $tone, $yearsExperience), ContentSource::Rules, aiError: $aiError);
+        return new GeneratedLetter($this->template($resume, $job, $requirements, $language, $tone, $yearsExperience, $facts), ContentSource::Rules, aiError: $aiError);
     }
 
     /**
@@ -88,7 +92,10 @@ final readonly class CoverLetterWriter
         return $warnings;
     }
 
-    private function input(ResumeData $resume, JobListing $job, JobRequirements $requirements, string $language, LetterTone $tone, LetterLength $length, ?int $yearsExperience): string
+    /**
+     * @param  list<string>  $facts
+     */
+    private function input(ResumeData $resume, JobListing $job, JobRequirements $requirements, string $language, LetterTone $tone, LetterLength $length, ?int $yearsExperience, array $facts): string
     {
         return (string) json_encode([
             'language' => Locale::getDisplayLanguage($language, 'en') ?: $language,
@@ -112,6 +119,7 @@ final readonly class CoverLetterWriter
             'job' => [
                 'title' => $job->title,
                 'company' => $job->company,
+                'company_facts' => $facts,
                 'requirements' => [
                     'required_skills' => array_column($requirements->requiredSkills, 'name'),
                     'nice_to_have_skills' => array_column($requirements->niceToHaveSkills, 'name'),
@@ -121,7 +129,10 @@ final readonly class CoverLetterWriter
         ], JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
     }
 
-    private function template(ResumeData $resume, JobListing $job, JobRequirements $requirements, string $language, LetterTone $tone, ?int $yearsExperience): string
+    /**
+     * @param  list<string>  $facts
+     */
+    private function template(ResumeData $resume, JobListing $job, JobRequirements $requirements, string $language, LetterTone $tone, ?int $yearsExperience, array $facts): string
     {
         $locale = in_array($language, self::TEMPLATE_LANGUAGES, true) ? $language : 'en';
         $t = fn (string $key, array $params = []): string => (string) __("quick_apply.letter.{$key}", $params, $locale);
@@ -146,6 +157,11 @@ final readonly class CoverLetterWriter
 
         if ($matched !== []) {
             $paragraphs[] = $t('skills', ['skills' => $this->listing($matched, $t('and'))]);
+        }
+
+        // The person's own words about the company, each quoted as they wrote it.
+        foreach (array_slice($facts, 0, 2) as $fact) {
+            $paragraphs[] = $t('company_fact', ['company' => $job->company, 'fact' => $fact]);
         }
 
         $paragraphs[] = $t("close.{$tone->value}", ['company' => $job->company]);

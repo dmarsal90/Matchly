@@ -43,4 +43,19 @@ return [
         'offers' => 'Offers',
         'small_sample' => 'These numbers come from few applications; read them as hints, not as rules.',
     ],
+    'closest' => [
+        'title' => 'Get to a 100 % fit with one of these jobs',
+        'description' => 'The open jobs you are closest to meeting in full. Learn what is missing and each one becomes a perfect fit on paper.',
+        'score' => 'Match: :score / 100',
+        'missing' => '{1} Only :count skill left to learn.|[2,*] :count skills left to learn.',
+        'required' => 'Required',
+        'nice' => 'Nice to have',
+    ],
+    'courses' => [
+        'learn' => 'Where to learn :skill',
+        'list' => 'Courses, free ones first',
+        'free' => 'Free',
+        'paid' => 'Paid',
+        'search' => '(search results)',
+    ],
 ];

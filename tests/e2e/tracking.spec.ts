@@ -113,3 +113,59 @@ test('shows the funnel and the skills worth learning', async ({ page }) => {
     ).toBeVisible();
     await expect(page.getByText('E2E Board')).toBeVisible();
 });
+
+test('lists where to learn each missing skill, free options first', async ({
+    page,
+}) => {
+    await page.goto('/insights');
+
+    const row = page.getByText('Dónde aprender Kubernetes').first();
+    await row.click();
+    const list = page
+        .getByRole('list', { name: 'Cursos, primero los gratuitos' })
+        .first();
+    const badges = await list.getByText(/^(Gratis|De pago)$/).allTextContents();
+
+    expect(badges.length).toBeGreaterThan(2);
+    // Every free option comes before the first paid one.
+    expect(badges.indexOf('De pago')).toBeGreaterThan(
+        badges.lastIndexOf('Gratis'),
+    );
+    await expect(
+        list.getByRole('link', { name: /Kubernetes tutorials/ }),
+    ).toHaveAttribute('target', '_blank');
+    await expect(
+        page.getByRole('heading', {
+            name: 'Llega al 100 % con una de estas ofertas',
+        }),
+    ).toBeVisible();
+
+    await expectNoViolations(page);
+});
+
+test('company notes reach the cover letter', async ({ page }) => {
+    await page.goto('/jobs');
+    await page.getByRole('link', { name: 'Frontend Developer (Vue)' }).click();
+
+    const panel = page.getByRole('region', { name: 'Lo que sé de Umbrella' });
+    await panel.getByLabel('Lo que sabes').fill('Publican su hoja de ruta');
+    await panel.getByRole('button', { name: 'Añadir nota' }).click();
+    await expect(panel.getByText('Publican su hoja de ruta')).toBeVisible();
+    await expect(panel.getByText('Escrita por ti')).toBeVisible();
+    await expectNoViolations(page);
+
+    await page.getByRole('button', { name: 'Solicitud rápida' }).click();
+    await page
+        .getByRole('dialog', { name: 'Solicitud rápida' })
+        .getByRole('button', { name: 'Preparar solicitud' })
+        .click();
+
+    await expect(
+        page.getByRole('heading', {
+            name: 'Solicitud para Frontend Developer (Vue)',
+        }),
+    ).toBeVisible();
+    await expect(page.locator('textarea').first()).toHaveValue(
+        /Umbrella.*Publican su hoja de ruta/s,
+    );
+});

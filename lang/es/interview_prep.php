@@ -59,6 +59,7 @@ return [
             'none' => 'Todavía no he trabajado con :skill de forma profesional y prefiero decirlo abiertamente. Me pondría al día con la documentación y un pequeño proyecto práctico en mis primeras semanas.',
         ],
         'ask' => [
+            'fact' => 'He visto que :fact. ¿Cómo influye eso en el día a día del equipo?',
             'team' => '¿Cómo se organiza el equipo y con quién trabajaría día a día?',
             'success' => '¿Qué significaría tener éxito en los primeros seis meses como :title?',
             'process' => '¿Cuáles son los siguientes pasos del proceso en :company?',

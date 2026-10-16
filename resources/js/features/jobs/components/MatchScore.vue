@@ -18,9 +18,9 @@ const tone = computed(() =>
     !props.match.eligible
         ? 'text-muted-foreground'
         : {
-              high: 'text-emerald-600 dark:text-emerald-400',
-              medium: 'text-amber-600 dark:text-amber-400',
-              low: 'text-rose-600 dark:text-rose-400',
+              high: 'text-emerald-700 dark:text-emerald-400',
+              medium: 'text-amber-700 dark:text-amber-400',
+              low: 'text-rose-700 dark:text-rose-400',
           }[props.match.level],
 );
 const label = computed(() =>

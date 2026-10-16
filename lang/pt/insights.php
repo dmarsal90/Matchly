@@ -43,4 +43,19 @@ return [
         'offers' => 'Ofertas',
         'small_sample' => 'Estes números vêm de poucas candidaturas; lê-os como pistas, não como regras.',
     ],
+    'closest' => [
+        'title' => 'Chega aos 100 % com uma destas ofertas',
+        'description' => 'As ofertas abertas que estás mais perto de cumprir por completo. Aprende o que falta e cada uma encaixará ao máximo no papel.',
+        'score' => 'Afinidade: :score / 100',
+        'missing' => '{1} Só te falta :count tecnologia por aprender.|[2,*] Faltam-te :count tecnologias por aprender.',
+        'required' => 'Obrigatória',
+        'nice' => 'Desejável',
+    ],
+    'courses' => [
+        'learn' => 'Onde aprender :skill',
+        'list' => 'Cursos, primeiro os gratuitos',
+        'free' => 'Grátis',
+        'paid' => 'Pago',
+        'search' => '(resultados de pesquisa)',
+    ],
 ];

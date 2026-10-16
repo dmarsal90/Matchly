@@ -122,7 +122,8 @@ Además de la solicitud rápida, Matchly acompaña la candidatura hasta el final
 - **Historial** en cada tarjeta de «Mis ofertas»: cambios de estado (incluidos oferta, aceptada, declinada y sin respuesta), rondas de entrevista, seguimientos y notas privadas.
 - **Recordatorios de seguimiento**: `php artisan applications:follow-up` (programado a diario) avisa de las candidaturas sin respuesta tras `FOLLOW_UP_DAYS` días (10 por defecto) y adjunta un borrador que puedes copiar.
 - **Preparar entrevista**: preguntas probables con esquemas STAR sacados de tu CV, respuestas honestas para lo que aún no sabes y preguntas para la empresa. Funciona sin IA; con IA se redacta mejor, pero nunca se inventa experiencia.
-- **Panorama** (`/insights`): qué habilidades te abrirían más ofertas y cómo van tus candidaturas (conversión por etapa, tiempos de respuesta, resultados por fuente y área).
+- **Panorama** (`/insights`): qué habilidades te abrirían más ofertas, con **cursos para cada una (gratuitos primero, de pago después)** y las ofertas que tienes más cerca del 100 %, y cómo van tus candidaturas (conversión por etapa, tiempos de respuesta, resultados por fuente y área). `php artisan courses:check` verifica que los enlaces del catálogo (`config/courses.php`) siguen vivos.
+- **Lo que sé de la empresa**: en la ficha de cada oferta anotas datos de la empresa, o dejas que Matchly lea su web pública (respetando `robots.txt`) y te sugiera frases suyas. Solo lo que apruebes se usa en la carta y en las preguntas para la entrevista; nunca se inventa nada de la empresa.
 
 ## Estructura
 

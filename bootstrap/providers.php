@@ -9,6 +9,7 @@ return [
     App\Modules\Identity\FortifyServiceProvider::class,
     App\Modules\Identity\IdentityServiceProvider::class,
     App\Modules\Jobs\JobsServiceProvider::class,
+    App\Modules\Learning\LearningServiceProvider::class,
     App\Modules\Matching\MatchingServiceProvider::class,
     App\Modules\Profiles\ProfilesServiceProvider::class,
     App\Modules\Providers\ProvidersServiceProvider::class,
