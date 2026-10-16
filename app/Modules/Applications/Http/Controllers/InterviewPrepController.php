@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Modules\Applications\Http\Controllers;
 
 use App\Modules\AI\Application\AiGateway;
+use App\Modules\Applications\Application\Actions\SaveInterviewAnswer;
 use App\Modules\Applications\Application\Actions\StartInterviewPrep;
 use App\Modules\Applications\Http\Requests\StartInterviewPrepRequest;
 use App\Modules\Applications\Infrastructure\Models\Application;
+use App\Modules\Applications\Infrastructure\Models\InterviewAnswer;
 use App\Modules\Identity\Domain\Enums\ConsentPurpose;
 use App\Modules\Identity\Infrastructure\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
@@ -39,10 +41,15 @@ final class InterviewPrepController
             'prep' => $prep === null ? null : [
                 'status' => $prep->status->value,
                 'source' => $prep->source?->value,
-                'content' => $prep->content,
+                'content' => $prep->content === null ? null : [...$prep->content, 'questions' => array_map(fn (array $question): array => [...$question, 'key' => SaveInterviewAnswer::keyOf($question['question'])], $prep->content['questions'])],
                 'warnings' => $prep->warnings ?? [],
                 'updated_at' => $prep->updated_at->toIso8601String(),
             ],
+            'answers' => $application->interviewAnswers()->get()->mapWithKeys(fn (InterviewAnswer $answer): array => [$answer->question_key => [
+                'answer' => $answer->answer,
+                'feedback' => $answer->feedback,
+                'feedback_source' => $answer->feedback_source?->value,
+            ]])->all(),
             'options' => [
                 'ai_available' => $ai->available($user),
                 'ai_consented' => $user->hasConsented(ConsentPurpose::AiProcessing),

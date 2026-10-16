@@ -99,6 +99,10 @@ final readonly class ConfirmImport
             $profile->github_username = $import->reference;
         }
 
+        if ($import->source === SkillSource::Portfolio && $profile->portfolio_url === null) {
+            $profile->portfolio_url = $import->reference;
+        }
+
         if ($import->source === SkillSource::Linkedin) {
             if ($selection->headline !== null && trim($selection->headline) !== '') {
                 $profile->headline = mb_substr(trim($selection->headline), 0, 120);

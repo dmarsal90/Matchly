@@ -37,7 +37,8 @@ export type ProfileOptions = {
     maxCvKilobytes: number;
 };
 
-export type SkillSource = 'declared' | 'cv' | 'github' | 'linkedin';
+export type SkillSource =
+    'declared' | 'cv' | 'github' | 'linkedin' | 'portfolio';
 
 export type DeclaredSkill = {
     name: string;
@@ -142,6 +143,10 @@ export type GithubState = {
     linked_username: string | null;
     suggested_username: string | null;
     oauth_available: boolean;
+};
+
+export type PortfolioState = {
+    suggested_url: string | null;
 };
 
 export type ImportedSkill = {

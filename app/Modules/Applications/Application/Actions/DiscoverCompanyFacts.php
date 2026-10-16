@@ -7,10 +7,10 @@ namespace App\Modules\Applications\Application\Actions;
 use App\Modules\Applications\Domain\Enums\NoteOrigin;
 use App\Modules\Applications\Domain\Services\CompanyFactExtractor;
 use App\Modules\Applications\Domain\Services\CompanyKey;
-use App\Modules\Applications\Domain\Services\RobotsTxt;
 use App\Modules\Applications\Infrastructure\Models\CompanyNote;
-use App\Modules\Applications\Infrastructure\Web\PublicPageFetcher;
 use App\Modules\Identity\Infrastructure\Models\User;
+use App\Modules\Shared\Domain\Services\RobotsTxt;
+use App\Modules\Shared\Infrastructure\Http\PublicPageFetcher;
 
 /**
  * Reads a few public pages of the company's own site (home, about, careers)

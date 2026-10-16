@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\Applications\Domain\Services;
+namespace App\Modules\Shared\Domain\Services;
 
 /**
  * The part of robots.txt that matters to a polite crawler: the rules of the

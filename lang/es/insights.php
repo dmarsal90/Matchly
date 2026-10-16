@@ -41,6 +41,13 @@ return [
         'applied' => 'Enviadas',
         'interviews' => 'Entrevistas',
         'offers' => 'Ofertas',
+        'calibration' => [
+            'title' => '¿La afinidad predice las respuestas?',
+            'summary' => 'Las ofertas que llegaron a entrevista tenían de media :interview / 100; las rechazadas o sin respuesta, :closed / 100.',
+            'works' => 'Las afinidades más altas coinciden con más respuestas: apunta a las mejores afinidades.',
+            'no_signal' => 'Tus respuestas no siguen a la afinidad por ahora: prueba con ofertas que puntúan más bajo y fíjate en qué funciona.',
+            'few' => 'Aún hay pocos resultados para concluir nada. Es solo una comparación; no se ajusta nada automáticamente.',
+        ],
         'small_sample' => 'Estas cifras salen de pocas candidaturas; tómalas como pistas, no como reglas.',
     ],
     'closest' => [
@@ -54,8 +61,19 @@ return [
     'courses' => [
         'learn' => 'Dónde aprender :skill',
         'list' => 'Cursos, primero los gratuitos',
+        'hours' => '≈ :hours h (estimación orientativa)',
         'free' => 'Gratis',
         'paid' => 'De pago',
         'search' => '(resultados de búsqueda)',
+    ],
+    'report' => [
+        'title' => 'Mi informe de búsqueda',
+        'generated' => 'Generado el :date',
+        'offline' => 'Es un único archivo HTML: se abre sin conexión, se puede imprimir y no carga nada de internet.',
+        'hours' => 'Horas orientativas',
+        'hours_note' => 'Las horas son una estimación aproximada para llegar a un nivel de trabajo desde cero; dependen de tu punto de partida.',
+        'courses' => 'Cursos gratuitos',
+        'download' => 'Descargar informe',
+        'download_hint' => 'Archivo HTML autocontenido, para guardar o imprimir.',
     ],
 ];

@@ -41,6 +41,13 @@ return [
         'applied' => 'Enviadas',
         'interviews' => 'Entrevistas',
         'offers' => 'Ofertas',
+        'calibration' => [
+            'title' => 'A afinidade prevê as respostas?',
+            'summary' => 'As ofertas que chegaram a entrevista tinham em média :interview / 100; as rejeitadas ou sem resposta, :closed / 100.',
+            'works' => 'As afinidades mais altas coincidem com mais respostas: aposta nas melhores afinidades.',
+            'no_signal' => 'As tuas respostas não seguem a afinidade por agora: experimenta ofertas com pontuação mais baixa e repara no que funciona.',
+            'few' => 'Ainda há poucos resultados para concluir. É só uma comparação; nada é ajustado automaticamente.',
+        ],
         'small_sample' => 'Estes números vêm de poucas candidaturas; lê-os como pistas, não como regras.',
     ],
     'closest' => [
@@ -54,8 +61,19 @@ return [
     'courses' => [
         'learn' => 'Onde aprender :skill',
         'list' => 'Cursos, primeiro os gratuitos',
+        'hours' => '≈ :hours h (estimativa orientativa)',
         'free' => 'Grátis',
         'paid' => 'Pago',
         'search' => '(resultados de pesquisa)',
+    ],
+    'report' => [
+        'title' => 'O meu relatório de pesquisa',
+        'generated' => 'Gerado em :date',
+        'offline' => 'Um único ficheiro HTML: abre sem ligação, pode ser impresso e não carrega nada da internet.',
+        'hours' => 'Horas orientativas',
+        'hours_note' => 'As horas são uma estimativa aproximada para chegar a um nível de trabalho a partir do zero; dependem do teu ponto de partida.',
+        'courses' => 'Cursos gratuitos',
+        'download' => 'Descarregar relatório',
+        'download_hint' => 'Ficheiro HTML autónomo, para guardar ou imprimir.',
     ],
 ];

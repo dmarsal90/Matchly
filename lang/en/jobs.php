@@ -188,6 +188,11 @@ return [
         'sign_in_to_save' => 'Sign in to save jobs',
         'regions' => 'You can work from: :regions',
     ],
+    'benchmark' => [
+        'title' => 'Salary reference',
+        'summary' => 'Similar jobs usually pay about :median a year (the middle half between :low and :high).',
+        'note' => 'Based on :count open jobs of the same category and level that state a salary in our database. It is a rough reference, not a market study.',
+    ],
     'salary' => [
         'range' => ':min – :max',
         'from' => 'from :min',

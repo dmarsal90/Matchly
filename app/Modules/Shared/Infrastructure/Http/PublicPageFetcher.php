@@ -2,9 +2,8 @@
 
 declare(strict_types=1);
 
-namespace App\Modules\Applications\Infrastructure\Web;
+namespace App\Modules\Shared\Infrastructure\Http;
 
-use App\Modules\Shared\Infrastructure\Http\PublicUrlGuard;
 use GuzzleHttp\Psr7\UriResolver;
 use GuzzleHttp\Psr7\Utils;
 use Illuminate\Contracts\Config\Repository as Config;

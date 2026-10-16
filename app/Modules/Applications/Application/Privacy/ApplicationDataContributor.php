@@ -8,6 +8,7 @@ use App\Modules\Applications\Infrastructure\Models\Application;
 use App\Modules\Applications\Infrastructure\Models\ApplicationEvent;
 use App\Modules\Applications\Infrastructure\Models\ApplicationPackage;
 use App\Modules\Applications\Infrastructure\Models\CompanyNote;
+use App\Modules\Applications\Infrastructure\Models\InterviewAnswer;
 use App\Modules\Applications\Infrastructure\Models\InterviewPrep;
 use App\Modules\Identity\Domain\Contracts\PersonalDataContributor;
 use App\Modules\Identity\Domain\Data\PersonalData;
@@ -39,6 +40,13 @@ final class ApplicationDataContributor implements PersonalDataContributor
                     'job' => "{$prep->application->job->title} · {$prep->application->job->company}",
                     'status' => $prep->status->value,
                     'content' => $prep->content,
+                ])->values()->all(),
+            'interview_answers' => InterviewAnswer::query()->with('application.job:id,title,company')->whereHas('application', fn ($application) => $application->where('user_id', $userId))->orderBy('id')->get()
+                ->map(fn (InterviewAnswer $answer): array => [
+                    'job' => "{$answer->application->job->title} · {$answer->application->job->company}",
+                    'answer' => $answer->answer,
+                    'feedback' => $answer->feedback,
+                    'updated_at' => $answer->updated_at->toIso8601String(),
                 ])->values()->all(),
             'company_notes' => CompanyNote::query()->where('user_id', $userId)->orderBy('id')->get()
                 ->map(fn (CompanyNote $note): array => ['company' => $note->company, 'fact' => $note->fact, 'source_url' => $note->source_url, 'origin' => $note->origin->value, 'approved' => $note->approved])

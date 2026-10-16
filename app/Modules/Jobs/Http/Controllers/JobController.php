@@ -13,6 +13,7 @@ use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Jobs\Application\Actions\RecordJobView;
 use App\Modules\Jobs\Application\Queries\JobFilters;
 use App\Modules\Jobs\Application\Queries\JobSearchQuery;
+use App\Modules\Jobs\Application\Queries\SalaryBenchmark;
 use App\Modules\Jobs\Application\Queries\ViewerJobState;
 use App\Modules\Jobs\Domain\Enums\DateRange;
 use App\Modules\Jobs\Domain\Enums\EmploymentType;
@@ -80,7 +81,7 @@ final class JobController
         ]);
     }
 
-    public function show(Request $request, JobListing $job, RecordJobView $recordView, ViewerJobState $viewerState, JobMatchDetails $fit, AiGateway $ai, #[CurrentUser] ?User $user): Response|RedirectResponse
+    public function show(Request $request, JobListing $job, RecordJobView $recordView, ViewerJobState $viewerState, JobMatchDetails $fit, SalaryBenchmark $benchmark, AiGateway $ai, #[CurrentUser] ?User $user): Response|RedirectResponse
     {
         if ($job->duplicate_of_id !== null) {
             return to_route('jobs.show', ['job' => $job->duplicate_of_id], 301);
@@ -101,6 +102,7 @@ final class JobController
         return Inertia::render('jobs/Show', [
             'job' => (new JobListingResource($job))->withViewerState($tracked, $viewed, $matches)->withDescription()->resolve($request),
             'isOpen' => $job->status === JobStatus::Open,
+            'salaryBenchmark' => $benchmark->for($job),
             'requirements' => $details['requirements'],
             'match' => $details['match'],
             'companyNotes' => $user === null ? [] : CompanyNote::query()

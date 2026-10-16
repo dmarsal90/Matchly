@@ -8,6 +8,7 @@ use App\Modules\Applications\Domain\Enums\ApplicationEventType;
 use App\Modules\Applications\Domain\Enums\ApplicationStatus;
 use App\Modules\Applications\Infrastructure\Models\Application;
 use App\Modules\Applications\Infrastructure\Models\ApplicationEvent;
+use App\Modules\Matching\Infrastructure\Models\JobMatch;
 use Carbon\CarbonImmutable;
 
 /**
@@ -30,7 +31,8 @@ final readonly class ApplicationFunnel
      *     outcomes: array<string, int>,
      *     timing: array{first_response_days: float|null, first_interview_days: float|null},
      *     by_source: list<array{name: string, applied: int, interviews: int, offers: int}>,
-     *     by_category: list<array{name: string, applied: int, interviews: int, offers: int}>
+     *     by_category: list<array{name: string, applied: int, interviews: int, offers: int}>,
+     *     calibration: array{interview_score: int|null, closed_score: int|null, interview_count: int, closed_count: int}
      * }
      */
     public function for(int $userId): array
@@ -47,6 +49,8 @@ final readonly class ApplicationFunnel
         /** @var array<string, array{name: string, applied: int, interviews: int, offers: int}> $byCategory */
         $byCategory = [];
         $applied = 0;
+        /** @var array{interview: list<int>, closed: list<int>} $jobIds job ids by how far the application got */
+        $jobIds = ['interview' => [], 'closed' => []];
 
         foreach ($applications as $application) {
             $rank = $this->rank($application);
@@ -64,6 +68,12 @@ final readonly class ApplicationFunnel
             if ($application->applied_at !== null) {
                 $firstResponse[] = $this->daysUntil($application, fn (ApplicationEvent $event): bool => $this->isResponse($event));
                 $firstInterview[] = $this->daysUntil($application, fn (ApplicationEvent $event): bool => $this->isInterview($event));
+            }
+
+            if ($rank >= 2) {
+                $jobIds['interview'][] = $application->job_listing_id;
+            } elseif (in_array($application->status, [ApplicationStatus::Rejected, ApplicationStatus::NoResponse], true)) {
+                $jobIds['closed'][] = $application->job_listing_id;
             }
 
             $this->tally($bySource, $application->job->source->name, $rank);
@@ -87,6 +97,31 @@ final readonly class ApplicationFunnel
             'timing' => ['first_response_days' => $this->average($firstResponse), 'first_interview_days' => $this->average($firstInterview)],
             'by_source' => $this->top($bySource),
             'by_category' => $this->top($byCategory),
+            'calibration' => $this->calibration($userId, $jobIds),
+        ];
+    }
+
+    /**
+     * The match score of the jobs that reached an interview against the ones
+     * that were turned down or never answered: does a higher score really
+     * mean more replies for this person? Only a comparison, nothing is tuned.
+     *
+     * @param  array{interview: list<int>, closed: list<int>}  $jobIds
+     * @return array{interview_score: int|null, closed_score: int|null, interview_count: int, closed_count: int}
+     */
+    private function calibration(int $userId, array $jobIds): array
+    {
+        $average = function (array $ids) use ($userId): ?int {
+            $score = $ids === [] ? null : JobMatch::query()->where('user_id', $userId)->whereIn('job_listing_id', $ids)->avg('score');
+
+            return $score === null ? null : (int) round((float) $score);
+        };
+
+        return [
+            'interview_score' => $average($jobIds['interview']),
+            'closed_score' => $average($jobIds['closed']),
+            'interview_count' => count($jobIds['interview']),
+            'closed_count' => count($jobIds['closed']),
         ];
     }
 

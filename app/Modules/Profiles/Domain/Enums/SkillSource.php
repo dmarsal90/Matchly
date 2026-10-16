@@ -16,6 +16,7 @@ enum SkillSource: string
     case Cv = 'cv';
     case Github = 'github';
     case Linkedin = 'linkedin';
+    case Portfolio = 'portfolio';
 
     public function isEvidence(): bool
     {
@@ -29,6 +30,7 @@ enum SkillSource: string
             self::Cv => ConsentPurpose::CvProcessing,
             self::Github => ConsentPurpose::GithubImport,
             self::Linkedin => ConsentPurpose::LinkedinImport,
+            self::Portfolio => ConsentPurpose::PortfolioImport,
         };
     }
 

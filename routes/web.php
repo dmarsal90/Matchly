@@ -8,6 +8,7 @@ use App\Modules\Applications\Http\Controllers\ApplicationController;
 use App\Modules\Applications\Http\Controllers\ApplicationEventController;
 use App\Modules\Applications\Http\Controllers\CompanyNoteController;
 use App\Modules\Applications\Http\Controllers\InsightsController;
+use App\Modules\Applications\Http\Controllers\InterviewAnswerController;
 use App\Modules\Applications\Http\Controllers\InterviewPrepController;
 use App\Modules\Applications\Http\Controllers\QuickApplyController;
 use App\Modules\Applications\Http\Controllers\SavedJobController;
@@ -63,11 +64,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::post('company-notes/{note}/approve', [CompanyNoteController::class, 'approve'])->whereNumber('note')->name('company-notes.approve');
     Route::delete('company-notes/{note}', [CompanyNoteController::class, 'destroy'])->whereNumber('note')->name('company-notes.destroy');
     Route::get('insights', [InsightsController::class, 'index'])->name('insights.index');
+    Route::get('insights/report', [InsightsController::class, 'report'])->middleware('throttle:30,1')->name('insights.report');
     Route::get('applications', [ApplicationController::class, 'index'])->name('applications.index');
     Route::patch('applications/{application}', [ApplicationController::class, 'update'])->name('applications.update');
+    Route::patch('applications/{application}/deadline', [ApplicationController::class, 'deadline'])->whereNumber('application')->name('applications.deadline');
     Route::delete('applications/{application}', [ApplicationController::class, 'destroy'])->name('applications.destroy');
     Route::post('applications/{application}/events', [ApplicationEventController::class, 'store'])->name('applications.events.store');
     Route::get('applications/{application}/interview-prep', [InterviewPrepController::class, 'show'])->whereNumber('application')->name('applications.interview-prep.show');
+    Route::put('applications/{application}/interview-prep/answer', [InterviewAnswerController::class, 'update'])->whereNumber('application')->name('applications.interview-prep.answer');
+    Route::post('applications/{application}/interview-prep/feedback', [InterviewAnswerController::class, 'feedback'])->whereNumber('application')->middleware('throttle:quick-apply')->name('applications.interview-prep.feedback');
     Route::post('applications/{application}/interview-prep', [InterviewPrepController::class, 'store'])->whereNumber('application')->middleware('throttle:quick-apply')->name('applications.interview-prep.store');
 
     // Quick apply: a package is prepared for review; the person applies on the employer's site.
@@ -109,6 +114,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Merged skill profile, its sources (GitHub, LinkedIn export, CV) and the search profile.
     Route::get('profile/skills', [SkillsController::class, 'index'])->name('skills.index');
     Route::post('profile/imports/github', [ProfileImportController::class, 'github'])->middleware('throttle:imports')->name('skills.imports.github');
+    Route::post('profile/imports/portfolio', [ProfileImportController::class, 'portfolio'])->middleware('throttle:imports')->name('skills.imports.portfolio');
     Route::post('profile/imports/linkedin', [ProfileImportController::class, 'linkedin'])->middleware('throttle:uploads')->name('skills.imports.linkedin');
     Route::post('profile/imports/cv', [ProfileImportController::class, 'cv'])->middleware('throttle:imports')->name('skills.imports.cv');
     Route::get('profile/imports/{import}', [ProfileImportController::class, 'show'])->name('skills.imports.show');

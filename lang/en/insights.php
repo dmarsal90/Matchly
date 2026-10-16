@@ -41,6 +41,13 @@ return [
         'applied' => 'Applied',
         'interviews' => 'Interviews',
         'offers' => 'Offers',
+        'calibration' => [
+            'title' => 'Does the match score predict replies?',
+            'summary' => 'Jobs that reached an interview scored :interview / 100 on average; the ones that were rejected or never answered scored :closed / 100.',
+            'works' => 'Higher scores are lining up with more replies: aim at the best matches.',
+            'no_signal' => 'Your replies are not following the score so far: try applying to jobs the score rates lower, and tell us what worked.',
+            'few' => 'Too few results yet to conclude anything. This is only a comparison; nothing is adjusted automatically.',
+        ],
         'small_sample' => 'These numbers come from few applications; read them as hints, not as rules.',
     ],
     'closest' => [
@@ -54,8 +61,19 @@ return [
     'courses' => [
         'learn' => 'Where to learn :skill',
         'list' => 'Courses, free ones first',
+        'hours' => '≈ :hours h (rough estimate)',
         'free' => 'Free',
         'paid' => 'Paid',
         'search' => '(search results)',
+    ],
+    'report' => [
+        'title' => 'My job search report',
+        'generated' => 'Generated on :date',
+        'offline' => 'A single HTML file: it opens offline, can be printed and loads nothing from the internet.',
+        'hours' => 'Rough hours',
+        'hours_note' => 'Hours are a rough estimate to reach a working level from scratch; they depend on where you start.',
+        'courses' => 'Free courses',
+        'download' => 'Download report',
+        'download_hint' => 'A self-contained HTML file to keep or print.',
     ],
 ];

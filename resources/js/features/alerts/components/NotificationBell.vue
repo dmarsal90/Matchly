@@ -12,6 +12,7 @@ import {
 } from '@/features/alerts/lib/notification';
 import type {
     AppNotification,
+    DeadlineData,
     FollowUpData,
     JobAlertData,
 } from '@/features/alerts/types';
@@ -146,6 +147,30 @@ if (userId.value && echoIsConfigured()) {
             });
         },
         'application.follow_up',
+    );
+
+    useEchoNotification<DeadlineData>(
+        `users.${userId.value}`,
+        (payload) => {
+            unread.value++;
+            items.value = [
+                {
+                    id: payload.id,
+                    data: payload,
+                    read_at: null,
+                    created_at: new Date().toISOString(),
+                },
+                ...items.value,
+            ].slice(0, 8);
+            toast.info(notificationTitle(payload), {
+                description: notificationSummary(payload),
+                action: {
+                    label: trans('alerts.notifications.open'),
+                    onClick: () => router.visit(notificationHref(payload)),
+                },
+            });
+        },
+        'application.deadline',
     );
 }
 </script>

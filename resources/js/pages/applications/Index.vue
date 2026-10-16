@@ -12,6 +12,7 @@ import { show as showPrep } from '@/routes/applications/interview-prep';
 import { show as showPackage } from '@/routes/applications/packages';
 import type { Job } from '@/features/jobs/types';
 import {
+    deadline as deadlineRoute,
     destroy,
     index as applicationsIndex,
     update,
@@ -28,10 +29,12 @@ type TrackedApplication = {
     notes: string | null;
     status_changed_at: string;
     applied_at: string | null;
+    deadline_on: string | null;
     job_open: boolean;
     job: Job;
     events: ApplicationEventEntry[];
     follow_up_draft: string | null;
+    thank_you_draft: string | null;
     package: { id: number; status: string } | null;
 };
 
@@ -58,6 +61,14 @@ const columns = computed(() =>
         items: props.applications.filter((item) => item.status === status),
     })),
 );
+
+function setDeadline(item: TrackedApplication, deadline: string): void {
+    router.patch(
+        deadlineRoute.url(item.id),
+        { deadline: deadline || null },
+        { preserveScroll: true, only: ['applications'] },
+    );
+}
 
 function save(item: TrackedApplication, status: string): void {
     router.patch(
@@ -174,6 +185,24 @@ const formatDate = (iso: string): string =>
                         </NativeSelect>
                     </div>
 
+                    <div class="grid gap-1">
+                        <Label :for="`deadline-${item.id}`" class="text-xs">{{
+                            trans('applications.deadline.label')
+                        }}</Label>
+                        <input
+                            :id="`deadline-${item.id}`"
+                            type="date"
+                            :value="item.deadline_on ?? ''"
+                            class="h-8 w-full rounded-md border border-input bg-transparent px-2 text-sm shadow-xs outline-none focus-visible:border-ring focus-visible:ring-[3px] focus-visible:ring-ring/50"
+                            @change="
+                                setDeadline(
+                                    item,
+                                    ($event.target as HTMLInputElement).value,
+                                )
+                            "
+                        />
+                    </div>
+
                     <details>
                         <summary
                             class="cursor-pointer text-xs text-muted-foreground"
@@ -204,6 +233,7 @@ const formatDate = (iso: string): string =>
                         :application-id="item.id"
                         :events="item.events"
                         :follow-up-draft="item.follow_up_draft"
+                        :thank-you-draft="item.thank_you_draft"
                     />
 
                     <div class="flex items-center justify-between gap-2">
