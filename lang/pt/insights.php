@@ -66,4 +66,14 @@ return [
         'paid' => 'Pago',
         'search' => '(resultados de pesquisa)',
     ],
+    'report' => [
+        'title' => 'O meu relatório de pesquisa',
+        'generated' => 'Gerado em :date',
+        'offline' => 'Um único ficheiro HTML: abre sem ligação, pode ser impresso e não carrega nada da internet.',
+        'hours' => 'Horas orientativas',
+        'hours_note' => 'As horas são uma estimativa aproximada para chegar a um nível de trabalho a partir do zero; dependem do teu ponto de partida.',
+        'courses' => 'Cursos gratuitos',
+        'download' => 'Descarregar relatório',
+        'download_hint' => 'Ficheiro HTML autónomo, para guardar ou imprimir.',
+    ],
 ];
