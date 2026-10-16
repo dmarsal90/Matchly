@@ -75,3 +75,33 @@ it('shows the insights page to signed-in users only', function (): void {
         ->component('insights/Index')
         ->where('skillGaps.skills.0.skill', 'kubernetes'));
 });
+
+it('attaches courses to every missing skill, free ones first', function (): void {
+    $user = User::factory()->create();
+    matchWithGaps($user, 80, [['kubernetes', true], ['cobol-xyz', false]]);
+
+    $skills = collect(app(SkillGapReport::class)->for($user->id)['skills'])->keyBy('skill');
+    $prices = fn (string $slug): array => array_column($skills[$slug]['courses'], 'price');
+
+    expect($skills['kubernetes']['courses'][0])->toMatchArray(['provider' => 'kubernetes.io', 'price' => 'free', 'curated' => true])
+        ->and($prices('kubernetes'))->toBe(['free', 'free', 'free', 'free', 'paid', 'paid', 'paid'])
+        // No hand-picked entry: search links, free sites first.
+        ->and($skills['cobol-xyz']['courses'][0])->toMatchArray(['provider' => 'YouTube', 'price' => 'free', 'curated' => false])
+        ->and($prices('cobol-xyz'))->toBe(['free', 'free', 'free', 'paid', 'paid']);
+});
+
+it('picks the jobs the person is nearest to meeting in full and what each one still needs', function (): void {
+    $user = User::factory()->create();
+    $far = matchWithGaps($user, 95, [['kubernetes', true], ['terraform', true], ['aws', false]]);
+    $near = matchWithGaps($user, 60, [['terraform', true]]);
+    $nearer = matchWithGaps($user, 55, [['terraform', false]]);
+    matchWithGaps($user, 99, []);
+
+    $closest = app(SkillGapReport::class)->for($user->id)['closest'];
+
+    // Fewest missing first, then best score; a job with nothing missing is not a gap to close.
+    expect(array_column($closest, 'id'))->toBe([$near->id, $nearer->id, $far->id])
+        ->and($closest[0]['missing'][0])->toMatchArray(['skill' => 'terraform', 'required' => true])
+        ->and($closest[0]['missing'][0]['courses'][0]['price'])->toBe('free')
+        ->and(array_column($closest[2]['missing'], 'skill'))->toBe(['kubernetes', 'terraform', 'aws']);
+});
