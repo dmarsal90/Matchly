@@ -111,6 +111,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     // Merged skill profile, its sources (GitHub, LinkedIn export, CV) and the search profile.
     Route::get('profile/skills', [SkillsController::class, 'index'])->name('skills.index');
     Route::post('profile/imports/github', [ProfileImportController::class, 'github'])->middleware('throttle:imports')->name('skills.imports.github');
+    Route::post('profile/imports/portfolio', [ProfileImportController::class, 'portfolio'])->middleware('throttle:imports')->name('skills.imports.portfolio');
     Route::post('profile/imports/linkedin', [ProfileImportController::class, 'linkedin'])->middleware('throttle:uploads')->name('skills.imports.linkedin');
     Route::post('profile/imports/cv', [ProfileImportController::class, 'cv'])->middleware('throttle:imports')->name('skills.imports.cv');
     Route::get('profile/imports/{import}', [ProfileImportController::class, 'show'])->name('skills.imports.show');

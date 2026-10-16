@@ -25,6 +25,11 @@ return [
             'description' => 'Read the profile files of your LinkedIn data export.',
             'revoke_warning' => 'Withdrawing deletes the data imported from LinkedIn.',
         ],
+        'portfolio_import' => [
+            'title' => 'Import from my portfolio',
+            'description' => 'Read your public website to detect technologies.',
+            'revoke_warning' => 'Withdrawing will delete the data imported from your portfolio.',
+        ],
         'ai_processing' => [
             'title' => 'Use AI with my data',
             'description' => 'Send your profile to AI providers to generate tailored cover letters and CVs.',
