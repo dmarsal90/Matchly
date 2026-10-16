@@ -44,6 +44,20 @@ Route::inertia('privacy', 'legal/Privacy', ['retention' => [
     'days' => (string) config('privacy.retention.unverified_account_days'),
     'months' => (string) config('privacy.retention.inactive_cv_text_months'),
 ]])->name('legal.privacy');
+// Lets browsers install the app with its own icon and name.
+Route::get('manifest.webmanifest', fn () => response()->json([
+    'name' => config('app.name'),
+    'short_name' => config('app.name'),
+    'start_url' => '/jobs',
+    'display' => 'standalone',
+    'background_color' => '#F5F8F7',
+    'theme_color' => '#10463F',
+    'icons' => [
+        ['src' => '/icon-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any maskable'],
+        ['src' => '/icon-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any maskable'],
+    ],
+], 200, ['Content-Type' => 'application/manifest+json']))->name('manifest');
+
 Route::inertia('terms', 'legal/Terms')->name('legal.terms');
 
 // A shared insights report: the unguessable token in the link is the only credential.
