@@ -78,3 +78,21 @@ it('stores the reminder for the notification centre without the draft', function
     $data = $user->notifications()->sole()->data;
     expect($data['type'])->toBe('follow_up')->and($data['company'])->toBe($application->job->company)->and($data)->not->toHaveKey('draft');
 });
+
+it('shows the history and a follow-up draft on the board for applied applications only', function (): void {
+    $user = User::factory()->create();
+    $applied = appliedApplication($user, 12);
+    $applied->events()->create(['type' => ApplicationEventType::Note, 'note' => 'Spoke to HR', 'occurred_at' => now()->subDays(5)]);
+    appliedApplication($user, 12, ApplicationStatus::Interview);
+
+    $this->actingAs($user)->get('/applications')->assertInertia(fn ($page) => $page
+        ->has('applications', 2)
+        ->where('applications.0.follow_up_draft', fn ($draft): bool => is_string($draft) || $draft === null)
+        ->etc());
+
+    $props = $this->actingAs($user)->get('/applications')->viewData('page')['props']['applications'];
+    $byId = collect($props)->keyBy('id');
+    expect($byId[$applied->id]['follow_up_draft'])->toBeString()
+        ->and($byId[$applied->id]['events'][0]['note'])->toBe('Spoke to HR')
+        ->and($byId->except($applied->id)->first()['follow_up_draft'])->toBeNull();
+});

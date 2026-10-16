@@ -5,6 +5,8 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Label } from '@/components/ui/label';
 import { NativeSelect } from '@/components/ui/native-select';
+import ApplicationTimeline from '@/features/applications/components/ApplicationTimeline.vue';
+import type { ApplicationEventEntry } from '@/features/applications/types';
 import ApplyButton from '@/features/jobs/components/ApplyButton.vue';
 import { show as showPackage } from '@/routes/applications/packages';
 import type { Job } from '@/features/jobs/types';
@@ -27,6 +29,8 @@ type TrackedApplication = {
     applied_at: string | null;
     job_open: boolean;
     job: Job;
+    events: ApplicationEventEntry[];
+    follow_up_draft: string | null;
     package: { id: number; status: string } | null;
 };
 
@@ -98,7 +102,7 @@ const formatDate = (iso: string): string =>
             >
         </EmptyState>
 
-        <div v-else class="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
+        <div v-else class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             <section
                 v-for="column in columns"
                 :key="column.status"
@@ -194,6 +198,12 @@ const formatDate = (iso: string): string =>
                             >
                         </div>
                     </details>
+
+                    <ApplicationTimeline
+                        :application-id="item.id"
+                        :events="item.events"
+                        :follow-up-draft="item.follow_up_draft"
+                    />
 
                     <div class="flex items-center justify-between gap-2">
                         <div class="flex flex-wrap items-center gap-2">
