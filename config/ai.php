@@ -100,8 +100,8 @@ return [
             'api_key' => env('GEMINI_API_KEY'),
             'base_url' => env('GEMINI_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta'),
             'models' => [
-                'fast' => env('GEMINI_MODEL_FAST', 'gemini-2.5-flash'),
-                'quality' => env('GEMINI_MODEL_QUALITY', 'gemini-2.5-pro'),
+                'fast' => env('GEMINI_MODEL_FAST', 'gemini-flash-lite-latest'),
+                'quality' => env('GEMINI_MODEL_QUALITY', 'gemini-3.6-flash'),
             ],
         ],
         'groq' => [
@@ -155,8 +155,8 @@ return [
         'gpt-4o-mini' => ['input' => 0.15, 'output' => 0.60],
         'gpt-4o' => ['input' => 2.50, 'output' => 10.00],
         'deepseek-chat' => ['input' => 0.27, 'output' => 1.10],
-        'gemini-2.5-flash' => ['input' => 0.30, 'output' => 2.50],
-        'gemini-2.5-pro' => ['input' => 1.25, 'output' => 10.00],
+        'gemini-3.6-flash' => ['input' => 0.30, 'output' => 2.50],
+        'gemini-flash-lite-latest' => ['input' => 0.10, 'output' => 0.40],
         'llama-3.1-8b-instant' => ['input' => 0.05, 'output' => 0.08],
         'llama-3.3-70b-versatile' => ['input' => 0.59, 'output' => 0.79],
         'mistral-small-latest' => ['input' => 0.10, 'output' => 0.30],
