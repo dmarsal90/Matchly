@@ -130,7 +130,17 @@ Además de la solicitud rápida, Matchly acompaña la candidatura hasta el final
 - **Referencia salarial** en la ficha de la oferta: mediana y rango central de ofertas parecidas (misma categoría, nivel y moneda) que indican sueldo en nuestra propia base, solo con al menos 5 y siempre presentada como orientativa, no como estudio de mercado.
 - **Plantillas de CV**: clásica, moderna y compacta al descargar el PDF. Las tres son una sola columna de texto real con los mismos encabezados, para que un sistema de seguimiento de candidatos las lea igual.
 - **Portfolio como fuente de habilidades**: Matchly lee tu web pública (y unas pocas páginas habituales de tu dominio, respetando `robots.txt`) y propone las tecnologías que menciona. Lo revisas antes de guardar; no se inventan niveles ni años. Tiene su propio consentimiento revocable.
+- **Qué probar a continuación**: ideas concretas sacadas solo de tus cifras (a qué fuente o área dedicar más esfuerzo, si te conviene probar ofertas de menor afinidad, si seguir antes), cada una con un mínimo de candidaturas detrás.
+- **Simulacro de entrevista**: las preguntas de tu pack una a una, con una guía de tiempo, y un resumen final que ordena tus respuestas de más floja a más sólida.
+- **Plan de estudio de 4 semanas** a partir de las horas orientativas de lo que te falta y de las horas que tengas por semana, descargable como calendario `.ics`.
+- **Radar de empresas** (`/radar`): sigue una empresa desde su oferta y `php artisan alerts:radar` (diario) te avisa de sus ofertas nuevas entre las que ya recoge la app. No visita sus webs.
+- **Mercado** (`/market`): demanda, tendencia y sueldo (mediana y rango, con muestra mínima) de tus tecnologías y de las que te faltan, según las etiquetas de las ofertas abiertas.
+- **Compartir el panorama**: un enlace de solo lectura, caducable (1, 7 o 30 días) y revocable, a una copia congelada del informe; sin tu nombre salvo que lo pidas.
 - **Lo que sé de la empresa**: en la ficha de cada oferta anotas datos de la empresa, o dejas que Matchly lea su web pública (respetando `robots.txt`) y te sugiera frases suyas. Solo lo que apruebes se usa en la carta y en las preguntas para la entrevista; nunca se inventa nada de la empresa.
+
+## Extensión del navegador
+
+La carpeta [`extension/`](extension/README.md) es una extensión (Chrome, Edge, Brave) que rellena los formularios de empleo con los datos de las solicitudes que ya aprobaste y adjunta el CV en PDF. Solo lee, solo rellena campos vacíos y **nunca envía el formulario**. Se conecta con un token que creas en *Ajustes › Extensión del navegador* y que solo ve las solicitudes aprobadas.
 
 ## Estructura
 
