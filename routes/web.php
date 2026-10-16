@@ -50,11 +50,13 @@ Route::get('manifest.webmanifest', fn () => response()->json([
     'short_name' => config('app.name'),
     'start_url' => '/jobs',
     'display' => 'standalone',
-    'background_color' => '#F5F8F7',
-    'theme_color' => '#10463F',
+    'background_color' => '#0F3D2E',
+    'theme_color' => '#0F3D2E',
     'icons' => [
-        ['src' => '/icon-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any maskable'],
-        ['src' => '/icon-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any maskable'],
+        ['src' => '/icon-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'any'],
+        ['src' => '/icon-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'any'],
+        ['src' => '/icon-maskable-192.png', 'sizes' => '192x192', 'type' => 'image/png', 'purpose' => 'maskable'],
+        ['src' => '/icon-maskable-512.png', 'sizes' => '512x512', 'type' => 'image/png', 'purpose' => 'maskable'],
     ],
 ], 200, ['Content-Type' => 'application/manifest+json']))->name('manifest');
 
