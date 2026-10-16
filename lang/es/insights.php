@@ -41,6 +41,13 @@ return [
         'applied' => 'Enviadas',
         'interviews' => 'Entrevistas',
         'offers' => 'Ofertas',
+        'calibration' => [
+            'title' => '¿La afinidad predice las respuestas?',
+            'summary' => 'Las ofertas que llegaron a entrevista tenían de media :interview / 100; las rechazadas o sin respuesta, :closed / 100.',
+            'works' => 'Las afinidades más altas coinciden con más respuestas: apunta a las mejores afinidades.',
+            'no_signal' => 'Tus respuestas no siguen a la afinidad por ahora: prueba con ofertas que puntúan más bajo y fíjate en qué funciona.',
+            'few' => 'Aún hay pocos resultados para concluir nada. Es solo una comparación; no se ajusta nada automáticamente.',
+        ],
         'small_sample' => 'Estas cifras salen de pocas candidaturas; tómalas como pistas, no como reglas.',
     ],
     'closest' => [

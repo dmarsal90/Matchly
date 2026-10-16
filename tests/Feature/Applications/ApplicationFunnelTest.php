@@ -86,3 +86,19 @@ it('sends the funnel to the insights page', function (): void {
 
     $this->actingAs($user)->get('/insights')->assertInertia(fn (Assert $page) => $page->where('funnel.applied', 1));
 });
+
+it('compares the match score of jobs that got an interview with the ones that did not', function (): void {
+    $user = User::factory()->create();
+    $score = function (Application $application, int $score) use ($user): void {
+        App\Modules\Matching\Infrastructure\Models\JobMatch::query()->create(['user_id' => $user->id, 'job_listing_id' => $application->job_listing_id, 'score' => $score, 'level' => 'medium', 'eligible' => true, 'result' => [], 'computed_at' => now()]);
+    };
+    $score(trackedAt($user, ApplicationStatus::Interview, 20), 80);
+    $score(trackedAt($user, ApplicationStatus::Offer, 30), 70);
+    $score(trackedAt($user, ApplicationStatus::Rejected, 25), 50);
+    $score(trackedAt($user, ApplicationStatus::NoResponse, 40), 40);
+    // Still waiting: tells nothing yet.
+    $score(trackedAt($user, ApplicationStatus::Applied, 3), 10);
+
+    expect(app(ApplicationFunnel::class)->for($user->id)['calibration'])->toBe(['interview_score' => 75, 'closed_score' => 45, 'interview_count' => 2, 'closed_count' => 2])
+        ->and(app(ApplicationFunnel::class)->for(User::factory()->create()->id)['calibration']['interview_score'])->toBeNull();
+});
