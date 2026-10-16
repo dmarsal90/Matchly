@@ -10,8 +10,6 @@ use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Inertia\Testing\AssertableInertia as Assert;
 
-// candidateWithProfile() and spanishLaravelJob() live in QuickApplyTest.php.
-
 function appliedFor(User $user): Application
 {
     $application = new Application;
