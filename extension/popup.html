@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Matchly</title>
+        <link rel="stylesheet" href="popup.css" />
+    </head>
+    <body>
+        <main>
+            <h1>Matchly</h1>
+
+            <section id="fill" hidden>
+                <label for="package" data-i="choose"></label>
+                <select id="package"></select>
+                <label class="inline"
+                    ><input type="checkbox" id="attach" checked />
+                    <span data-i="attach"></span
+                ></label>
+                <button id="run" data-i="run"></button>
+                <p class="note" data-i="review"></p>
+            </section>
+
+            <details id="settings">
+                <summary data-i="settings"></summary>
+                <label for="base" data-i="address"></label>
+                <input
+                    id="base"
+                    type="url"
+                    placeholder="https://"
+                    autocomplete="off"
+                />
+                <label for="token" data-i="token"></label>
+                <input
+                    id="token"
+                    type="password"
+                    autocomplete="off"
+                    spellcheck="false"
+                />
+                <button id="save" data-i="save"></button>
+            </details>
+
+            <p id="status" role="status" aria-live="polite"></p>
+        </main>
+        <script src="popup.js"></script>
+    </body>
+</html>

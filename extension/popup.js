@@ -1,0 +1,205 @@
+const TEXT = {
+    en: {
+        choose: 'Approved application',
+        attach: 'Attach the CV (PDF)',
+        run: 'Fill this page',
+        review: 'It only fills empty fields. You review and submit the form yourself.',
+        settings: 'Connection',
+        address: 'Matchly address',
+        token: 'Access token',
+        save: 'Save',
+        saved: 'Saved.',
+        none: 'No approved applications yet. Approve one in Matchly first.',
+        connect: 'Add your address and token below.',
+        denied: 'Permission to reach that address was denied.',
+        badToken:
+            'The token is not valid. Create a new one in Matchly › Settings.',
+        failed: 'Could not reach Matchly.',
+        done: 'Filled {n} field(s){cv}. Review before you submit.',
+        cv: ' and attached the CV',
+        nothing: 'Nothing to fill on this page.',
+    },
+    es: {
+        choose: 'Solicitud aprobada',
+        attach: 'Adjuntar el CV (PDF)',
+        run: 'Rellenar esta página',
+        review: 'Solo rellena campos vacíos. Tú revisas y envías el formulario.',
+        settings: 'Conexión',
+        address: 'Dirección de Matchly',
+        token: 'Token de acceso',
+        save: 'Guardar',
+        saved: 'Guardado.',
+        none: 'Aún no hay solicitudes aprobadas. Aprueba una en Matchly primero.',
+        connect: 'Añade abajo tu dirección y tu token.',
+        denied: 'Se denegó el permiso para acceder a esa dirección.',
+        badToken: 'El token no es válido. Crea uno nuevo en Matchly › Ajustes.',
+        failed: 'No se pudo conectar con Matchly.',
+        done: 'Rellenados {n} campo(s){cv}. Revisa antes de enviar.',
+        cv: ' y adjuntado el CV',
+        nothing: 'No hay nada que rellenar en esta página.',
+    },
+    pt: {
+        choose: 'Candidatura aprovada',
+        attach: 'Anexar o CV (PDF)',
+        run: 'Preencher esta página',
+        review: 'Só preenche campos vazios. Tu revês e envias o formulário.',
+        settings: 'Ligação',
+        address: 'Endereço do Matchly',
+        token: 'Token de acesso',
+        save: 'Guardar',
+        saved: 'Guardado.',
+        none: 'Ainda não há candidaturas aprovadas. Aprova uma no Matchly primeiro.',
+        connect: 'Adiciona em baixo o teu endereço e token.',
+        denied: 'A permissão para aceder a esse endereço foi negada.',
+        badToken: 'O token não é válido. Cria um novo em Matchly › Definições.',
+        failed: 'Não foi possível ligar ao Matchly.',
+        done: 'Preenchidos {n} campo(s){cv}. Revê antes de enviar.',
+        cv: ' e anexado o CV',
+        nothing: 'Não há nada para preencher nesta página.',
+    },
+};
+const language = (navigator.language || 'en').slice(0, 2);
+const t = TEXT[language] || TEXT.en;
+document.documentElement.lang = TEXT[language] ? language : 'en';
+
+const $ = (id) => document.getElementById(id);
+const status = (message, isError = false) => {
+    $('status').textContent = message;
+    $('status').className = isError ? 'error' : '';
+};
+
+for (const element of document.querySelectorAll('[data-i]')) {
+    element.textContent = t[element.dataset.i];
+}
+
+async function api(path, asBlob = false) {
+    const { base, token } = await chrome.storage.local.get(['base', 'token']);
+    const response = await fetch(`${base}/api/extension/${path}`, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+            Accept: 'application/json',
+        },
+    });
+    if (response.status === 401) {
+        throw new Error('badToken');
+    }
+    if (!response.ok) {
+        throw new Error('failed');
+    }
+
+    return asBlob ? response.arrayBuffer() : response.json();
+}
+
+function toBase64(buffer) {
+    let binary = '';
+    for (const byte of new Uint8Array(buffer)) {
+        binary += String.fromCharCode(byte);
+    }
+
+    return btoa(binary);
+}
+
+async function load() {
+    const { base, token } = await chrome.storage.local.get(['base', 'token']);
+    $('base').value = base || '';
+    $('token').value = token || '';
+    if (!base || !token) {
+        $('settings').open = true;
+        status(t.connect);
+
+        return;
+    }
+    try {
+        const { packages } = await api('packages');
+        $('package').replaceChildren(
+            ...packages.map((item) =>
+                Object.assign(document.createElement('option'), {
+                    value: item.id,
+                    textContent: `${item.title} · ${item.company}`,
+                }),
+            ),
+        );
+        $('fill').hidden = packages.length === 0;
+        status(packages.length === 0 ? t.none : '');
+    } catch (error) {
+        $('settings').open = true;
+        status(t[error.message] || t.failed, true);
+    }
+}
+
+$('save').addEventListener('click', async () => {
+    let origin;
+    try {
+        origin = new URL($('base').value.trim()).origin;
+    } catch {
+        status(t.failed, true);
+
+        return;
+    }
+    // Ask only for the Matchly address, and only when the person saves it.
+    const granted = await chrome.permissions.request({
+        origins: [`${origin}/*`],
+    });
+    if (!granted) {
+        status(t.denied, true);
+
+        return;
+    }
+    await chrome.storage.local.set({
+        base: origin,
+        token: $('token').value.trim(),
+    });
+    status(t.saved);
+    await load();
+});
+
+$('run').addEventListener('click', async () => {
+    try {
+        const id = $('package').value;
+        const { fields } = await api(`packages/${id}/fields`);
+        const resume = $('attach').checked
+            ? {
+                  name: 'cv.pdf',
+                  base64: toBase64(
+                      await api(`packages/${id}/resume.pdf`, true),
+                  ),
+              }
+            : null;
+        const [tab] = await chrome.tabs.query({
+            active: true,
+            currentWindow: true,
+        });
+        const target = { tabId: tab.id, allFrames: true };
+
+        await chrome.scripting.executeScript({
+            target,
+            func: (payload) => {
+                globalThis.__matchlyPayload = payload;
+            },
+            args: [{ fields, resume }],
+        });
+        const results = await chrome.scripting.executeScript({
+            target,
+            files: ['match.js', 'fill.js'],
+        });
+        const total = results.reduce(
+            (sum, item) => ({
+                filled: sum.filled + ((item.result || {}).filled || 0),
+                attached: sum.attached + ((item.result || {}).attached || 0),
+            }),
+            { filled: 0, attached: 0 },
+        );
+
+        status(
+            total.filled + total.attached === 0
+                ? t.nothing
+                : t.done
+                      .replace('{n}', total.filled)
+                      .replace('{cv}', total.attached > 0 ? t.cv : ''),
+        );
+    } catch (error) {
+        status(t[error.message] || t.failed, true);
+    }
+});
+
+load();

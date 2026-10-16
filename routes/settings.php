@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Modules\AI\Http\Controllers\AiSettingsController;
 use App\Modules\Identity\Http\Controllers\PrivacyController;
+use App\Modules\Identity\Http\Controllers\Settings\ExtensionController;
 use App\Modules\Identity\Http\Controllers\Settings\ProfileController;
 use App\Modules\Identity\Http\Controllers\Settings\SecurityController;
 use App\Modules\Identity\Http\Middleware\RequirePasswordIfSet;
@@ -34,6 +35,10 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::put('settings/privacy/consent', [PrivacyController::class, 'updateConsent'])->name('privacy.consent');
     Route::get('settings/notifications', [NotificationPreferencesController::class, 'edit'])->name('notification-preferences.edit');
     Route::put('settings/notifications', [NotificationPreferencesController::class, 'update'])->name('notification-preferences.update');
+
+    Route::get('settings/extension', [ExtensionController::class, 'edit'])->name('extension.edit');
+    Route::post('settings/extension', [ExtensionController::class, 'store'])->middleware('throttle:10,1')->name('extension.store');
+    Route::delete('settings/extension/{token}', [ExtensionController::class, 'destroy'])->whereNumber('token')->name('extension.destroy');
 
     Route::get('settings/ai', [AiSettingsController::class, 'edit'])->name('ai.edit');
     Route::put('settings/ai/key', [AiSettingsController::class, 'update'])->middleware('throttle:10,1')->name('ai.key.update');
