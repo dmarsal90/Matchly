@@ -16,6 +16,7 @@ enum AiTask: string
     case TailorCv = 'tailor_cv';
     case CoverLetter = 'cover_letter';
     case InterviewPrep = 'interview_prep';
+    case InterviewFeedback = 'interview_feedback';
 
     public function tier(): ModelTier
     {
@@ -34,6 +35,7 @@ enum AiTask: string
             self::TailorCv => 3000,
             self::CoverLetter => 1500,
             self::InterviewPrep => 3500,
+            self::InterviewFeedback => 900,
         };
     }
 
@@ -45,6 +47,7 @@ enum AiTask: string
             self::StructureCv => 20000,
             self::SummarizeGithub => 15000,
             self::TailorCv, self::CoverLetter, self::InterviewPrep => 20000,
+            self::InterviewFeedback => 8000,
         };
     }
 

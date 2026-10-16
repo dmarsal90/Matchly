@@ -73,6 +73,14 @@ final class Application extends Model
         return $this->hasOne(InterviewPrep::class);
     }
 
+    /**
+     * @return HasMany<InterviewAnswer, $this>
+     */
+    public function interviewAnswers(): HasMany
+    {
+        return $this->hasMany(InterviewAnswer::class);
+    }
+
     protected function casts(): array
     {
         return [

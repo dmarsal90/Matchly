@@ -81,11 +81,23 @@ export type InterviewStar = {
     result: string | null;
 };
 
+export type PracticeNote = { key?: string; text?: string };
+
+export type PracticeAnswer = {
+    answer: string;
+    feedback: {
+        strengths: PracticeNote[];
+        improvements: PracticeNote[];
+    } | null;
+    feedback_source: 'ai' | 'rules' | null;
+};
+
 export type InterviewPrepData = {
     status: 'generating' | 'ready' | 'failed';
     source: 'ai' | 'rules' | null;
     content: {
         questions: {
+            key: string;
             category: 'technical' | 'behavioral' | 'motivation';
             question: string;
             skill: string | null;
