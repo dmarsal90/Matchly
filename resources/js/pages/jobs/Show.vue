@@ -10,6 +10,9 @@ import type {
 import ApplyButton from '@/features/jobs/components/ApplyButton.vue';
 import JobRequirementsPanel from '@/features/jobs/components/JobRequirementsPanel.vue';
 import MatchBreakdown from '@/features/jobs/components/MatchBreakdown.vue';
+import SalaryBenchmark, {
+    type SalaryBenchmark as Benchmark,
+} from '@/features/jobs/components/SalaryBenchmark.vue';
 import SalaryLabel from '@/features/jobs/components/SalaryLabel.vue';
 import SaveJobButton from '@/features/jobs/components/SaveJobButton.vue';
 import { relativeTime } from '@/features/jobs/lib/format';
@@ -25,6 +28,7 @@ const props = defineProps<{
     isOpen: boolean;
     requirements: JobRequirements;
     match: JobMatch | null;
+    salaryBenchmark: Benchmark | null;
     quickApply: QuickApplyOptions | null;
     companyNotes: CompanyNoteEntry[];
 }>();
@@ -179,6 +183,8 @@ const description = computed(() => `${props.job.title} · ${props.job.company}`)
                 </li>
             </ul>
         </section>
+
+        <SalaryBenchmark v-if="salaryBenchmark" :benchmark="salaryBenchmark" />
 
         <MatchBreakdown :match="match" :signed-in="signedIn" />
 

@@ -188,6 +188,11 @@ return [
         'sign_in_to_save' => 'Inicie sessão para guardar ofertas',
         'regions' => 'Pode trabalhar a partir de: :regions',
     ],
+    'benchmark' => [
+        'title' => 'Referência salarial',
+        'summary' => 'Ofertas semelhantes costumam pagar cerca de :median por ano (a metade central entre :low e :high).',
+        'note' => 'Calculado com :count ofertas abertas da mesma categoria e nível que indicam salário na nossa base. É uma referência orientativa, não um estudo de mercado.',
+    ],
     'salary' => [
         'range' => ':min – :max',
         'from' => 'a partir de :min',
