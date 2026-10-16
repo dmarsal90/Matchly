@@ -71,6 +71,12 @@ return [
     'copy' => 'Copiar',
     'copied' => 'Copiado',
     'download_letter' => 'Descarregar carta (.txt)',
+    'template' => [
+        'label' => 'Modelo do CV',
+        'classic' => 'Clássico (preto, sóbrio)',
+        'modern' => 'Moderno (destaque azul)',
+        'compact' => 'Compacto (menos páginas)',
+    ],
     'download_resume' => 'Descarregar CV (PDF)',
     'download_requires_approval' => 'Aprove a candidatura para descarregar o CV.',
     'editor' => [
