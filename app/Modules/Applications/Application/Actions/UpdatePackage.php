@@ -54,7 +54,7 @@ final readonly class UpdatePackage
 
         $master = $package->masterResumeData();
         $text = (string) ($changes['cover_letter'] ?? $package->cover_letter);
-        $kept = array_values(array_filter((array) $package->warnings, fn (array $warning): bool => ! in_array($warning['key'], ['unbacked_skills', 'years_claim', ...DraftReviewer::KEYS], true)));
+        $kept = array_values(array_filter((array) $package->warnings, fn (array $warning): bool => ! in_array($warning['key'], ['unbacked_skills', 'years_claim', 'weak_fit', ...DraftReviewer::KEYS], true)));
         $job = $package->job;
         $resumeNow = $edited ?? $current;
         $reviewed = $job !== null && $resumeNow !== null

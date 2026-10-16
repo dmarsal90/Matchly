@@ -142,7 +142,7 @@ function onSet(key: keyof JobFilters, value: string | number | null): void {
 <template>
     <Head :title="trans('jobs.title')" />
 
-    <div class="mx-auto w-full max-w-6xl space-y-6 py-6">
+    <div class="mx-auto w-full max-w-6xl space-y-6 px-4 py-6">
         <header class="space-y-4">
             <div>
                 <h1 class="text-2xl font-semibold tracking-tight">

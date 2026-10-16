@@ -9,6 +9,12 @@ La aplicación nunca llama a un proveedor directamente: todo pasa por `AiGateway
 
 Un proveedor solo tiene que hacer una cosa: recibir un `AiCompletion` (prompt de sistema, entrada, esquema, modelo y máximo de tokens) y devolver un `AiResult` (los datos JSON decodificados y el consumo de tokens).
 
+## Proveedores incluidos, gratis y de pago
+
+Vienen configurados Anthropic y OpenAI (de pago, mejor redacción), DeepSeek (muy barato), Gemini, Groq, Hugging Face y OpenRouter con modelos `:free` (con capa gratuita) y Mistral u Ollama. Basta con poner la clave en `.env`; el que no tenga clave se salta.
+
+**Rotación de claves:** cualquier `*_API_KEY` admite varias claves separadas por comas (`HUGGINGFACE_API_KEY=hf_aaa,hf_bbb`). Se usan por turnos y, si una llega al límite de tasa, el siguiente reintento usa otra, de modo que las cuotas gratuitas se suman. Recuerda incluir el proveedor en `AI_FALLBACK_ORDER`.
+
 ## Caso 1: API compatible con OpenAI (lo habitual)
 
 Groq, OpenRouter, Mistral, Together, DeepSeek, Ollama, LM Studio o vLLM exponen `/chat/completions`. **No hace falta código**, solo una entrada en `config/ai.php`, dentro de `providers`:
