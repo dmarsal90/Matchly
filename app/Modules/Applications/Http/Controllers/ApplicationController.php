@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace App\Modules\Applications\Http\Controllers;
 
 use App\Modules\Applications\Application\Actions\UpdateApplication;
+use App\Modules\Applications\Application\Generators\FollowUpDraftWriter;
 use App\Modules\Applications\Domain\Enums\ApplicationStatus;
 use App\Modules\Applications\Http\Requests\UpdateApplicationRequest;
 use App\Modules\Applications\Infrastructure\Models\Application;
+use App\Modules\Applications\Infrastructure\Models\ApplicationEvent;
 use App\Modules\Applications\Infrastructure\Models\ApplicationPackage;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Jobs\Domain\Enums\JobStatus;
@@ -22,13 +24,13 @@ use Inertia\Response;
 /** "My jobs": the user's saved jobs and application pipeline. */
 final class ApplicationController
 {
-    public function index(Request $request, #[CurrentUser] User $user): Response
+    public function index(Request $request, #[CurrentUser] User $user, FollowUpDraftWriter $draftWriter): Response
     {
         $applications = Application::query()
             ->where('user_id', $user->id)
             // Defence in depth: never surface jobs held for moderation.
             ->whereHas('job', fn ($job) => $job->where('status', '!=', JobStatus::Flagged->value))
-            ->with('job.source:id,key,name,homepage_url,requires_attribution')
+            ->with(['job.source:id,key,name,homepage_url,requires_attribution', 'events', 'user'])
             ->latest('status_changed_at')
             ->get();
 
@@ -49,6 +51,16 @@ final class ApplicationController
                 'applied_at' => $application->applied_at?->toIso8601String(),
                 'job_open' => $application->job->status === JobStatus::Open,
                 'job' => (new JobListingResource($application->job))->resolve($request),
+                'events' => $application->events->map(fn (ApplicationEvent $event): array => [
+                    'id' => $event->id,
+                    'type' => $event->type->value,
+                    'status' => $event->status?->value,
+                    'round' => $event->round,
+                    'note' => $event->note,
+                    'occurred_at' => $event->occurred_at->toIso8601String(),
+                ])->values()->all(),
+                // A message to copy for applications still waiting for an answer; never sent.
+                'follow_up_draft' => $application->status === ApplicationStatus::Applied ? $draftWriter->write($application) : null,
                 'package' => isset($packages[$application->job_listing_id])
                     ? ['id' => $packages[$application->job_listing_id]->id, 'status' => $packages[$application->job_listing_id]->status->value]
                     : null,

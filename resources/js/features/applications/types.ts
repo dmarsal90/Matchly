@@ -64,3 +64,12 @@ export type QuickApplyOptions = {
     packages?: number;
     latest_package_id?: number | null;
 };
+
+export type ApplicationEventEntry = {
+    id: number;
+    type: 'status_changed' | 'interview' | 'note' | 'follow_up';
+    status: string | null;
+    round: number | null;
+    note: string | null;
+    occurred_at: string;
+};
