@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="application-name" content="{{ config('app.name') }}">
         <meta name="description" content="{{ __('meta.description', ['app' => config('app.name')]) }}">
+        <meta property="og:image" content="{{ url('/og-image.png') }}">
         <meta property="og:site_name" content="{{ config('app.name') }}">
 
         {{-- Applies the dark class before first paint to avoid a flash of the wrong theme --}}
@@ -21,17 +22,20 @@
         {{-- Mirrors --background from app.css so the page never flashes white in dark mode --}}
         <style>
             html {
-                background-color: oklch(1 0 0);
+                background-color: hsl(158 17% 96.5%);
             }
 
             html.dark {
-                background-color: oklch(0.145 0 0);
+                background-color: hsl(170 30% 6%);
             }
         </style>
 
-        <link rel="icon" href="/favicon.ico" sizes="any">
-        <link rel="icon" href="/favicon.svg" type="image/svg+xml">
-        <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        <link rel="icon" href="/favicon.ico?v=3" sizes="any">
+        <link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml">
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png?v=3">
+        <link rel="manifest" href="/manifest.webmanifest">
+        <meta name="theme-color" content="#0F3D2E" media="(prefers-color-scheme: light)">
+        <meta name="theme-color" content="#0F3D2E" media="(prefers-color-scheme: dark)">
 
         @fonts
 

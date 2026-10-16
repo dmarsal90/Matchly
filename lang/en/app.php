@@ -16,4 +16,11 @@ return [
     'theme_dark' => 'Dark',
     'theme_system' => 'System',
     'footer_rights' => '© :year :app',
+    'browse_jobs' => 'Browse jobs',
+    'how_it_works' => 'How it works',
+    'points' => [
+        'collect' => ['title' => 'We gather the jobs', 'text' => 'We collect remote jobs from public sources several times a day and drop duplicates and expired ones.'],
+        'match' => ['title' => 'We work out your fit', 'text' => 'We compare your profile with what each job asks for and tell you what is missing to reach 100 %.'],
+        'prepare' => ['title' => 'You prepare the application', 'text' => 'A tailored letter and CV that you review and approve. Nothing is sent unless you decide so.'],
+    ],
 ];

@@ -1,12 +1,90 @@
-# Matchly
+<p align="center">
+  <img src="docs/screenshots/icon.png" alt="Matchly" width="120">
+</p>
 
-Plataforma que agrega ofertas de trabajo remoto de fuentes gratuitas, calcula la compatibilidad con el perfil de cada usuario, genera cartas y CV adaptados con IA y envía alertas.
+<h1 align="center">Matchly</h1>
 
-> El nombre del producto se define **solo** en `APP_NAME` (`.env`) y como valor por defecto en `config/app.php`. Todo lo demás (UI, correos, títulos, metadatos, PDF) lo lee de la configuración o de las traducciones con el placeholder `:app`. `tests/Architecture/BrandNameTest.php` falla si aparece escrito a mano.
+<p align="center">
+  <strong>Encuentra trabajo remoto que encaje contigo, y llega a la entrevista preparado.</strong><br>
+  Reúne ofertas de fuentes públicas, calcula cuánto encajas con cada una, prepara tu candidatura<br>
+  y te acompaña hasta la respuesta. Tú decides; nada se envía por ti.
+</p>
+
+<p align="center">
+  <a href="https://github.com/dmarsal90/Matchly/actions/workflows/ci.yml"><img src="https://github.com/dmarsal90/Matchly/actions/workflows/ci.yml/badge.svg" alt="CI"></a>
+  <img src="https://img.shields.io/badge/Laravel-13-F4A62A?logo=laravel&logoColor=white" alt="Laravel 13">
+  <img src="https://img.shields.io/badge/Vue-3-0F3D2E?logo=vuedotjs&logoColor=white" alt="Vue 3">
+  <img src="https://img.shields.io/badge/Tailwind-4-0F3D2E?logo=tailwindcss&logoColor=white" alt="Tailwind 4">
+  <img src="https://img.shields.io/badge/tests-773%20%2B%20E2E-0F3D2E" alt="Tests">
+  <img src="https://img.shields.io/badge/idiomas-ES%20%C2%B7%20EN%20%C2%B7%20PT-F4A62A" alt="Idiomas">
+  <a href="LICENSE"><img src="https://img.shields.io/badge/licencia-MIT-lightgrey" alt="MIT"></a>
+</p>
+
+<p align="center">
+  <a href="#cómo-se-ve">Capturas</a> ·
+  <a href="#qué-hace">Qué hace</a> ·
+  <a href="#puesta-en-marcha-docker">Puesta en marcha</a> ·
+  <a href="docs/architecture.md">Arquitectura</a> ·
+  <a href="docs/deployment.md">Despliegue</a>
+</p>
+
+<p align="center">
+  <img src="docs/screenshots/jobs-light.png" alt="Listado de ofertas con filtros y afinidad" width="860">
+</p>
+
+## Por qué Matchly
+
+Buscar trabajo es repetir lo mismo cien veces: mirar tableros, adivinar si encajas, reescribir la carta, acordarte de hacer seguimiento. Matchly hace la parte mecánica y te deja el criterio.
+
+- **Honesto.** Ninguna cifra se inventa: hay un mínimo de datos para cada comparación y las estimaciones se presentan como orientativas.
+- **Tuyo.** Nunca se contacta con una empresa en tu nombre. La IA es opcional, con su propio consentimiento, y nada se guarda sin que lo revises.
+- **Privado.** Consentimientos revocables que borran lo importado, textos personales cifrados, exportación y borrado de tu cuenta.
+- **Verificable.** Más de 770 tests, E2E en escritorio y móvil, accesibilidad comprobada en claro y oscuro, y arquitectura vigilada por tests.
+
+## Cómo se ve
+
+<table>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/home-light.png" alt="Inicio"><br><sub><b>Inicio</b>: de la oferta a la solicitud, en tres pasos.</sub></td>
+    <td width="50%"><img src="docs/screenshots/applications-light.png" alt="Mis ofertas"><br><sub><b>Mis ofertas</b>: tablero con historial, fechas límite y seguimiento.</sub></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="docs/screenshots/insights-light.png" alt="Panorama"><br><sub><b>Panorama</b>: qué probar, cómo van tus candidaturas y qué aprender.</sub></td>
+    <td width="50%"><img src="docs/screenshots/market-light.png" alt="Mercado"><br><sub><b>Mercado</b>: demanda y sueldo de tus tecnologías.</sub></td>
+  </tr>
+</table>
+
+<p align="center"><img src="docs/screenshots/jobs-dark.png" alt="Modo oscuro" width="720"><br><sub>Modo claro y oscuro, en español, inglés y portugués.</sub></p>
+
+## Qué hace
+
+```mermaid
+flowchart LR
+    A[Fuentes públicas<br>13 tableros] --> B[Ofertas limpias<br>sin duplicados]
+    B --> C[Tu perfil<br>CV · GitHub · LinkedIn · portfolio]
+    C --> D[Afinidad con<br>cada oferta]
+    D --> E[Solicitud rápida<br>carta + CV, tú apruebas]
+    E --> F[Seguimiento<br>fechas, recordatorios]
+    F --> G[Entrevista<br>pack, práctica, simulacro]
+    G --> H[Panorama<br>qué mejorar]
+```
+
+| | |
+| --- | --- |
+| 🔎 **Encontrar** | 13 fuentes gratuitas, filtros por modalidad, país, contrato, nivel y sueldo, alertas por app, tiempo real o correo, y **radar de empresas**. |
+| 🎯 **Encajar** | Perfil de habilidades desde cuestionario, CV, GitHub, LinkedIn y portfolio; afinidad con cada oferta y qué te falta para llegar al 100 %. |
+| ✍️ **Preparar** | Carta y CV adaptados (con o sin IA) que revisas y apruebas, PDF en tres plantillas legibles por ATS, notas de empresa aprobadas por ti y **extensión de navegador** que rellena los formularios. |
+| 📋 **Seguir** | Tablero con historial, fechas límite, hasta dos seguimientos con borrador, nota de agradecimiento tras cada entrevista. |
+| 🎤 **Entrevistar** | Preguntas probables con esquemas STAR de tu propio CV, respuestas honestas a tus carencias, práctica con comentarios y simulacro por turnos. |
+| 📈 **Mejorar** | Panorama con embudo, calibración, qué probar a continuación, cursos (gratis primero), plan de estudio de 4 semanas en `.ics`, mercado por tecnología e informe descargable o compartible por enlace caducable. |
+
+Todas las funciones, una a una, están [más abajo](#funciones-en-detalle).
 
 ## Stack
 
 Laravel 13 · PHP 8.4 · Inertia 3 + Vue 3 (TypeScript) · Tailwind CSS 4 · PostgreSQL 17 · Redis 7 · Horizon · Reverb · Fortify · Pest · Larastan · Vitest · Docker.
+
+> El nombre del producto se define **solo** en `APP_NAME` (`.env`) y como valor por defecto en `config/app.php`; todo lo demás lo lee de la configuración o del placeholder `:app` de las traducciones, y `tests/Architecture/BrandNameTest.php` falla si aparece escrito a mano.
 
 ## Puesta en marcha (Docker)
 
@@ -115,7 +193,7 @@ php artisan jobs:sources                   # estado de cada fuente
 
 Cómo añadir una fuente: [docs/adding-a-job-provider.md](docs/adding-a-job-provider.md).
 
-## Seguimiento y preparación de entrevistas
+## Funciones en detalle
 
 Además de la solicitud rápida, Matchly acompaña la candidatura hasta el final. Todo es para ti: nunca se contacta con una empresa en tu nombre.
 
