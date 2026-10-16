@@ -3,13 +3,18 @@ import EmptyState from '@/components/EmptyState.vue';
 import Heading from '@/components/Heading.vue';
 import Pagination from '@/components/Pagination.vue';
 import { Button } from '@/components/ui/button';
+import {
+    notificationHref,
+    notificationSummary,
+    notificationTitle,
+} from '@/features/alerts/lib/notification';
 import type { AppNotification } from '@/features/alerts/types';
 import { relativeTime } from '@/features/jobs/lib/format';
-import { index as jobsIndex, show as showJob } from '@/routes/jobs';
+import { show as showJob } from '@/routes/jobs';
 import { index, read, readAll } from '@/routes/notifications';
 import { Head, Link, router } from '@inertiajs/vue3';
 import { Bell } from '@lucide/vue';
-import { getActiveLanguage, trans, transChoice } from 'laravel-vue-i18n';
+import { getActiveLanguage, trans } from 'laravel-vue-i18n';
 import { computed } from 'vue';
 
 const props = defineProps<{
@@ -26,15 +31,6 @@ defineOptions({
 const hasUnread = computed(() =>
     props.notifications.data.some((item) => !item.read_at),
 );
-
-function title(item: AppNotification): string {
-    const key =
-        item.data.frequency === 'immediate'
-            ? 'alerts.notifications.job_alert'
-            : 'alerts.notifications.job_alert_digest';
-
-    return transChoice(key, item.data.count, { name: item.data.alert_name });
-}
 
 function markRead(item: AppNotification): void {
     router.post(read.url(item.id), {}, { preserveScroll: true });
@@ -81,7 +77,7 @@ function goToPage(page: number): void {
                 <div class="flex flex-wrap items-start justify-between gap-2">
                     <div>
                         <p :class="item.read_at ? '' : 'font-medium'">
-                            {{ title(item) }}
+                            {{ notificationTitle(item.data) }}
                         </p>
                         <p
                             v-if="item.created_at"
@@ -97,10 +93,9 @@ function goToPage(page: number): void {
                     </div>
                     <div class="flex gap-1">
                         <Button variant="outline" size="sm" as-child>
-                            <Link
-                                :href="jobsIndex({ query: item.data.filters })"
-                                >{{ trans('alerts.notifications.open') }}</Link
-                            >
+                            <Link :href="notificationHref(item.data)">{{
+                                trans('alerts.notifications.open')
+                            }}</Link>
                         </Button>
                         <Button
                             v-if="!item.read_at"
@@ -112,7 +107,13 @@ function goToPage(page: number): void {
                         </Button>
                     </div>
                 </div>
-                <ul class="space-y-0.5 text-sm">
+                <p
+                    v-if="item.data.type === 'follow_up'"
+                    class="text-sm text-muted-foreground"
+                >
+                    {{ notificationSummary(item.data) }}
+                </p>
+                <ul v-else class="space-y-0.5 text-sm">
                     <li v-for="job in item.data.jobs" :key="job.id">
                         <Link
                             :href="showJob({ job: job.id })"

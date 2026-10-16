@@ -5,7 +5,16 @@ import {
     DropdownMenuContent,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import type { AppNotification, JobAlertData } from '@/features/alerts/types';
+import {
+    notificationHref,
+    notificationSummary,
+    notificationTitle,
+} from '@/features/alerts/lib/notification';
+import type {
+    AppNotification,
+    FollowUpData,
+    JobAlertData,
+} from '@/features/alerts/types';
 import { relativeTime } from '@/features/jobs/lib/format';
 import { index as jobsIndex } from '@/routes/jobs';
 import {
@@ -31,15 +40,6 @@ watch(
     () => page.props.notifications?.unread,
     (value) => (unread.value = value ?? 0),
 );
-
-function title(data: JobAlertData): string {
-    const key =
-        data.frequency === 'immediate'
-            ? 'alerts.notifications.job_alert'
-            : 'alerts.notifications.job_alert_digest';
-
-    return transChoice(key, data.count, { name: data.alert_name });
-}
 
 async function load(): Promise<void> {
     loading.value = true;
@@ -71,7 +71,7 @@ function open(item: AppNotification): void {
             },
         );
     }
-    router.visit(jobsIndex({ query: item.data.filters }));
+    router.visit(notificationHref(item.data));
 }
 
 function markAllRead(): void {
@@ -122,6 +122,30 @@ if (userId.value && echoIsConfigured()) {
             );
         },
         'job.alert',
+    );
+
+    useEchoNotification<FollowUpData>(
+        `users.${userId.value}`,
+        (payload) => {
+            unread.value++;
+            items.value = [
+                {
+                    id: payload.id,
+                    data: payload,
+                    read_at: null,
+                    created_at: new Date().toISOString(),
+                },
+                ...items.value,
+            ].slice(0, 8);
+            toast.info(notificationTitle(payload), {
+                description: notificationSummary(payload),
+                action: {
+                    label: trans('alerts.notifications.open'),
+                    onClick: () => router.visit(notificationHref(payload)),
+                },
+            });
+        },
+        'application.follow_up',
     );
 }
 </script>
@@ -183,17 +207,13 @@ if (userId.value && echoIsConfigured()) {
                                         ? 'text-muted-foreground'
                                         : 'font-medium'
                                 "
-                                >{{ title(item.data) }}</span
+                                >{{ notificationTitle(item.data) }}</span
                             >
                         </span>
                         <span
                             class="line-clamp-1 text-xs text-muted-foreground"
                         >
-                            {{
-                                item.data.jobs
-                                    .map((job) => job.title)
-                                    .join(' · ')
-                            }}
+                            {{ notificationSummary(item.data) }}
                         </span>
                         <span
                             v-if="item.created_at"

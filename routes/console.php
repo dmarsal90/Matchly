@@ -21,3 +21,6 @@ Schedule::command('privacy:prune')->dailyAt('04:00')->onOneServer();
 // Saved-search digests (immediate alerts are sent as jobs arrive).
 Schedule::command('alerts:digest daily')->dailyAt('08:00')->onOneServer();
 Schedule::command('alerts:digest weekly')->weeklyOn(1, '08:00')->onOneServer();
+
+// Applications sent N days ago with no answer: remind once, with a draft message.
+Schedule::command('applications:follow-up')->dailyAt('09:00')->onOneServer();
