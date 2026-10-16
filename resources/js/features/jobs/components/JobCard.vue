@@ -47,11 +47,11 @@ const logoFailed = ref(false);
 
 <template>
     <article
-        class="group relative flex flex-col gap-3 rounded-xl border bg-card p-4 transition-colors hover:border-foreground/20 sm:flex-row sm:gap-4"
+        class="group relative flex flex-col gap-3 rounded-xl border bg-card p-4 transition-[border-color,box-shadow] hover:border-primary/35 hover:shadow-sm sm:flex-row sm:gap-4"
         :class="job.viewed && 'bg-muted/30'"
     >
         <div
-            class="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border bg-muted text-sm font-semibold text-muted-foreground"
+            class="flex size-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-primary/10 bg-accent text-sm font-semibold text-accent-foreground"
             aria-hidden="true"
         >
             <img

@@ -21,17 +21,20 @@
         {{-- Mirrors --background from app.css so the page never flashes white in dark mode --}}
         <style>
             html {
-                background-color: oklch(1 0 0);
+                background-color: hsl(158 17% 96.5%);
             }
 
             html.dark {
-                background-color: oklch(0.145 0 0);
+                background-color: hsl(170 30% 6%);
             }
         </style>
 
         <link rel="icon" href="/favicon.ico" sizes="any">
         <link rel="icon" href="/favicon.svg" type="image/svg+xml">
         <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+        <link rel="manifest" href="/manifest.webmanifest">
+        <meta name="theme-color" content="#10463F" media="(prefers-color-scheme: light)">
+        <meta name="theme-color" content="#0B1513" media="(prefers-color-scheme: dark)">
 
         @fonts
 
