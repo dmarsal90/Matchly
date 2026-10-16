@@ -18,6 +18,11 @@ updates:
     groups:
       npm-minor:
         update-types: [minor, patch]
+    ignore:
+      # vue-tsc and typescript-eslint do not support TypeScript 7 yet (the build
+      # of the type checker and the linter breaks). Revisit when both do.
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
     commit-message: { prefix: 'chore(deps)' }
 
   - package-ecosystem: github-actions
