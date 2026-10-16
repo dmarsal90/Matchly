@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property string|null $notes
  * @property CarbonImmutable $status_changed_at
  * @property CarbonImmutable|null $applied_at
+ * @property CarbonImmutable|null $follow_up_reminded_at
  * @property CarbonImmutable $created_at
  * @property-read JobListing $job
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ApplicationEvent> $events
@@ -68,6 +69,7 @@ final class Application extends Model
             'notes' => 'encrypted',
             'status_changed_at' => 'immutable_datetime',
             'applied_at' => 'immutable_datetime',
+            'follow_up_reminded_at' => 'immutable_datetime',
         ];
     }
 }
