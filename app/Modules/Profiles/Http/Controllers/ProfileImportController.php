@@ -9,12 +9,14 @@ use App\Modules\Profiles\Application\Actions\AnalyzeCvSkills;
 use App\Modules\Profiles\Application\Actions\ConfirmImport;
 use App\Modules\Profiles\Application\Actions\ImportLinkedInExport;
 use App\Modules\Profiles\Application\Actions\StartGithubImport;
+use App\Modules\Profiles\Application\Actions\StartPortfolioImport;
 use App\Modules\Profiles\Domain\Enums\ImportStatus;
 use App\Modules\Profiles\Domain\Enums\LanguageLevel;
 use App\Modules\Profiles\Domain\Exceptions\ImportFailed;
 use App\Modules\Profiles\Http\Requests\AnalyzeCvRequest;
 use App\Modules\Profiles\Http\Requests\ConfirmImportRequest;
 use App\Modules\Profiles\Http\Requests\StartGithubImportRequest;
+use App\Modules\Profiles\Http\Requests\StartPortfolioImportRequest;
 use App\Modules\Profiles\Http\Requests\UploadLinkedInExportRequest;
 use App\Modules\Profiles\Infrastructure\Models\ProfileImport;
 use Illuminate\Container\Attributes\CurrentUser;
@@ -32,6 +34,15 @@ final class ProfileImportController
         $start->handle($user, $request->username(), $request->boolean('ai_summary'));
 
         Inertia::flash('toast', ['type' => 'info', 'message' => __('skills.github.started')]);
+
+        return back();
+    }
+
+    public function portfolio(StartPortfolioImportRequest $request, #[CurrentUser] User $user, StartPortfolioImport $start): RedirectResponse
+    {
+        $start->handle($user, $request->url());
+
+        Inertia::flash('toast', ['type' => 'info', 'message' => __('skills.portfolio.started')]);
 
         return back();
     }

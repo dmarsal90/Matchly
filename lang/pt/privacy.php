@@ -25,6 +25,11 @@ return [
             'description' => 'Ler os ficheiros de perfil da sua exportação de dados do LinkedIn.',
             'revoke_warning' => 'Ao retirar, os dados importados do LinkedIn serão apagados.',
         ],
+        'portfolio_import' => [
+            'title' => 'Importar do meu portefólio',
+            'description' => 'Ler o teu site público para detetar tecnologias.',
+            'revoke_warning' => 'Ao retirar, os dados importados do teu portefólio serão apagados.',
+        ],
         'ai_processing' => [
             'title' => 'Usar IA com os meus dados',
             'description' => 'Enviar o seu perfil a fornecedores de IA para gerar cartas e currículos adaptados.',

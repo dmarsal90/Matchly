@@ -136,6 +136,21 @@ return [
     ],
 
     /*
+     * Rough hours to reach a working level from scratch, by skill type
+     * (config/skills.php). A guide to size a study plan, not a promise: it
+     * depends on the person's background, so the UI labels it as an estimate.
+     */
+    'hours' => [
+        'language' => 60,
+        'framework' => 40,
+        'database' => 25,
+        'cloud' => 40,
+        'tool' => 15,
+        'practice' => 20,
+        'default' => 20,
+    ],
+
+    /*
      * Search links for any skill: free places first, then paid ones. {query}
      * is the URL-encoded skill name.
      */

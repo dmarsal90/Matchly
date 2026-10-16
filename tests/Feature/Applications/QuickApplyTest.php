@@ -202,6 +202,21 @@ it('exports the CV as a PDF only once approved', function (): void {
         ->and($response->headers->get('Content-Disposition'))->toContain('ana-garcia-globex.pdf');
 });
 
+it('offers several CV looks that keep the same one-column text, and falls back to the classic one', function (): void {
+    $package = prepare(candidateWithProfile(), spanishLaravelJob());
+    $this->post(route('applications.packages.approve', $package));
+    $html = fn (App\Modules\Applications\Domain\Enums\ResumeTemplate $template): string => view('pdf.resume', ['resume' => $package->refresh()->resumeData(), 'locale' => 'es', 'template' => $template])->render();
+
+    expect($html(App\Modules\Applications\Domain\Enums\ResumeTemplate::Modern))->toContain('#1e3a8a')
+        ->and($html(App\Modules\Applications\Domain\Enums\ResumeTemplate::Compact))->toContain('font-size: 9pt; line-height')
+        ->and($html(App\Modules\Applications\Domain\Enums\ResumeTemplate::Classic))->not->toContain('#1e3a8a')->not->toContain('font-size: 9pt; line-height');
+
+    foreach (['classic', 'modern', 'compact', 'nonsense'] as $template) {
+        $response = $this->get(route('applications.packages.resume', [$package, 'template' => $template]))->assertOk();
+        expect($response->getContent())->toStartWith('%PDF-');
+    }
+});
+
 it('downloads the letter as text', function (): void {
     $package = prepare(candidateWithProfile(), spanishLaravelJob());
 

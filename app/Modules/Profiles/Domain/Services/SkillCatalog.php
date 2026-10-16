@@ -65,6 +65,12 @@ final class SkillCatalog
         return isset($this->catalog[$slug]) ? $this->known($slug) : null;
     }
 
+    /** The catalog type of a skill (language, framework...), null when it is not in the catalog. */
+    public function type(string $slug): ?string
+    {
+        return isset($this->catalog[$slug]['type']) ? (string) $this->catalog[$slug]['type'] : null;
+    }
+
     public function label(string $slug, string $fallback): string
     {
         return $this->catalog[$slug]['label'] ?? $fallback;

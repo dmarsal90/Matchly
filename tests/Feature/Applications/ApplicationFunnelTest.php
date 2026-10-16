@@ -86,3 +86,37 @@ it('sends the funnel to the insights page', function (): void {
 
     $this->actingAs($user)->get('/insights')->assertInertia(fn (Assert $page) => $page->where('funnel.applied', 1));
 });
+
+it('compares the match score of jobs that got an interview with the ones that did not', function (): void {
+    $user = User::factory()->create();
+    $score = function (Application $application, int $score) use ($user): void {
+        App\Modules\Matching\Infrastructure\Models\JobMatch::query()->create(['user_id' => $user->id, 'job_listing_id' => $application->job_listing_id, 'score' => $score, 'level' => 'medium', 'eligible' => true, 'result' => [], 'computed_at' => now()]);
+    };
+    $score(trackedAt($user, ApplicationStatus::Interview, 20), 80);
+    $score(trackedAt($user, ApplicationStatus::Offer, 30), 70);
+    $score(trackedAt($user, ApplicationStatus::Rejected, 25), 50);
+    $score(trackedAt($user, ApplicationStatus::NoResponse, 40), 40);
+    // Still waiting: tells nothing yet.
+    $score(trackedAt($user, ApplicationStatus::Applied, 3), 10);
+
+    expect(app(ApplicationFunnel::class)->for($user->id)['calibration'])->toBe(['interview_score' => 75, 'closed_score' => 45, 'interview_count' => 2, 'closed_count' => 2])
+        ->and(app(ApplicationFunnel::class)->for(User::factory()->create()->id)['calibration']['interview_score'])->toBeNull();
+});
+
+it('downloads the insights as one self-contained HTML file', function (): void {
+    $user = User::factory()->create(['name' => 'Ana <b>Ruiz</b>', 'locale' => 'es']);
+    trackedAt($user, ApplicationStatus::Interview, 20);
+
+    $response = $this->actingAs($user)->get('/insights/report');
+    $html = $response->getContent();
+
+    $response->assertOk()->assertHeader('Content-Disposition', 'attachment; filename="'.Illuminate\Support\Str::slug((string) config('app.name')).'-report-'.now()->toDateString().'.html"');
+    expect($response->headers->get('Content-Type'))->toContain('text/html')
+        ->and($html)->toContain('Mi informe de búsqueda')->toContain('Ana &lt;b&gt;Ruiz&lt;/b&gt;')->not->toContain('<b>Ruiz')
+        // Nothing fetched from outside the file.
+        ->and($html)->not->toMatch('/<script|<link |src="http|@import|url\(http/');
+
+    $this->get('/logout');
+    auth()->logout();
+    $this->get('/insights/report')->assertRedirect();
+});

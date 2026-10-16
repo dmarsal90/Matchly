@@ -24,3 +24,4 @@ Schedule::command('alerts:digest weekly')->weeklyOn(1, '08:00')->onOneServer();
 
 // Applications sent N days ago with no answer: remind once, with a draft message.
 Schedule::command('applications:follow-up')->dailyAt('09:00')->onOneServer();
+Schedule::command('applications:deadlines')->dailyAt('09:00')->onOneServer();
