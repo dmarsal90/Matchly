@@ -71,6 +71,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('applications/{application}', [ApplicationController::class, 'destroy'])->name('applications.destroy');
     Route::post('applications/{application}/events', [ApplicationEventController::class, 'store'])->name('applications.events.store');
     Route::get('applications/{application}/interview-prep', [InterviewPrepController::class, 'show'])->whereNumber('application')->name('applications.interview-prep.show');
+    Route::get('applications/{application}/interview-prep/mock', [InterviewAnswerController::class, 'mock'])->whereNumber('application')->name('applications.interview-prep.mock');
+    Route::post('applications/{application}/interview-prep/mock/review', [InterviewAnswerController::class, 'review'])->whereNumber('application')->middleware('throttle:quick-apply')->name('applications.interview-prep.mock.review');
     Route::put('applications/{application}/interview-prep/answer', [InterviewAnswerController::class, 'update'])->whereNumber('application')->name('applications.interview-prep.answer');
     Route::post('applications/{application}/interview-prep/feedback', [InterviewAnswerController::class, 'feedback'])->whereNumber('application')->middleware('throttle:quick-apply')->name('applications.interview-prep.feedback');
     Route::post('applications/{application}/interview-prep', [InterviewPrepController::class, 'store'])->whereNumber('application')->middleware('throttle:quick-apply')->name('applications.interview-prep.store');
