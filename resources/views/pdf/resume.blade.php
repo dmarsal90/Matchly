@@ -14,6 +14,11 @@
         return trim($format($from).' – '.($to !== null ? $format($to) : $t('present')), ' –');
     };
     $languageName = fn (string $code): string => \Locale::getDisplayLanguage($code, $locale) ?: $code;
+    $look = match ($template) {
+        \App\Modules\Applications\Domain\Enums\ResumeTemplate::Modern => ['margin' => '20mm 18mm', 'size' => '10pt', 'leading' => '1.5', 'name' => '22pt', 'accent' => '#1e3a8a', 'rule' => '#1e3a8a', 'gap' => '16pt'],
+        \App\Modules\Applications\Domain\Enums\ResumeTemplate::Compact => ['margin' => '12mm 13mm', 'size' => '9pt', 'leading' => '1.3', 'name' => '17pt', 'accent' => '#1a1a1a', 'rule' => '#999', 'gap' => '9pt'],
+        default => ['margin' => '18mm 16mm', 'size' => '10pt', 'leading' => '1.4', 'name' => '20pt', 'accent' => '#1a1a1a', 'rule' => '#999', 'gap' => '14pt'],
+    };
 @endphp
 <!DOCTYPE html>
 <html lang="{{ $locale }}">
@@ -21,12 +26,12 @@
     <meta charset="utf-8">
     <title>{{ $resume->contact['name'] }}</title>
     <style>
-        @page { margin: 18mm 16mm; }
-        body { font-family: 'DejaVu Sans', sans-serif; font-size: 10pt; line-height: 1.4; color: #1a1a1a; }
-        h1 { font-size: 20pt; margin: 0 0 2pt; font-weight: bold; }
+        @page { margin: {{ $look['margin'] }}; }
+        body { font-family: 'DejaVu Sans', sans-serif; font-size: {{ $look['size'] }}; line-height: {{ $look['leading'] }}; color: #1a1a1a; }
+        h1 { font-size: {{ $look['name'] }}; margin: 0 0 2pt; font-weight: bold; color: {{ $look['accent'] }}; }
         .headline { font-size: 11pt; color: #444; margin: 0 0 6pt; }
         .contact { font-size: 9pt; color: #333; margin: 0 0 10pt; }
-        h2 { font-size: 11pt; text-transform: uppercase; letter-spacing: 0.5pt; border-bottom: 1px solid #999; padding-bottom: 2pt; margin: 14pt 0 6pt; }
+        h2 { font-size: 11pt; text-transform: uppercase; letter-spacing: 0.5pt; color: {{ $look['accent'] }}; border-bottom: 1px solid {{ $look['rule'] }}; padding-bottom: 2pt; margin: {{ $look['gap'] }} 0 6pt; }
         h3 { font-size: 10.5pt; margin: 8pt 0 0; font-weight: bold; }
         .meta { font-size: 9pt; color: #555; margin: 0 0 3pt; }
         ul { margin: 2pt 0 0 14pt; padding: 0; }

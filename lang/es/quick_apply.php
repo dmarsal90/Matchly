@@ -71,6 +71,12 @@ return [
     'copy' => 'Copiar',
     'copied' => 'Copiado',
     'download_letter' => 'Descargar carta (.txt)',
+    'template' => [
+        'label' => 'Plantilla del CV',
+        'classic' => 'Clásica (negro, sobria)',
+        'modern' => 'Moderna (acento azul)',
+        'compact' => 'Compacta (menos páginas)',
+    ],
     'download_resume' => 'Descargar CV (PDF)',
     'download_requires_approval' => 'Aprueba la solicitud para descargar el CV.',
     'editor' => [

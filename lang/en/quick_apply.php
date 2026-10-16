@@ -71,6 +71,12 @@ return [
     'copy' => 'Copy',
     'copied' => 'Copied',
     'download_letter' => 'Download letter (.txt)',
+    'template' => [
+        'label' => 'CV template',
+        'classic' => 'Classic (black, plain)',
+        'modern' => 'Modern (blue accent)',
+        'compact' => 'Compact (fewer pages)',
+    ],
     'download_resume' => 'Download CV (PDF)',
     'download_requires_approval' => 'Approve the application to download the CV.',
     'editor' => [
