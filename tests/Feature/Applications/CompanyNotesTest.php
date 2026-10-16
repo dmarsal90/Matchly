@@ -57,3 +57,19 @@ it('lets only the owner delete a note', function (): void {
 it('requires a signed-in user', function (): void {
     $this->post(route('company-notes.store'), ['company' => 'Acme', 'fact' => 'A valid fact here'])->assertRedirect(route('login'));
 });
+
+it('uses a web suggestion only after its owner approves it', function (): void {
+    $owner = User::factory()->create();
+    $note = new CompanyNote(['company_key' => 'acme', 'company' => 'Acme', 'fact' => 'Founded in 2019 as a remote-first company', 'source_url' => 'https://acme.example/', 'origin' => App\Modules\Applications\Domain\Enums\NoteOrigin::Web, 'approved' => false]);
+    $note->user()->associate($owner);
+    $note->save();
+
+    expect(app(App\Modules\Applications\Application\Queries\ApprovedCompanyFacts::class)->for($owner->id, 'Acme'))->toBe([]);
+
+    $this->actingAs(User::factory()->create())->post(route('company-notes.approve', $note))->assertForbidden();
+    expect($note->refresh()->approved)->toBeFalse();
+
+    $this->actingAs($owner)->post(route('company-notes.approve', $note))->assertRedirect();
+
+    expect(app(App\Modules\Applications\Application\Queries\ApprovedCompanyFacts::class)->for($owner->id, 'Acme'))->toBe(['Founded in 2019 as a remote-first company']);
+});

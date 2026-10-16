@@ -59,6 +59,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::post('jobs/{job}/save', [SavedJobController::class, 'toggle'])->whereNumber('job')->middleware('throttle:60,1')->name('jobs.save');
     Route::post('company-notes', [CompanyNoteController::class, 'store'])->middleware('throttle:60,1')->name('company-notes.store');
+    Route::post('company-notes/discover', [CompanyNoteController::class, 'discover'])->middleware('throttle:6,60')->name('company-notes.discover');
+    Route::post('company-notes/{note}/approve', [CompanyNoteController::class, 'approve'])->whereNumber('note')->name('company-notes.approve');
     Route::delete('company-notes/{note}', [CompanyNoteController::class, 'destroy'])->whereNumber('note')->name('company-notes.destroy');
     Route::get('insights', [InsightsController::class, 'index'])->name('insights.index');
     Route::get('applications', [ApplicationController::class, 'index'])->name('applications.index');
