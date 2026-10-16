@@ -69,7 +69,7 @@ final class FollowUpReminderNotification extends Notification implements ShouldQ
             ->markdown('mail.applications.follow-up', [
                 'company' => $job?->company,
                 'title' => $job?->title,
-                'date' => $application?->applied_at?->translatedFormat('j F Y'),
+                'date' => $application?->applied_at?->settings(['locale' => app()->getLocale()])->isoFormat('LL'),
                 'draft' => $application === null ? '' : app(FollowUpDraftWriter::class)->write($application),
                 'url' => route('applications.index'),
             ]);
