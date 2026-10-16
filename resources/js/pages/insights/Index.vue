@@ -66,6 +66,12 @@ type Funnel = {
     };
     by_source: Group[];
     by_category: Group[];
+    calibration: {
+        interview_score: number | null;
+        closed_score: number | null;
+        interview_count: number;
+        closed_count: number;
+    };
 };
 
 const props = defineProps<{
@@ -212,6 +218,41 @@ const stageMax = computed(() => Math.max(1, props.funnel.applied));
                         </p>
                     </template>
                     <p v-else>{{ trans('insights.funnel.timing_none') }}</p>
+                </div>
+
+                <div
+                    v-if="
+                        funnel.calibration.interview_score !== null &&
+                        funnel.calibration.closed_score !== null
+                    "
+                    class="space-y-1 rounded-lg border p-3 text-sm"
+                >
+                    <h3 class="font-medium">
+                        {{ trans('insights.funnel.calibration.title') }}
+                    </h3>
+                    <p>
+                        {{
+                            trans('insights.funnel.calibration.summary', {
+                                interview: String(
+                                    funnel.calibration.interview_score,
+                                ),
+                                closed: String(funnel.calibration.closed_score),
+                            })
+                        }}
+                    </p>
+                    <p class="text-xs text-muted-foreground">
+                        {{
+                            funnel.calibration.interview_count < 3 ||
+                            funnel.calibration.closed_count < 3
+                                ? trans('insights.funnel.calibration.few')
+                                : funnel.calibration.interview_score >=
+                                    funnel.calibration.closed_score
+                                  ? trans('insights.funnel.calibration.works')
+                                  : trans(
+                                        'insights.funnel.calibration.no_signal',
+                                    )
+                        }}
+                    </p>
                 </div>
 
                 <div class="space-y-2">
