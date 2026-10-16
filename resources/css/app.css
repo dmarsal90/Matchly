@@ -188,6 +188,12 @@
         letter-spacing: -0.015em;
         text-wrap: balance;
     }
+    html {
+        scroll-behavior: smooth;
+    }
+    :focus-visible {
+        outline-offset: 2px;
+    }
     ::selection {
         background: color-mix(in oklab, var(--highlight) 38%, transparent);
     }
