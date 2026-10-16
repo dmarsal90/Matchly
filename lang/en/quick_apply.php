@@ -138,6 +138,7 @@ return [
         'years' => '{1} I have :count year of professional experience.|[2,*] I have :count years of professional experience.',
         'headline' => 'About me: :headline.',
         'skills' => 'My experience with :skills matches what you are looking for in this role.',
+        'company_fact' => 'What draws me to :company in particular: :fact.',
         'and' => 'and',
         'close' => [
             'formal' => 'I would welcome the opportunity to discuss my application further. Thank you for your time and consideration.',

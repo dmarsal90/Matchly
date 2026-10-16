@@ -138,6 +138,7 @@ return [
         'years' => '{1} Cuento con :count año de experiencia profesional.|[2,*] Cuento con :count años de experiencia profesional.',
         'headline' => 'Mi perfil: :headline.',
         'skills' => 'Mi experiencia con :skills encaja con lo que buscan para este puesto.',
+        'company_fact' => 'De :company me atrae especialmente lo siguiente: :fact.',
         'and' => 'y',
         'close' => [
             'formal' => 'Quedo a su disposición para ampliar cualquier información y les agradezco su tiempo y consideración.',
