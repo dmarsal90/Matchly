@@ -2,10 +2,12 @@
 import EmptyState from '@/components/EmptyState.vue';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
-import { index as insightsIndex, report } from '@/routes/insights';
+import { NativeSelect } from '@/components/ui/native-select';
+import { Label } from '@/components/ui/label';
+import { index as insightsIndex, plan, report } from '@/routes/insights';
 import { index as skillsIndex } from '@/routes/skills';
 import { show as showJob } from '@/routes/jobs';
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, router } from '@inertiajs/vue3';
 import { Badge } from '@/components/ui/badge';
 import {
     ChartNoAxesColumn,
@@ -15,7 +17,7 @@ import {
     Lightbulb,
     Target,
 } from '@lucide/vue';
-import { trans, transChoice } from 'laravel-vue-i18n';
+import { getActiveLanguage, trans, transChoice } from 'laravel-vue-i18n';
 import { computed } from 'vue';
 
 type Course = {
@@ -87,7 +89,48 @@ const props = defineProps<{
     };
     funnel: Funnel;
     experiments: { key: string; params: Record<string, string> }[];
+    studyPlan: {
+        hours_per_week: number;
+        weeks: {
+            week: number;
+            starts_on: string;
+            total: number;
+            items: {
+                skill: string;
+                name: string;
+                hours: number;
+                course: { title: string; url: string } | null;
+                part: number;
+                parts: number;
+                continues: boolean;
+            }[];
+        }[];
+        continues: { name: string; hours: number }[];
+        left_out: string[];
+    };
 }>();
+
+const HOUR_CHOICES = [2, 5, 8, 10, 15, 20];
+function changeHours(value: string): void {
+    router.get(
+        insightsIndex.url(),
+        { hours: value },
+        {
+            only: ['studyPlan'],
+            preserveScroll: true,
+            preserveState: true,
+            replace: true,
+        },
+    );
+}
+const planHasItems = computed(() =>
+    props.studyPlan.weeks.some((week) => week.items.length > 0),
+);
+const planDate = (value: string): string =>
+    new Date(`${value}T00:00:00`).toLocaleDateString(getActiveLanguage(), {
+        day: 'numeric',
+        month: 'long',
+    });
 
 const stageLabel = (key: string): string =>
     trans(`insights.funnel.stages.${key}`);
@@ -716,6 +759,136 @@ const stageMax = computed(() => Math.max(1, props.funnel.applied));
                     </tbody>
                 </table>
             </template>
+        </section>
+
+        <section v-if="top" class="space-y-4" aria-labelledby="study-plan">
+            <div>
+                <h2 id="study-plan" class="text-lg font-semibold">
+                    {{ trans('insights.plan.title') }}
+                </h2>
+                <p class="text-sm text-muted-foreground">
+                    {{ trans('insights.plan.description') }}
+                </p>
+            </div>
+
+            <div class="flex flex-wrap items-end gap-3">
+                <div class="grid gap-1.5">
+                    <Label for="plan-hours" class="text-xs">{{
+                        trans('insights.plan.hours')
+                    }}</Label>
+                    <NativeSelect
+                        id="plan-hours"
+                        class="h-9 w-24 text-sm"
+                        :model-value="studyPlan.hours_per_week"
+                        @update:model-value="changeHours(String($event))"
+                    >
+                        <option
+                            v-for="choice in HOUR_CHOICES"
+                            :key="choice"
+                            :value="choice"
+                        >
+                            {{ choice }}
+                        </option>
+                    </NativeSelect>
+                </div>
+                <Button
+                    v-if="planHasItems"
+                    as-child
+                    variant="outline"
+                    size="sm"
+                >
+                    <a
+                        :href="
+                            plan.url({
+                                query: { hours: studyPlan.hours_per_week },
+                            })
+                        "
+                        download
+                    >
+                        <Download class="size-4" aria-hidden="true" />
+                        {{ trans('insights.plan.download') }}
+                    </a>
+                </Button>
+            </div>
+            <p v-if="planHasItems" class="text-xs text-muted-foreground">
+                {{ trans('insights.plan.download_hint') }}
+            </p>
+
+            <p v-if="!planHasItems" class="text-sm">
+                {{ trans('insights.plan.empty') }}
+            </p>
+            <ol v-else class="grid gap-3 sm:grid-cols-2">
+                <li
+                    v-for="week in studyPlan.weeks"
+                    :key="week.week"
+                    class="space-y-2 rounded-xl border p-4"
+                >
+                    <h3 class="font-medium">
+                        {{
+                            trans('insights.plan.week', {
+                                n: String(week.week),
+                                date: planDate(week.starts_on),
+                            })
+                        }}
+                    </h3>
+                    <ul v-if="week.items.length" class="space-y-1 text-sm">
+                        <li
+                            v-for="item in week.items"
+                            :key="item.skill + item.part"
+                        >
+                            <span class="font-medium">{{ item.name }}</span>
+                            · ≈ {{ item.hours }} h
+                            <span
+                                v-if="item.parts > 1"
+                                class="text-muted-foreground"
+                                >({{
+                                    trans('insights.plan.part', {
+                                        part: String(item.part),
+                                        parts: String(item.parts),
+                                    })
+                                }})</span
+                            >
+                            <a
+                                v-if="item.course"
+                                :href="item.course.url"
+                                target="_blank"
+                                rel="noopener noreferrer nofollow"
+                                class="ml-1 underline underline-offset-2"
+                                >{{ item.course.title }}</a
+                            >
+                        </li>
+                    </ul>
+                    <p class="text-xs text-muted-foreground">
+                        {{
+                            trans('insights.plan.total', {
+                                hours: String(week.total),
+                            })
+                        }}
+                    </p>
+                </li>
+            </ol>
+            <p
+                v-if="studyPlan.continues.length"
+                class="text-sm text-muted-foreground"
+            >
+                {{
+                    trans('insights.plan.continues', {
+                        skills: studyPlan.continues
+                            .map((item) => `${item.name} (≈ ${item.hours} h)`)
+                            .join(', '),
+                    })
+                }}
+            </p>
+            <p
+                v-if="studyPlan.left_out.length"
+                class="text-sm text-muted-foreground"
+            >
+                {{
+                    trans('insights.plan.left_out', {
+                        skills: studyPlan.left_out.join(', '),
+                    })
+                }}
+            </p>
         </section>
     </div>
 </template>

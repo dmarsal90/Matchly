@@ -12,7 +12,7 @@ use Carbon\CarbonImmutable;
 
 /**
  * Tells people when a company they follow has a new open job. It looks only at
- * listings Matchly itself has ingested since the last check: it does not visit
+ * listings the app itself has ingested since the last check: it does not visit
  * any company site. One notification per company and run, at most MAX_JOBS jobs.
  */
 final readonly class SendRadarNotifications
