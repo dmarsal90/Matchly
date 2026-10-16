@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace App\Modules\Applications\Http\Controllers;
 
+use App\Modules\Applications\Application\Actions\SetApplicationDeadline;
 use App\Modules\Applications\Application\Actions\UpdateApplication;
 use App\Modules\Applications\Application\Generators\FollowUpDraftWriter;
 use App\Modules\Applications\Domain\Enums\ApplicationEventType;
 use App\Modules\Applications\Domain\Enums\ApplicationStatus;
+use App\Modules\Applications\Http\Requests\SetApplicationDeadlineRequest;
 use App\Modules\Applications\Http\Requests\UpdateApplicationRequest;
 use App\Modules\Applications\Infrastructure\Models\Application;
 use App\Modules\Applications\Infrastructure\Models\ApplicationEvent;
@@ -50,6 +52,7 @@ final class ApplicationController
                 'notes' => $application->notes,
                 'status_changed_at' => $application->status_changed_at->toIso8601String(),
                 'applied_at' => $application->applied_at?->toIso8601String(),
+                'deadline_on' => $application->deadline_on?->toDateString(),
                 'job_open' => $application->job->status === JobStatus::Open,
                 'job' => (new JobListingResource($application->job))->resolve($request),
                 'events' => $application->events->map(fn (ApplicationEvent $event): array => [
@@ -77,6 +80,15 @@ final class ApplicationController
         Gate::authorize('update', $application);
 
         $update->handle($application, $request->status(), $request->notes());
+
+        return back();
+    }
+
+    public function deadline(SetApplicationDeadlineRequest $request, Application $application, SetApplicationDeadline $set): RedirectResponse
+    {
+        Gate::authorize('update', $application);
+
+        $set->handle($application, $request->deadline());
 
         return back();
     }

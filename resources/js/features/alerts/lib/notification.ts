@@ -8,6 +8,10 @@ export function notificationTitle(data: AppNotification['data']): string {
         return trans('follow_up.notification.title');
     }
 
+    if (data.type === 'deadline') {
+        return trans('deadline.notification.title');
+    }
+
     const key =
         data.frequency === 'immediate'
             ? 'alerts.notifications.job_alert'
@@ -26,11 +30,19 @@ export function notificationSummary(data: AppNotification['data']): string {
         });
     }
 
+    if (data.type === 'deadline') {
+        return transChoice('deadline.notification.body', data.days_left, {
+            company: data.company ?? '',
+            title: data.title ?? '',
+            days: String(data.days_left),
+        });
+    }
+
     return data.jobs.map((job) => job.title).join(' · ');
 }
 
 export function notificationHref(data: AppNotification['data']): string {
-    return data.type === 'follow_up'
+    return data.type === 'follow_up' || data.type === 'deadline'
         ? applicationsIndex.url()
         : jobsIndex.url({ query: data.filters });
 }

@@ -65,6 +65,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('insights', [InsightsController::class, 'index'])->name('insights.index');
     Route::get('applications', [ApplicationController::class, 'index'])->name('applications.index');
     Route::patch('applications/{application}', [ApplicationController::class, 'update'])->name('applications.update');
+    Route::patch('applications/{application}/deadline', [ApplicationController::class, 'deadline'])->whereNumber('application')->name('applications.deadline');
     Route::delete('applications/{application}', [ApplicationController::class, 'destroy'])->name('applications.destroy');
     Route::post('applications/{application}/events', [ApplicationEventController::class, 'store'])->name('applications.events.store');
     Route::get('applications/{application}/interview-prep', [InterviewPrepController::class, 'show'])->whereNumber('application')->name('applications.interview-prep.show');

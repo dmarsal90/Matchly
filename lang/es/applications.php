@@ -19,6 +19,11 @@ return [
         'no_response' => 'Sin respuesta',
     ],
     'move_to' => 'Mover a',
+    'deadline' => [
+        'label' => 'Fecha límite',
+        'none' => 'Sin fecha límite',
+        'clear' => 'Quitar',
+    ],
     'notes' => 'Notas privadas',
     'notes_placeholder' => 'Contacto, fechas, impresiones…',
     'save_notes' => 'Guardar notas',
