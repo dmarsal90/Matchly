@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import CompanyNotes from '@/features/applications/components/CompanyNotes.vue';
 import QuickApplyButton from '@/features/applications/components/QuickApplyButton.vue';
-import type { QuickApplyOptions } from '@/features/applications/types';
+import type {
+    CompanyNoteEntry,
+    QuickApplyOptions,
+} from '@/features/applications/types';
 import ApplyButton from '@/features/jobs/components/ApplyButton.vue';
 import JobRequirementsPanel from '@/features/jobs/components/JobRequirementsPanel.vue';
 import MatchBreakdown from '@/features/jobs/components/MatchBreakdown.vue';
@@ -22,6 +26,7 @@ const props = defineProps<{
     requirements: JobRequirements;
     match: JobMatch | null;
     quickApply: QuickApplyOptions | null;
+    companyNotes: CompanyNoteEntry[];
 }>();
 
 // Public page: guests see the requirements, signed-in users their score too.
@@ -178,6 +183,12 @@ const description = computed(() => `${props.job.title} · ${props.job.company}`)
         <MatchBreakdown :match="match" :signed-in="signedIn" />
 
         <JobRequirementsPanel :requirements="requirements" />
+
+        <CompanyNotes
+            v-if="signedIn"
+            :company="job.company"
+            :notes="companyNotes"
+        />
 
         <section class="space-y-3">
             <h2 class="text-lg font-semibold">

@@ -158,6 +158,23 @@ function remove(): void {
                     trans('quick_apply.package.prepared_at', { time: created })
                 }}
             </p>
+            <!-- Always reachable, whatever the state of the package. -->
+            <p class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                <Link
+                    :href="showJob({ job: job.id, slug: job.slug })"
+                    class="font-medium underline underline-offset-2"
+                    >{{ trans('quick_apply.package.view_job') }}</Link
+                >
+                <a
+                    v-if="job.is_open"
+                    :href="job.apply_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1 font-medium underline underline-offset-2"
+                    >{{ trans('quick_apply.package.open_original')
+                    }}<ExternalLink class="size-3.5" aria-hidden="true"
+                /></a>
+            </p>
         </header>
 
         <div

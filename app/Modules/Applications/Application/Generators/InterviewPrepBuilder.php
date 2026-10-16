@@ -7,6 +7,7 @@ namespace App\Modules\Applications\Application\Generators;
 use App\Modules\AI\Application\AiGateway;
 use App\Modules\AI\Domain\Enums\AiTask;
 use App\Modules\AI\Domain\Exceptions\AiUnavailable;
+use App\Modules\Applications\Application\Queries\ApprovedCompanyFacts;
 use App\Modules\Applications\Domain\Data\ResumeData;
 use App\Modules\Applications\Domain\Enums\ContentSource;
 use App\Modules\Identity\Infrastructure\Models\User;
@@ -33,7 +34,7 @@ final readonly class InterviewPrepBuilder
 {
     private const int MAX_SKILLS = 6;
 
-    public function __construct(private AiGateway $ai, private SkillCatalog $catalog) {}
+    public function __construct(private AiGateway $ai, private SkillCatalog $catalog, private ApprovedCompanyFacts $companyFacts) {}
 
     /**
      * @return Pack
@@ -45,7 +46,8 @@ final readonly class InterviewPrepBuilder
         $own = $this->ownSlugs($resume);
         $gapSkills = array_values(array_filter($skills, fn (array $skill): bool => ! in_array($skill['slug'], $own, true)));
 
-        $rules = $this->fromRules($resume, $job, $skills, $own, $gapSkills, $locale);
+        $facts = $this->companyFacts->for($user->id, $job->company);
+        $rules = $this->fromRules($resume, $job, $skills, $own, $gapSkills, $locale, $facts);
         $warnings = $resume->isEmpty() ? [['key' => 'empty_profile', 'params' => []]] : [];
 
         if (! $useAi) {
@@ -53,7 +55,7 @@ final readonly class InterviewPrepBuilder
         }
 
         try {
-            $response = $this->ai->run(AiTask::InterviewPrep, $this->input($resume, $job, $requirements, $language, $gapSkills), $user);
+            $response = $this->ai->run(AiTask::InterviewPrep, $this->input($resume, $job, $requirements, $language, $gapSkills, $facts), $user);
         } catch (AiUnavailable $exception) {
             return [...$rules, 'source' => ContentSource::Rules, 'aiError' => $exception->reason, 'warnings' => [...$warnings, ['key' => 'ai_unavailable', 'params' => ['reason' => $exception->reason]]]];
         }
@@ -106,9 +108,10 @@ final readonly class InterviewPrepBuilder
      * @param  list<array{slug: string, name: string, required: bool}>  $skills
      * @param  list<string>  $own
      * @param  list<array{slug: string, name: string, required: bool}>  $gapSkills
+     * @param  list<string>  $facts
      * @return array{questions: list<Question>, gaps: list<Gap>, ask: list<string>}
      */
-    private function fromRules(ResumeData $resume, JobListing $job, array $skills, array $own, array $gapSkills, string $locale): array
+    private function fromRules(ResumeData $resume, JobListing $job, array $skills, array $own, array $gapSkills, string $locale, array $facts): array
     {
         $t = fn (string $key, array $params = []): string => (string) __("interview_prep.template.{$key}", $params, $locale);
 
@@ -140,7 +143,12 @@ final readonly class InterviewPrepBuilder
         return [
             'questions' => $questions,
             'gaps' => $gaps,
-            'ask' => [$t('ask.team'), $t('ask.success', ['title' => $job->title]), $t('ask.process', ['company' => $job->company])],
+            'ask' => [
+                ...array_map(fn (string $fact): string => $t('ask.fact', ['fact' => $fact]), array_slice($facts, 0, 2)),
+                $t('ask.team'),
+                $t('ask.success', ['title' => $job->title]),
+                $t('ask.process', ['company' => $job->company]),
+            ],
         ];
     }
 
@@ -180,8 +188,9 @@ final readonly class InterviewPrepBuilder
 
     /**
      * @param  list<array{slug: string, name: string, required: bool}>  $gapSkills
+     * @param  list<string>  $facts
      */
-    private function input(ResumeData $resume, JobListing $job, JobRequirements $requirements, string $language, array $gapSkills): string
+    private function input(ResumeData $resume, JobListing $job, JobRequirements $requirements, string $language, array $gapSkills, array $facts): string
     {
         return (string) json_encode([
             'language' => Locale::getDisplayLanguage($language, 'en') ?: $language,
@@ -200,6 +209,7 @@ final readonly class InterviewPrepBuilder
             'job' => [
                 'title' => $job->title,
                 'company' => $job->company,
+                'company_facts' => $facts,
                 'requirements' => [
                     'required_skills' => array_column($requirements->requiredSkills, 'name'),
                     'nice_to_have_skills' => array_column($requirements->niceToHaveSkills, 'name'),

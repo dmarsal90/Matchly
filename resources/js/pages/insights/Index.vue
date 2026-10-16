@@ -4,10 +4,25 @@ import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
 import { index as insightsIndex } from '@/routes/insights';
 import { index as skillsIndex } from '@/routes/skills';
+import { show as showJob } from '@/routes/jobs';
 import { Head, Link } from '@inertiajs/vue3';
-import { ChartNoAxesColumn, Lightbulb, Target } from '@lucide/vue';
+import { Badge } from '@/components/ui/badge';
+import {
+    ChartNoAxesColumn,
+    ExternalLink,
+    Lightbulb,
+    Target,
+} from '@lucide/vue';
 import { trans, transChoice } from 'laravel-vue-i18n';
 import { computed } from 'vue';
+
+type Course = {
+    title: string;
+    provider: string;
+    url: string;
+    price: 'free' | 'paid';
+    curated: boolean;
+};
 
 type SkillGap = {
     skill: string;
@@ -16,6 +31,21 @@ type SkillGap = {
     required: number;
     tracked: number;
     only_gap: number;
+    courses: Course[];
+};
+
+type ClosestJob = {
+    id: number;
+    slug: string;
+    title: string;
+    company: string;
+    score: number;
+    missing: {
+        skill: string;
+        name: string;
+        required: boolean;
+        courses: Course[];
+    }[];
 };
 
 type Group = {
@@ -39,7 +69,12 @@ type Funnel = {
 };
 
 const props = defineProps<{
-    skillGaps: { jobs: number; tracked: number; skills: SkillGap[] };
+    skillGaps: {
+        jobs: number;
+        tracked: number;
+        skills: SkillGap[];
+        closest: ClosestJob[];
+    };
     funnel: Funnel;
 }>();
 
@@ -329,6 +364,105 @@ const stageMax = computed(() => Math.max(1, props.funnel.applied));
                     </div>
                 </div>
 
+                <div v-if="skillGaps.closest.length" class="space-y-3">
+                    <div>
+                        <h3 class="font-medium">
+                            {{ trans('insights.closest.title') }}
+                        </h3>
+                        <p class="text-sm text-muted-foreground">
+                            {{ trans('insights.closest.description') }}
+                        </p>
+                    </div>
+                    <article
+                        v-for="job in skillGaps.closest"
+                        :key="job.id"
+                        class="space-y-3 rounded-xl border p-4"
+                    >
+                        <div
+                            class="flex flex-wrap items-baseline justify-between gap-2"
+                        >
+                            <Link
+                                :href="showJob({ job: job.id, slug: job.slug })"
+                                class="font-medium hover:underline"
+                                >{{ job.title }} · {{ job.company }}</Link
+                            >
+                            <span class="text-sm text-muted-foreground">{{
+                                trans('insights.closest.score', {
+                                    score: String(job.score),
+                                })
+                            }}</span>
+                        </div>
+                        <p class="text-sm">
+                            {{
+                                transChoice(
+                                    'insights.closest.missing',
+                                    job.missing.length,
+                                    { count: String(job.missing.length) },
+                                )
+                            }}
+                        </p>
+                        <div
+                            v-for="skill in job.missing"
+                            :key="skill.skill"
+                            class="rounded-lg bg-muted/30 p-3"
+                        >
+                            <p
+                                class="flex items-center gap-2 text-sm font-medium"
+                            >
+                                {{ skill.name }}
+                                <Badge variant="outline">{{
+                                    skill.required
+                                        ? trans('insights.closest.required')
+                                        : trans('insights.closest.nice')
+                                }}</Badge>
+                            </p>
+                            <ul
+                                class="mt-2 space-y-1 text-sm"
+                                :aria-label="trans('insights.courses.list')"
+                            >
+                                <li
+                                    v-for="course in skill.courses"
+                                    :key="course.url"
+                                    class="flex flex-wrap items-center gap-2"
+                                >
+                                    <Badge
+                                        :variant="
+                                            course.price === 'free'
+                                                ? 'default'
+                                                : 'outline'
+                                        "
+                                        >{{
+                                            trans(
+                                                `insights.courses.${course.price}`,
+                                            )
+                                        }}</Badge
+                                    >
+                                    <a
+                                        :href="course.url"
+                                        target="_blank"
+                                        rel="noopener noreferrer nofollow"
+                                        class="inline-flex items-center gap-1 underline underline-offset-2"
+                                        >{{ course.title }}
+                                        <span class="text-muted-foreground"
+                                            >· {{ course.provider }}</span
+                                        >
+                                        <ExternalLink
+                                            class="size-3"
+                                            aria-hidden="true"
+                                    /></a>
+                                    <span
+                                        v-if="!course.curated"
+                                        class="text-xs text-muted-foreground"
+                                        >{{
+                                            trans('insights.courses.search')
+                                        }}</span
+                                    >
+                                </li>
+                            </ul>
+                        </div>
+                    </article>
+                </div>
+
                 <p class="text-xs text-muted-foreground">
                     {{
                         trans('insights.skill_gaps.basis', {
@@ -370,38 +504,110 @@ const stageMax = computed(() => Math.max(1, props.funnel.applied));
                         </tr>
                     </thead>
                     <tbody class="divide-y">
-                        <tr v-for="item in skillGaps.skills" :key="item.skill">
-                            <th
-                                scope="row"
-                                class="py-2 pr-3 text-left font-medium"
-                            >
-                                {{ item.name }}
-                            </th>
-                            <td class="py-2 pr-3">
-                                <div class="flex items-center gap-2">
-                                    <div
-                                        class="h-2 rounded-full bg-primary"
-                                        :style="{
-                                            width: `${(item.jobs / max) * 100}%`,
-                                            minWidth: '4px',
-                                        }"
-                                        aria-hidden="true"
-                                    />
-                                    <span class="tabular-nums">{{
-                                        item.jobs
-                                    }}</span>
-                                </div>
-                            </td>
-                            <td class="py-2 pr-3 text-right tabular-nums">
-                                {{ item.required }}
-                            </td>
-                            <td class="py-2 pr-3 text-right tabular-nums">
-                                {{ item.only_gap }}
-                            </td>
-                            <td class="py-2 text-right tabular-nums">
-                                {{ item.tracked }}
-                            </td>
-                        </tr>
+                        <template
+                            v-for="item in skillGaps.skills"
+                            :key="item.skill"
+                        >
+                            <tr>
+                                <th
+                                    scope="row"
+                                    class="py-2 pr-3 text-left font-medium"
+                                >
+                                    {{ item.name }}
+                                </th>
+                                <td class="py-2 pr-3">
+                                    <div class="flex items-center gap-2">
+                                        <div
+                                            class="h-2 rounded-full bg-primary"
+                                            :style="{
+                                                width: `${(item.jobs / max) * 100}%`,
+                                                minWidth: '4px',
+                                            }"
+                                            aria-hidden="true"
+                                        />
+                                        <span class="tabular-nums">{{
+                                            item.jobs
+                                        }}</span>
+                                    </div>
+                                </td>
+                                <td class="py-2 pr-3 text-right tabular-nums">
+                                    {{ item.required }}
+                                </td>
+                                <td class="py-2 pr-3 text-right tabular-nums">
+                                    {{ item.only_gap }}
+                                </td>
+                                <td class="py-2 text-right tabular-nums">
+                                    {{ item.tracked }}
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="5" class="pb-3">
+                                    <details>
+                                        <summary
+                                            class="cursor-pointer text-xs text-muted-foreground"
+                                        >
+                                            {{
+                                                trans(
+                                                    'insights.courses.learn',
+                                                    { skill: item.name },
+                                                )
+                                            }}
+                                        </summary>
+                                        <ul
+                                            class="mt-2 space-y-1 text-sm"
+                                            :aria-label="
+                                                trans('insights.courses.list')
+                                            "
+                                        >
+                                            <li
+                                                v-for="course in item.courses"
+                                                :key="course.url"
+                                                class="flex flex-wrap items-center gap-2"
+                                            >
+                                                <Badge
+                                                    :variant="
+                                                        course.price === 'free'
+                                                            ? 'default'
+                                                            : 'outline'
+                                                    "
+                                                    >{{
+                                                        trans(
+                                                            `insights.courses.${course.price}`,
+                                                        )
+                                                    }}</Badge
+                                                >
+                                                <a
+                                                    :href="course.url"
+                                                    target="_blank"
+                                                    rel="noopener noreferrer nofollow"
+                                                    class="inline-flex items-center gap-1 underline underline-offset-2"
+                                                    >{{ course.title }}
+                                                    <span
+                                                        class="text-muted-foreground"
+                                                        >·
+                                                        {{
+                                                            course.provider
+                                                        }}</span
+                                                    >
+                                                    <ExternalLink
+                                                        class="size-3"
+                                                        aria-hidden="true"
+                                                /></a>
+                                                <span
+                                                    v-if="!course.curated"
+                                                    class="text-xs text-muted-foreground"
+                                                    >{{
+                                                        trans(
+                                                            'insights.courses.search',
+                                                        )
+                                                    }}</span
+                                                >
+                                            </li>
+                                        </ul>
+                                    </details>
+                                </td>
+                            </tr>
+                        </template>
                     </tbody>
                 </table>
             </template>

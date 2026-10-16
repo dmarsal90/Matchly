@@ -48,6 +48,8 @@ return [
         'save' => 'Save changes',
         'saved' => 'Changes saved.',
         'approved' => 'Application approved.',
+        'view_job' => 'View the job',
+        'open_original' => 'Open the original posting',
         'open_job' => 'Go to the job',
         'mark_applied' => 'I have sent it',
         'marked_applied' => 'Marked as sent in My jobs.',
@@ -136,6 +138,7 @@ return [
         'years' => '{1} I have :count year of professional experience.|[2,*] I have :count years of professional experience.',
         'headline' => 'About me: :headline.',
         'skills' => 'My experience with :skills matches what you are looking for in this role.',
+        'company_fact' => 'What draws me to :company in particular: :fact.',
         'and' => 'and',
         'close' => [
             'formal' => 'I would welcome the opportunity to discuss my application further. Thank you for your time and consideration.',

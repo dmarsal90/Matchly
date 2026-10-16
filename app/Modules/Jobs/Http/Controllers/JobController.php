@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace App\Modules\Jobs\Http\Controllers;
 
 use App\Modules\AI\Application\AiGateway;
+use App\Modules\Applications\Domain\Services\CompanyKey;
 use App\Modules\Applications\Infrastructure\Models\ApplicationPackage;
+use App\Modules\Applications\Infrastructure\Models\CompanyNote;
 use App\Modules\Identity\Domain\Enums\ConsentPurpose;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Jobs\Application\Actions\RecordJobView;
@@ -101,6 +103,13 @@ final class JobController
             'isOpen' => $job->status === JobStatus::Open,
             'requirements' => $details['requirements'],
             'match' => $details['match'],
+            'companyNotes' => $user === null ? [] : CompanyNote::query()
+                ->where('user_id', $user->id)
+                ->where('company_key', CompanyKey::from($job->company))
+                ->orderBy('id')
+                ->get()
+                ->map(fn (CompanyNote $note): array => ['id' => $note->id, 'fact' => $note->fact, 'source_url' => $note->source_url, 'origin' => $note->origin->value, 'approved' => $note->approved])
+                ->all(),
             'quickApply' => $user !== null ? [
                 ...$this->quickApplyOptions($user, $ai),
                 'packages' => ApplicationPackage::query()->where('user_id', $user->id)->where('job_listing_id', $job->id)->count(),
