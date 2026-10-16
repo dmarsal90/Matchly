@@ -15,8 +15,6 @@ use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Jobs\Domain\Enums\JobStatus;
 use App\Modules\Jobs\Infrastructure\Models\JobListing;
 use App\Modules\Matching\Application\Actions\ResolveJobRequirements;
-use App\Modules\Profiles\Domain\Enums\ImportStatus;
-use App\Modules\Profiles\Domain\Enums\SkillSource;
 use Illuminate\Http\Client\Request;
 use Illuminate\Support\Facades\Http;
 use Inertia\Testing\AssertableInertia as Assert;
@@ -25,55 +23,6 @@ use Inertia\Testing\AssertableInertia as Assert;
 function withoutReview(array $warnings): array
 {
     return array_values(array_filter($warnings, fn (array $warning): bool => ! in_array($warning['key'], DraftReviewer::KEYS, true)));
-}
-
-function candidateWithProfile(): User
-{
-    $user = User::factory()->create(['name' => 'Ana García']);
-    $user->profile()->create([
-        'headline' => 'Backend engineer',
-        'phone' => '+34 600 000 000',
-        'city' => 'Valencia',
-        'country' => 'ES',
-        'github_username' => 'ana',
-        'years_experience' => 6,
-        'languages' => [['code' => 'es', 'level' => 'native']],
-        'salary_min' => 60000,
-        'salary_currency' => 'EUR',
-        'salary_period' => 'year',
-    ]);
-    $user->profileImports()->create([
-        'source' => SkillSource::Linkedin,
-        'status' => ImportStatus::Confirmed,
-        'confirmed_at' => now(),
-        'payload' => [
-            'profile' => ['summary' => 'Backend developer focused on APIs.'],
-            'positions' => [[
-                'title' => 'Senior Backend Engineer', 'company' => 'Acme', 'location' => null,
-                'description' => "Mentored two junior developers.\nBuilt REST APIs with Laravel and PostgreSQL.",
-                'started_on' => '2021-03', 'finished_on' => null,
-            ]],
-            'education' => [['school' => 'Universitat de València', 'degree' => 'Computer Engineering', 'started_on' => '2012', 'finished_on' => '2016']],
-            'certifications' => [],
-            'projects' => [],
-        ],
-    ]);
-    foreach (['Figma' => 'figma', 'PHP' => 'php', 'Laravel' => 'laravel', 'PostgreSQL' => 'postgresql'] as $name => $slug) {
-        $user->skills()->create(['source' => SkillSource::Github, 'skill' => $slug, 'name' => $name, 'level' => 4]);
-    }
-
-    return $user;
-}
-
-function spanishLaravelJob(array $attributes = []): JobListing
-{
-    return JobListing::factory()->create([
-        'title' => 'Desarrollador Backend Senior',
-        'company' => 'Globex',
-        'description' => '<p>Buscamos una persona con experiencia en Laravel y PostgreSQL para el equipo de la empresa. Valoramos Kubernetes.</p>',
-        'tags' => [],
-        ...$attributes,
-    ]);
 }
 
 function prepare(User $user, JobListing $job, array $payload = []): ApplicationPackage
