@@ -1,0 +1,14 @@
+{
+    "manifest_version": 3,
+    "name": "Matchly",
+    "version": "1.0.0",
+    "description": "Fills job application forms with the applications you approved in Matchly. It never submits anything.",
+    "action": { "default_popup": "popup.html", "default_title": "Matchly" },
+    "permissions": ["activeTab", "scripting", "storage"],
+    "optional_host_permissions": [
+        "https://*/*",
+        "http://localhost/*",
+        "http://127.0.0.1/*"
+    ],
+    "minimum_chrome_version": "110"
+}

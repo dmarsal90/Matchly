@@ -3,6 +3,7 @@ import { index as applications } from '@/routes/applications';
 import { edit as editCareer } from '@/routes/career';
 import { index as insights } from '@/routes/insights';
 import { index as jobs } from '@/routes/jobs';
+import { index as market } from '@/routes/market';
 import { index as skills } from '@/routes/skills';
 import type { NavItem } from '@/types';
 import { usePage } from '@inertiajs/vue3';
@@ -13,6 +14,7 @@ import {
     Shield,
     Sparkles,
     Star,
+    TrendingUp,
     UserRound,
 } from '@lucide/vue';
 import { trans } from 'laravel-vue-i18n';
@@ -34,6 +36,7 @@ export function useNavigation(): {
             href: insights(),
             icon: ChartNoAxesColumn,
         },
+        { title: trans('nav.market'), href: market(), icon: TrendingUp },
         { title: trans('nav.alerts'), href: alerts(), icon: BellRing },
         { title: trans('nav.profile'), href: editCareer(), icon: UserRound },
         { title: trans('nav.skills'), href: skills(), icon: Sparkles },

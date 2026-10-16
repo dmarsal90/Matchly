@@ -336,3 +336,72 @@ it('reads the CV PDF back like an ATS and reports nothing lost for a complete CV
 
     expect(array_column($package->warnings, 'key'))->not->toContain('ats_unreadable', 'ats_missing');
 });
+
+describe('browser extension', function (): void {
+    function extensionToken(User $user): string
+    {
+        test()->actingAs($user)->post(route('extension.store'), ['name' => 'Laptop'])->assertRedirect()->assertSessionHasNoErrors();
+        $token = session('extension_token');
+        auth()->logout();
+        test()->flushSession();
+
+        return $token;
+    }
+
+    it('shows a new token once and keeps only its hash', function (): void {
+        $user = candidateWithProfile();
+
+        $this->actingAs($user)->post(route('extension.store'), ['name' => 'Laptop']);
+        $this->get(route('extension.edit'))->assertInertia(fn ($page) => $page->where('newToken', fn (string $token): bool => str_starts_with($token, 'mtx_'))->has('tokens', 1));
+        $this->get(route('extension.edit'))->assertInertia(fn ($page) => $page->where('newToken', null));
+
+        expect(DB::table('extension_tokens')->value('token_hash'))->toHaveLength(64)->not->toStartWith('mtx_');
+        $this->post(route('extension.store'), ['name' => ''])->assertSessionHasErrors('name');
+        foreach (range(2, 5) as $i) {
+            $this->post(route('extension.store'), ['name' => "T{$i}"]);
+        }
+        $this->post(route('extension.store'), ['name' => 'Sixth'])->assertSessionHasErrors('name');
+    });
+
+    it('lists only approved applications and gives their form fields and CV', function (): void {
+        $user = candidateWithProfile();
+        $approved = prepare($user, spanishLaravelJob());
+        $this->post(route('applications.packages.approve', $approved));
+        $draft = prepare($user, spanishLaravelJob(['external_id' => 'second', 'title' => 'Another job']));
+        $token = extensionToken($user);
+        $headers = ['Authorization' => "Bearer {$token}"];
+
+        $list = $this->getJson('/api/extension/packages', $headers)->assertOk()->json('packages');
+        expect(array_column($list, 'id'))->toBe([$approved->id]);
+
+        $fields = $this->getJson("/api/extension/packages/{$approved->id}/fields", $headers)->assertOk()->json('fields');
+        expect($fields)->toHaveKeys(['full_name', 'email', 'cover_letter']);
+
+        $this->get("/api/extension/packages/{$approved->id}/resume.pdf?template=modern", $headers)->assertOk()->assertHeader('Content-Type', 'application/pdf');
+        // A draft is never exposed.
+        $this->getJson("/api/extension/packages/{$draft->id}/fields", $headers)->assertNotFound();
+        expect(DB::table('extension_tokens')->value('last_used_at'))->not->toBeNull();
+    });
+
+    it('rejects missing, wrong and revoked tokens, and other people\'s packages', function (): void {
+        $owner = candidateWithProfile();
+        $package = prepare($owner, spanishLaravelJob());
+        $this->post(route('applications.packages.approve', $package));
+        $ownerToken = extensionToken($owner);
+
+        $this->getJson('/api/extension/packages')->assertUnauthorized();
+        $this->getJson('/api/extension/packages', ['Authorization' => 'Bearer mtx_nope'])->assertUnauthorized();
+        $this->getJson('/api/extension/packages', ['Authorization' => 'Bearer notmine'])->assertUnauthorized();
+
+        $other = User::factory()->create();
+        $otherToken = extensionToken($other);
+        $this->getJson("/api/extension/packages/{$package->id}/fields", ['Authorization' => "Bearer {$otherToken}"])->assertNotFound();
+
+        $this->actingAs($owner)->delete(route('extension.destroy', DB::table('extension_tokens')->where('user_id', $owner->id)->value('id')))->assertRedirect();
+        auth()->logout();
+        $this->getJson('/api/extension/packages', ['Authorization' => "Bearer {$ownerToken}"])->assertUnauthorized();
+
+        $tokenId = DB::table('extension_tokens')->where('user_id', $other->id)->value('id');
+        $this->actingAs($owner)->delete(route('extension.destroy', $tokenId))->assertForbidden();
+    });
+});

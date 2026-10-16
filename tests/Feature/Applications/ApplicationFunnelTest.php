@@ -120,3 +120,106 @@ it('downloads the insights as one self-contained HTML file', function (): void {
     auth()->logout();
     $this->get('/insights/report')->assertRedirect();
 });
+
+it('shows what to try next on the page and in the offline report', function (): void {
+    $user = User::factory()->create(['locale' => 'es']);
+    trackedAt($user, ApplicationStatus::Applied, 3);
+
+    $this->actingAs($user)->get('/insights')->assertInertia(fn (Assert $page) => $page->where('experiments.0.key', 'more_volume'));
+    expect($this->get('/insights/report')->getContent())->toContain('Qué probar a continuación')->toContain('Llevas 1 candidaturas');
+});
+
+it('plans the study hours of the missing skills and offers them as a calendar', function (): void {
+    $user = User::factory()->create(['locale' => 'es']);
+    $job = JobListing::factory()->create();
+    App\Modules\Matching\Infrastructure\Models\JobMatch::query()->create(['user_id' => $user->id, 'job_listing_id' => $job->id, 'score' => 80, 'level' => 'medium', 'eligible' => true, 'result' => ['missing_skills' => [['skill' => 'kubernetes', 'name' => 'Kubernetes', 'required' => true]]], 'computed_at' => now()]);
+
+    $this->actingAs($user)->get('/insights?hours=10')->assertInertia(fn (Assert $page) => $page
+        ->where('studyPlan.hours_per_week', 10)
+        ->where('studyPlan.weeks.0.items.0.skill', 'kubernetes'));
+    $this->get('/insights?hours=999')->assertInertia(fn (Assert $page) => $page->where('studyPlan.hours_per_week', 40));
+
+    $response = $this->get('/insights/plan.ics?hours=10')->assertOk();
+    expect($response->headers->get('Content-Type'))->toContain('text/calendar')
+        ->and($response->headers->get('Content-Disposition'))->toContain('-study-plan.ics')
+        ->and($response->getContent())->toContain('BEGIN:VEVENT')->toContain('SUMMARY:Estudiar Kubernetes');
+
+    auth()->logout();
+    $this->get('/insights/plan.ics')->assertRedirect();
+});
+
+describe('sharing the report', function (): void {
+    function sharedUrl(User $user, array $payload = ['days' => 7]): string
+    {
+        test()->actingAs($user)->post(route('insights.share'), $payload)->assertRedirect()->assertSessionHasNoErrors();
+
+        return (string) session('share_url');
+    }
+
+    it('serves a frozen copy to anyone with the link, without the name unless asked', function (): void {
+        $user = User::factory()->create(['name' => 'Ana Ruiz', 'locale' => 'es']);
+        trackedAt($user, ApplicationStatus::Interview, 20);
+
+        $private = sharedUrl($user);
+        $named = sharedUrl($user, ['days' => 1, 'with_name' => true]);
+        auth()->logout();
+        $this->flushSession();
+
+        $response = $this->get($private)->assertOk();
+        expect($response->getContent())->toContain('Mi informe de búsqueda')->not->toContain('Ana Ruiz')
+            ->and($response->headers->get('X-Robots-Tag'))->toContain('noindex')
+            ->and($this->get($named)->getContent())->toContain('Ana Ruiz');
+
+        $stored = DB::table('shared_reports')->first();
+        expect($stored->html)->not->toContain('Mi informe')->and(strlen($stored->token_hash))->toBe(64);
+        expect(DB::table('shared_reports')->where('token_hash', 'LIKE', '%'.basename($private).'%')->exists())->toBeFalse();
+    });
+
+    it('stops serving on expiry or revocation and never confirms what exists', function (): void {
+        $user = User::factory()->create();
+        $url = sharedUrl($user);
+        auth()->logout();
+        $this->flushSession();
+
+        $this->get($url)->assertOk();
+        expect(DB::table('shared_reports')->value('views'))->toBe(1);
+        $this->get('/shared/'.str_repeat('a', 48))->assertNotFound();
+        $this->get('/shared/short')->assertNotFound();
+
+        $this->travel(8)->days();
+        $this->get($url)->assertNotFound();
+        $this->travelBack();
+
+        $other = sharedUrl($user);
+        auth()->logout();
+        $this->flushSession();
+        $id = DB::table('shared_reports')->orderByDesc('id')->value('id');
+        $this->actingAs($user)->delete(route('insights.share.destroy', $id))->assertRedirect();
+        auth()->logout();
+        $this->flushSession();
+        $this->get($other)->assertNotFound();
+    });
+
+    it('limits lifetimes and active links, and keeps revocation to the owner', function (): void {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post(route('insights.share'), ['days' => 365])->assertSessionHasErrors('days');
+        foreach (range(1, 5) as $_) {
+            $this->post(route('insights.share'), ['days' => 7])->assertSessionHasNoErrors();
+        }
+        $this->post(route('insights.share'), ['days' => 7])->assertSessionHasErrors('days');
+
+        $this->get('/insights')->assertInertia(fn (Assert $page) => $page->has('shares', 5));
+        $id = DB::table('shared_reports')->value('id');
+        $this->actingAs(User::factory()->create())->delete(route('insights.share.destroy', $id))->assertForbidden();
+    });
+
+    it('exports the shares\' dates, never their content', function (): void {
+        $user = User::factory()->create();
+        sharedUrl($user);
+
+        $export = json_encode(app(App\Modules\Applications\Application\Privacy\ApplicationDataContributor::class)->export($user->id)->data);
+
+        expect($export)->toContain('shared_reports')->toContain('expires_at')->not->toContain('<html');
+    });
+});

@@ -12,6 +12,10 @@ export function notificationTitle(data: AppNotification['data']): string {
         return trans('deadline.notification.title');
     }
 
+    if (data.type === 'radar') {
+        return trans('radar.notification.title');
+    }
+
     const key =
         data.frequency === 'immediate'
             ? 'alerts.notifications.job_alert'
@@ -38,10 +42,22 @@ export function notificationSummary(data: AppNotification['data']): string {
         });
     }
 
+    if (data.type === 'radar') {
+        return transChoice('radar.notification.body', data.count, {
+            company: data.company,
+            count: String(data.count),
+            titles: data.jobs.map((job) => job.title).join(' · '),
+        });
+    }
+
     return data.jobs.map((job) => job.title).join(' · ');
 }
 
 export function notificationHref(data: AppNotification['data']): string {
+    if (data.type === 'radar') {
+        return jobsIndex.url({ query: { q: data.company } });
+    }
+
     return data.type === 'follow_up' || data.type === 'deadline'
         ? applicationsIndex.url()
         : jobsIndex.url({ query: data.filters });
