@@ -36,9 +36,18 @@ export type FollowUpData = {
     days: number;
 };
 
+export type DeadlineData = {
+    type: 'deadline';
+    application_id: number;
+    title: string | null;
+    company: string | null;
+    deadline: string;
+    days_left: number;
+};
+
 export type AppNotification = {
     id: string;
-    data: JobAlertData | FollowUpData;
+    data: JobAlertData | FollowUpData | DeadlineData;
     read_at: string | null;
     created_at: string | null;
 };

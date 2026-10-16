@@ -24,6 +24,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property CarbonImmutable $status_changed_at
  * @property CarbonImmutable|null $applied_at
  * @property CarbonImmutable|null $follow_up_reminded_at
+ * @property CarbonImmutable|null $deadline_on
+ * @property CarbonImmutable|null $deadline_reminded_at
  * @property CarbonImmutable $created_at
  * @property-read JobListing $job
  * @property-read \Illuminate\Database\Eloquent\Collection<int, ApplicationEvent> $events
@@ -79,6 +81,8 @@ final class Application extends Model
             'status_changed_at' => 'immutable_datetime',
             'applied_at' => 'immutable_datetime',
             'follow_up_reminded_at' => 'immutable_datetime',
+            'deadline_on' => 'immutable_date:Y-m-d',
+            'deadline_reminded_at' => 'immutable_datetime',
         ];
     }
 }
