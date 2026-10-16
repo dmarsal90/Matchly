@@ -9,8 +9,8 @@
         "types:check": "vue-tsc --noEmit",
         "lint": "eslint . --max-warnings=0",
         "lint:fix": "eslint . --fix",
-        "format": "prettier --write resources/ tests/e2e/ playwright.config.ts",
-        "format:check": "prettier --check resources/ tests/e2e/ playwright.config.ts",
+        "format": "prettier --write resources/ extension/ tests/e2e/ playwright.config.ts",
+        "format:check": "prettier --check resources/ extension/ tests/e2e/ playwright.config.ts",
         "test": "vitest run",
         "test:watch": "vitest",
         "test:e2e": "playwright test"

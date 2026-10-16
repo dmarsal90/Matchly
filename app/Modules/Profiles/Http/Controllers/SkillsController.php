@@ -43,6 +43,7 @@ final class SkillsController
                 'suggested_username' => $profile->github_username ?? $github?->nickname,
                 'oauth_available' => in_array(OAuthProvider::Github->value, OAuthController::enabledProviders(), true),
             ],
+            'portfolio' => ['suggested_url' => $profile->portfolio_url],
             'cv' => [
                 'ready' => $user->cvDocuments()->where('is_primary', true)->where('status', CvStatus::Extracted)->exists(),
             ],

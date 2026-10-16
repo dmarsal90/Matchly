@@ -115,3 +115,48 @@ it('e-mails the reminder with the draft only to people who consented', function 
         ->and($html)->toContain('Me presenté')->toContain('Ana Ruiz')->toContain('nunca contactamos')
         ->and($notification->toBroadcast($user)->data['type'])->toBe('follow_up');
 });
+
+it('offers a thank-you note after an interview round and a firmer second follow-up', function (): void {
+    $user = User::factory()->create(['name' => 'Ana Ruiz', 'locale' => 'es']);
+    $application = appliedApplication($user, 12);
+    $application->events()->create(['type' => ApplicationEventType::FollowUp, 'occurred_at' => now()->subDays(4)]);
+    $application->load('job', 'user', 'events');
+
+    $second = app(FollowUpDraftWriter::class)->write($application);
+    $thanks = app(FollowUpDraftWriter::class)->thanks($application);
+
+    expect($second)->toContain('Les escribí el')->toContain($application->job->company)
+        ->and($thanks)->toContain('Gracias por dedicarme su tiempo')->toContain('Ana Ruiz');
+
+    $interviewing = appliedApplication($user, 20, ApplicationStatus::Interview);
+    $this->actingAs($user)->post(route('applications.events.store', $interviewing), ['type' => 'interview', 'occurred_at' => now()->toDateString()]);
+
+    $props = $this->actingAs($user)->get('/applications')->viewData('page')['props']['applications'];
+    $byId = collect($props)->keyBy('id');
+    expect($byId[$interviewing->id]['thank_you_draft'])->toBeString()->and($byId[$application->id]['thank_you_draft'])->toBeNull();
+});
+
+it('reminds a second time after a follow-up that got no answer, and never a third', function (): void {
+    Notification::fake();
+    $user = User::factory()->create();
+    $application = appliedApplication($user, 30);
+
+    expect(app(SendFollowUpReminders::class)->handle())->toBe(1);
+
+    // Followed up 3 days ago: still waiting for the answer to that one.
+    $application->events()->create(['type' => ApplicationEventType::FollowUp, 'occurred_at' => now()->subDays(3)]);
+    expect(app(SendFollowUpReminders::class)->handle())->toBe(0);
+
+    // Followed up 11 days ago and nothing since: the second reminder.
+    $application->events()->delete();
+    $application->events()->create(['type' => ApplicationEventType::FollowUp, 'occurred_at' => now()->subDays(11)]);
+    // (the first reminder went out before that follow-up, 20 days ago)
+    $application->forceFill(['follow_up_reminded_at' => now()->subDays(20)])->save();
+    expect(app(SendFollowUpReminders::class)->handle())->toBe(1)
+        ->and(app(SendFollowUpReminders::class)->handle())->toBe(0);
+
+    // A second follow-up closes the sequence.
+    $application->events()->create(['type' => ApplicationEventType::FollowUp, 'occurred_at' => now()->subDays(11)]);
+    $application->forceFill(['follow_up_reminded_at' => now()->subDays(30)])->save();
+    expect(app(SendFollowUpReminders::class)->handle())->toBe(0);
+});

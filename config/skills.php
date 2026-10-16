@@ -30,6 +30,8 @@ return [
         'cv' => 0.7,
         'linkedin' => 0.75,
         'github' => 0.9,
+        // Their own site says it, but anyone can write anything on a page.
+        'portfolio' => 0.6,
     ],
 
     'catalog' => [

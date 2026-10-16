@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Label } from '@/components/ui/label';
+import { NativeSelect } from '@/components/ui/native-select';
 import { Spinner } from '@/components/ui/spinner';
 import ContactCard from '@/features/applications/components/ContactCard.vue';
 import CoverLetterEditor from '@/features/applications/components/CoverLetterEditor.vue';
@@ -33,7 +35,7 @@ import {
     Trash2,
 } from '@lucide/vue';
 import { getActiveLanguage, trans } from 'laravel-vue-i18n';
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 
 const props = defineProps<{
     package: ApplicationPackage;
@@ -85,6 +87,9 @@ const { start, stop } = usePoll(
     { autoStart: false },
 );
 watch(generating, (value) => (value ? start() : stop()), { immediate: true });
+
+const templates = ['classic', 'modern', 'compact'] as const;
+const template = ref<(typeof templates)[number]>('classic');
 
 const approved = computed(() => props.package.status === 'approved');
 const editable = computed(() =>
@@ -157,6 +162,23 @@ function remove(): void {
                 {{
                     trans('quick_apply.package.prepared_at', { time: created })
                 }}
+            </p>
+            <!-- Always reachable, whatever the state of the package. -->
+            <p class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+                <Link
+                    :href="showJob({ job: job.id, slug: job.slug })"
+                    class="font-medium underline underline-offset-2"
+                    >{{ trans('quick_apply.package.view_job') }}</Link
+                >
+                <a
+                    v-if="job.is_open"
+                    :href="job.apply_url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="inline-flex items-center gap-1 font-medium underline underline-offset-2"
+                    >{{ trans('quick_apply.package.open_original')
+                    }}<ExternalLink class="size-3.5" aria-hidden="true"
+                /></a>
             </p>
         </header>
 
@@ -245,8 +267,31 @@ function remove(): void {
                 >
                     {{ trans('quick_apply.package.save') }}
                 </Button>
+                <div v-if="approved" class="flex items-center gap-2">
+                    <Label for="resume-template" class="text-sm">{{
+                        trans('quick_apply.template.label')
+                    }}</Label>
+                    <NativeSelect
+                        id="resume-template"
+                        v-model="template"
+                        class="h-9 w-auto text-sm"
+                    >
+                        <option
+                            v-for="option in templates"
+                            :key="option"
+                            :value="option"
+                        >
+                            {{ trans(`quick_apply.template.${option}`) }}
+                        </option>
+                    </NativeSelect>
+                </div>
                 <Button v-if="approved" variant="outline" as-child>
-                    <a :href="resumePdf.url(package.id)"
+                    <a
+                        :href="
+                            resumePdf.url(package.id, {
+                                query: { template },
+                            })
+                        "
                         ><FileDown class="size-4" aria-hidden="true" />{{
                             trans('quick_apply.download_resume')
                         }}</a

@@ -40,5 +40,36 @@ export default defineConfigWithVueTs(
             'no-console': ['error', { allow: ['warn', 'error'] }],
         },
     },
+    {
+        // The browser extension is plain scripts, not part of the Vue app.
+        files: ['extension/**/*.js'],
+        languageOptions: {
+            sourceType: 'script',
+            globals: {
+                globalThis: 'readonly',
+                document: 'readonly',
+                navigator: 'readonly',
+                window: 'readonly',
+                fetch: 'readonly',
+                URL: 'readonly',
+                File: 'readonly',
+                Event: 'readonly',
+                DataTransfer: 'readonly',
+                HTMLTextAreaElement: 'readonly',
+                HTMLInputElement: 'readonly',
+                Uint8Array: 'readonly',
+                atob: 'readonly',
+                btoa: 'readonly',
+                chrome: 'readonly',
+            },
+        },
+    },
+    {
+        files: ['extension/**/*.test.js'],
+        languageOptions: {
+            sourceType: 'module',
+            globals: { HTMLElement: 'readonly', process: 'readonly' },
+        },
+    },
     prettier,
 );

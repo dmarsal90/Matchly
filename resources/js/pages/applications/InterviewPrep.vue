@@ -6,12 +6,14 @@ import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
+import InterviewPractice from '@/features/applications/components/InterviewPractice.vue';
 import type {
     InterviewPrepData,
     PackageWarning,
+    PracticeAnswer,
 } from '@/features/applications/types';
 import { index as applicationsIndex } from '@/routes/applications';
-import { store } from '@/routes/applications/interview-prep';
+import { mock, store } from '@/routes/applications/interview-prep';
 import { show as showJob } from '@/routes/jobs';
 import { Head, Link, useForm, usePoll } from '@inertiajs/vue3';
 import { CircleAlert, Sparkles } from '@lucide/vue';
@@ -22,6 +24,7 @@ const props = defineProps<{
     application: { id: number; status: string };
     job: { id: number; slug: string; title: string; company: string };
     prep: InterviewPrepData | null;
+    answers: Record<string, PracticeAnswer>;
     options: { ai_available: boolean; ai_consented: boolean };
 }>();
 
@@ -169,9 +172,16 @@ const STAR = ['situation', 'task', 'action', 'result'] as const;
             </ul>
 
             <section class="space-y-3" aria-labelledby="prep-questions">
-                <h2 id="prep-questions" class="text-lg font-semibold">
-                    {{ trans('interview_prep.questions.title') }}
-                </h2>
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <h2 id="prep-questions" class="text-lg font-semibold">
+                        {{ trans('interview_prep.questions.title') }}
+                    </h2>
+                    <Button variant="outline" size="sm" as-child>
+                        <Link :href="mock({ application: application.id })">{{
+                            trans('interview_prep.mock.open')
+                        }}</Link>
+                    </Button>
+                </div>
                 <article
                     v-for="(item, index) in prep.content.questions"
                     :key="index"
@@ -216,6 +226,13 @@ const STAR = ['situation', 'task', 'action', 'result'] as const;
                             </div>
                         </dl>
                     </details>
+                    <InterviewPractice
+                        :application-id="application.id"
+                        :question-key="item.key"
+                        :saved="answers[item.key]"
+                        :ai-available="options.ai_available"
+                        :ai-consented="options.ai_consented"
+                    />
                 </article>
             </section>
 

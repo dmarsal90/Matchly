@@ -1,18 +1,26 @@
 <script setup lang="ts">
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import CompanyNotes from '@/features/applications/components/CompanyNotes.vue';
 import QuickApplyButton from '@/features/applications/components/QuickApplyButton.vue';
-import type { QuickApplyOptions } from '@/features/applications/types';
+import type {
+    CompanyNoteEntry,
+    QuickApplyOptions,
+} from '@/features/applications/types';
 import ApplyButton from '@/features/jobs/components/ApplyButton.vue';
 import JobRequirementsPanel from '@/features/jobs/components/JobRequirementsPanel.vue';
 import MatchBreakdown from '@/features/jobs/components/MatchBreakdown.vue';
+import SalaryBenchmark, {
+    type SalaryBenchmark as Benchmark,
+} from '@/features/jobs/components/SalaryBenchmark.vue';
 import SalaryLabel from '@/features/jobs/components/SalaryLabel.vue';
 import SaveJobButton from '@/features/jobs/components/SaveJobButton.vue';
 import { relativeTime } from '@/features/jobs/lib/format';
 import type { Job, JobMatch, JobRequirements } from '@/features/jobs/types';
 import { index } from '@/routes/jobs';
-import { Head, Link, usePage } from '@inertiajs/vue3';
-import { AlertTriangle, ArrowLeft } from '@lucide/vue';
+import { destroy as unfollow, store as follow } from '@/routes/radar';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
+import { AlertTriangle, ArrowLeft, Radar } from '@lucide/vue';
 import { getActiveLanguage, trans } from 'laravel-vue-i18n';
 import { computed } from 'vue';
 
@@ -21,11 +29,28 @@ const props = defineProps<{
     isOpen: boolean;
     requirements: JobRequirements;
     match: JobMatch | null;
+    salaryBenchmark: Benchmark | null;
+    followedCompanyId: number | null;
     quickApply: QuickApplyOptions | null;
+    companyNotes: CompanyNoteEntry[];
 }>();
 
 // Public page: guests see the requirements, signed-in users their score too.
 const signedIn = computed(() => usePage().props.auth.user !== null);
+
+function toggleFollow(): void {
+    if (props.followedCompanyId !== null) {
+        router.delete(unfollow.url(props.followedCompanyId), {
+            preserveScroll: true,
+        });
+    } else {
+        router.post(
+            follow.url(),
+            { company: props.job.company },
+            { preserveScroll: true },
+        );
+    }
+}
 
 const posted = computed(() =>
     relativeTime(props.job.posted_at, getActiveLanguage()),
@@ -89,7 +114,25 @@ const description = computed(() => `${props.job.title} · ${props.job.company}`)
                 <h1 class="text-2xl font-semibold tracking-tight text-balance">
                     {{ job.title }}
                 </h1>
-                <p class="text-lg text-muted-foreground">{{ job.company }}</p>
+                <p
+                    class="flex flex-wrap items-center gap-2 text-lg text-muted-foreground"
+                >
+                    {{ job.company }}
+                    <Button
+                        v-if="signedIn"
+                        variant="outline"
+                        size="sm"
+                        :aria-pressed="followedCompanyId !== null"
+                        @click="toggleFollow"
+                    >
+                        <Radar class="size-4" aria-hidden="true" />
+                        {{
+                            followedCompanyId !== null
+                                ? trans('radar.following')
+                                : trans('radar.follow')
+                        }}
+                    </Button>
+                </p>
             </div>
 
             <div class="flex flex-wrap gap-1.5">
@@ -175,9 +218,17 @@ const description = computed(() => `${props.job.title} · ${props.job.company}`)
             </ul>
         </section>
 
+        <SalaryBenchmark v-if="salaryBenchmark" :benchmark="salaryBenchmark" />
+
         <MatchBreakdown :match="match" :signed-in="signedIn" />
 
         <JobRequirementsPanel :requirements="requirements" />
+
+        <CompanyNotes
+            v-if="signedIn"
+            :company="job.company"
+            :notes="companyNotes"
+        />
 
         <section class="space-y-3">
             <h2 class="text-lg font-semibold">

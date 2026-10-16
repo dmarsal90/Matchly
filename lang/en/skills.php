@@ -66,6 +66,10 @@ return [
             'title' => 'LinkedIn',
             'description' => 'Upload the ZIP with the official export of your LinkedIn data.',
         ],
+        'portfolio' => [
+            'title' => 'Portfolio',
+            'description' => 'We read your public website (and a few usual pages such as /projects) and list the technologies it mentions.',
+        ],
     ],
     'github' => [
         'username' => 'GitHub username or URL',
@@ -79,6 +83,14 @@ return [
         'connect_hint' => 'Optional: connecting your account lets us read more repositories (higher API limit).',
         'connected' => 'Connected account: :username',
         'ai_summary' => 'Add an AI summary of my repositories (I agree to them being sent to an AI provider)',
+    ],
+    'portfolio' => [
+        'url' => 'Your portfolio address',
+        'url_placeholder' => 'https://yoursite.com',
+        'consent' => 'I agree to my public website being read to detect my skills.',
+        'consent_hint' => 'We only read public pages on your own domain and respect its robots.txt. We never make up levels or years: you decide what is kept. You can withdraw consent in Settings › Privacy.',
+        'import' => 'Read my portfolio',
+        'started' => 'We are reading your portfolio. It takes a few seconds.',
     ],
     'linkedin' => [
         'file' => 'LinkedIn ZIP file',
@@ -117,6 +129,7 @@ return [
             'cv' => 'From your CV',
             'github' => 'From GitHub (:reference)',
             'linkedin' => 'From your LinkedIn export',
+            'portfolio' => 'From your portfolio (:reference)',
         ],
         'select_all' => 'Select all',
         'select_none' => 'Select none',
