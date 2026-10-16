@@ -198,6 +198,23 @@ it('speaks the Gemini API with the key in a header', function (): void {
         && $request->data()['generationConfig']['responseMimeType'] === 'application/json');
 });
 
+it('moves to the next Gemini model when one is rate limited, and ignores thought parts', function (): void {
+    config(['ai.fallback_order' => ['gemini'], 'ai.retries' => 0, 'ai.providers.gemini.api_key' => 'gemini-key', 'ai.providers.gemini.fallback_models' => ['gemini-backup']]);
+    Http::fake([
+        'generativelanguage.googleapis.com/*gemini-backup*' => Http::response([
+            'candidates' => [['content' => ['parts' => [['text' => 'pensando…', 'thought' => true], ['text' => json_encode(SUMMARY)]]]]],
+            'usageMetadata' => ['promptTokenCount' => 10, 'candidatesTokenCount' => 5],
+        ]),
+        'generativelanguage.googleapis.com/*' => Http::response(['error' => ['message' => 'quota']], 429),
+    ]);
+
+    $response = gateway()->run(AiTask::SummarizeGithub, 'input');
+
+    expect($response->provider)->toBe('gemini')->and($response->data['summary'])->toBe('Builds Laravel apps.');
+    Http::assertSent(fn (Request $request): bool => str_contains($request->url(), 'gemini-backup')
+        && $request->data()['generationConfig']['thinkingConfig']['thinkingLevel'] === 'low');
+});
+
 it('talks to a local Ollama without a key', function (): void {
     config(['ai.fallback_order' => ['ollama'], 'ai.providers.ollama.base_url' => 'http://ollama.test:11434/v1']);
     Http::fake(['ollama.test:11434/*' => Http::response(openAiAnswer((string) json_encode(SUMMARY)))]);

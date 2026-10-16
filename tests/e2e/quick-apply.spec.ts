@@ -49,6 +49,16 @@ test('prepares, reviews and approves a quick application', async ({ page }) => {
         page.getByText('Aprueba la solicitud para descargar el CV.'),
     ).toBeVisible();
 
+    // The CV can be opened and checked before approving it.
+    await page.getByRole('button', { name: 'Vista previa del CV' }).click();
+    const preview = page.getByRole('dialog', { name: 'Vista previa del CV' });
+    await expect(preview.locator('iframe')).toHaveAttribute(
+        'src',
+        /resume-preview\.pdf\?template=classic/,
+    );
+    await preview.getByRole('button', { name: 'Close' }).click();
+    await expect(preview).toBeHidden();
+
     await page.getByRole('button', { name: 'Aprobar' }).click();
     await expect(
         page.getByText('Aprobada. Ya puedes descargar el CV'),

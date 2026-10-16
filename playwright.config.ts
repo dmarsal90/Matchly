@@ -36,7 +36,7 @@ export default defineConfig({
             name: 'mobile',
             use: { ...devices['Pixel 7'] },
             // Mobile-first layout: the public listing must work on a phone.
-            testMatch: /jobs\.spec\.ts/,
+            testMatch: /(jobs|mobile-layout)\.spec\.ts/,
         },
     ],
     webServer: process.env.E2E_BASE_URL

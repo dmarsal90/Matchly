@@ -86,7 +86,7 @@ const description = computed(() => `${props.job.title} · ${props.job.company}`)
         />
     </Head>
 
-    <div class="mx-auto w-full max-w-3xl space-y-6 py-6">
+    <div class="mx-auto w-full max-w-3xl space-y-6 px-4 py-6">
         <Button as-child variant="ghost" size="sm" class="-ml-2">
             <Link :href="index()"
                 ><ArrowLeft class="size-4" aria-hidden="true" />{{
