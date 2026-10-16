@@ -59,7 +59,7 @@ it('prepares a package without AI: tailored CV and a template letter in the post
         ->and($resume->experience[0]['bullets'][0])->toBe('Built REST APIs with Laravel and PostgreSQL.')
         ->and($resume->keywords)->toBe(['Laravel', 'PostgreSQL'])
         ->and($package->master_resume['skills'])->toBe(['Figma', 'Laravel', 'PHP', 'PostgreSQL'])
-        ->and($package->cover_letter)->toStartWith('Estimado equipo de selección:')
+        ->and($package->cover_letter)->toStartWith('Estimado equipo de selección de Globex:')
         ->and($package->cover_letter)->toContain('Desarrollador Backend Senior en Globex')
         ->and($package->cover_letter)->toContain('Actualmente trabajo como Senior Backend Engineer en Acme. Cuento con 6 años')
         ->and($package->cover_letter)->toContain('Laravel y PostgreSQL')
@@ -154,6 +154,60 @@ describe('with AI', function (): void {
         Http::assertSent(fn (Request $request): bool => $request->data()['model'] === config('ai.providers.anthropic.models.quality'));
     });
 
+});
+
+it('asks the AI again when the letter body is shorter than the chosen length', function (): void {
+    config(['ai.enabled' => true, 'ai.fallback_order' => ['anthropic'], 'ai.providers.anthropic.api_key' => 'server-key', 'ai.retry_delay_ms' => 0]);
+    $long = implode(' ', array_fill(0, 21, 'Construí APIs REST con Laravel y PostgreSQL en Acme para mejorar el servicio.'));
+    $letterCalls = 0;
+    Http::fake(['api.anthropic.com/*' => function (Request $request) use (&$letterCalls, $long) {
+        if (! str_contains((string) json_encode($request->data()['tools'][0]['input_schema']), 'greeting')) {
+            return Http::response(['content' => [['type' => 'tool_use', 'name' => 'submit_result', 'input' => ['summary' => 'Backend developer focused on APIs.', 'skills' => ['Laravel'], 'experience' => [], 'keywords' => ['Laravel']]]], 'usage' => ['input_tokens' => 9, 'output_tokens' => 9]]);
+        }
+        $letterCalls++;
+        $body = $letterCalls === 1 ? 'Una carta demasiado corta para la longitud elegida por la persona que se postula.' : $long;
+
+        return Http::response(['content' => [['type' => 'tool_use', 'name' => 'submit_result', 'input' => ['greeting' => 'Hola:', 'body' => $body, 'closing' => 'Un saludo,']]], 'usage' => ['input_tokens' => 9, 'output_tokens' => 9]]);
+    }]);
+
+    $package = prepare(candidateWithProfile(), spanishLaravelJob(), ['use_ai' => true, 'ai_consent' => '1', 'length' => 'medium']);
+
+    expect($letterCalls)->toBe(2)
+        ->and($package->cover_letter)->toContain('Construí APIs REST')
+        ->and(collect($package->warnings)->pluck('key'))->not->toContain('letter_length');
+});
+
+it('rotates a comma-separated list of API keys', function (): void {
+    config(['ai.enabled' => true, 'ai.fallback_order' => ['groq'], 'ai.providers.groq.api_key' => 'key-a,key-b']);
+    $sent = [];
+    Http::fake(['api.groq.com/*' => function (Request $request) use (&$sent) {
+        $sent[] = $request->header('Authorization')[0];
+
+        return Http::response(['choices' => [['message' => ['content' => '{"greeting":"Hola:","body":"'.str_repeat('a', 60).'","closing":"Un saludo,"}']]], 'usage' => ['prompt_tokens' => 1, 'completion_tokens' => 1]]);
+    }]);
+
+    $gateway = app(App\Modules\AI\Application\AiGateway::class);
+    $gateway->run(App\Modules\AI\Domain\Enums\AiTask::CoverLetter, '{}');
+    $gateway->run(App\Modules\AI\Domain\Enums\AiTask::CoverLetter, '{}');
+
+    expect($sent)->toHaveCount(2)->and($sent[0])->not->toBe($sent[1]);
+});
+
+it('previews the CV inline before it is approved, framed only by this site', function (): void {
+    $user = candidateWithProfile();
+    $package = prepare($user, spanishLaravelJob());
+    expect($package->status)->toBe(PackageStatus::Draft);
+
+    $response = $this->actingAs($user)->get(route('applications.packages.resume-preview', ['package' => $package, 'template' => 'modern']));
+
+    $response->assertOk()
+        ->assertHeader('Content-Type', 'application/pdf')
+        ->assertHeader('X-Frame-Options', 'SAMEORIGIN');
+    expect($response->headers->get('Content-Disposition'))->toStartWith('inline;');
+
+    // The download stays locked until the CV is approved, and strangers cannot preview.
+    $this->get(route('applications.packages.resume', $package))->assertForbidden();
+    $this->actingAs(User::factory()->create())->get(route('applications.packages.resume-preview', $package))->assertForbidden();
 });
 
 it('falls back to rules and the template when the AI fails', function (): void {

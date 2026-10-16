@@ -26,7 +26,9 @@ final class SecurityHeaders
 
         $headers = $response->headers;
         $headers->set('X-Content-Type-Options', 'nosniff');
-        $headers->set('X-Frame-Options', 'DENY');
+        // Only the CV preview may be framed, and only by this site (it is shown in a dialog).
+        $frameable = $request->routeIs('applications.packages.resume-preview');
+        $headers->set('X-Frame-Options', $frameable ? 'SAMEORIGIN' : 'DENY');
         $headers->set('Referrer-Policy', 'strict-origin-when-cross-origin');
         $headers->set('Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=()');
         $headers->set('Cross-Origin-Opener-Policy', 'same-origin');
@@ -46,13 +48,13 @@ final class SecurityHeaders
             /** @var list<string> $relaxedPaths */
             $relaxedPaths = config('security.csp.relaxed_paths', []);
 
-            $headers->set($headerName, $this->contentSecurityPolicy((string) Vite::cspNonce(), $request->is(...$relaxedPaths)));
+            $headers->set($headerName, $this->contentSecurityPolicy((string) Vite::cspNonce(), $request->is(...$relaxedPaths), $frameable));
         }
 
         return $response;
     }
 
-    private function contentSecurityPolicy(string $nonce, bool $relaxed = false): string
+    private function contentSecurityPolicy(string $nonce, bool $relaxed = false, bool $frameable = false): string
     {
         /** @var list<string> $connect */
         $connect = config('security.csp.connect_src', []);
@@ -65,7 +67,7 @@ final class SecurityHeaders
             'default-src' => ["'self'"],
             'base-uri' => ["'self'"],
             'form-action' => ["'self'"],
-            'frame-ancestors' => ["'none'"],
+            'frame-ancestors' => [$frameable ? "'self'" : "'none'"],
             'object-src' => ["'none'"],
             'script-src' => $relaxed ? ["'self'", "'unsafe-inline'", "'unsafe-eval'"] : ["'self'", "'nonce-{$nonce}'"],
             // Vue transitions and Reka UI positioning write inline style attributes.
