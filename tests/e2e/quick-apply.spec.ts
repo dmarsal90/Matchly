@@ -54,6 +54,12 @@ test('prepares, reviews and approves a quick application', async ({ page }) => {
         page.getByText('Aprobada. Ya puedes descargar el CV'),
     ).toBeVisible();
 
+    // The look of the CV is chosen at download time: the link follows the choice.
+    await page.getByLabel('Plantilla del CV').selectOption('compact');
+    await expect(
+        page.getByRole('link', { name: 'Descargar CV (PDF)' }),
+    ).toHaveAttribute('href', /template=compact/);
+
     const [download] = await Promise.all([
         page.waitForEvent('download'),
         page.getByRole('link', { name: 'Descargar CV (PDF)' }).click(),
