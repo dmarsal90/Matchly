@@ -150,6 +150,8 @@ it('reminds a second time after a follow-up that got no answer, and never a thir
     // Followed up 11 days ago and nothing since: the second reminder.
     $application->events()->delete();
     $application->events()->create(['type' => ApplicationEventType::FollowUp, 'occurred_at' => now()->subDays(11)]);
+    // (the first reminder went out before that follow-up, 20 days ago)
+    $application->forceFill(['follow_up_reminded_at' => now()->subDays(20)])->save();
     expect(app(SendFollowUpReminders::class)->handle())->toBe(1)
         ->and(app(SendFollowUpReminders::class)->handle())->toBe(0);
 
