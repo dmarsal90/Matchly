@@ -20,6 +20,7 @@ Matchly es un monolito modular en Laravel 13 con Inertia 3 + Vue 3. Hay un solo 
 | `Profiles` | Cuestionario, CV, importaciones de GitHub y LinkedIn, perfil de habilidades fusionado y perfil de búsqueda |
 | `Matching` | Requisitos de cada oferta (reglas y, opcionalmente, IA) y puntuación de compatibilidad explicable (0-100) |
 | `Applications` | Seguimiento de candidaturas con historial, solicitud rápida (CV adaptado, carta y PDF), recordatorios de seguimiento, preparación de entrevistas y panorama (embudo) |
+| `Learning` | Catálogo curado de cursos por habilidad (gratis primero, de pago después) y su comprobador de enlaces |
 | `Alerts` | Búsquedas guardadas, emparejamiento de ofertas nuevas y resúmenes |
 | `Notifications` | Centro de notificaciones y emisión en tiempo real |
 | `AI` | `AiGateway`: proveedores intercambiables, prompts versionados, esquemas, presupuesto y coste |
@@ -65,6 +66,10 @@ La interfaz **siempre** lee de la base de datos, nunca de las APIs externas en v
 - *Recordatorios.* `applications:follow-up` (diario, 09:00) avisa una sola vez de las candidaturas aplicadas sin respuesta tras `FOLLOW_UP_DAYS` (10) días, salvo las que ya tuvieron seguimiento o cuya oferta se cerró. `FollowUpReminderNotification` sale por base de datos, tiempo real y correo (con consentimiento); el borrador del mensaje (`FollowUpDraftWriter`, en el idioma y tono de la carta enviada) solo va en el correo y en el tablero.
 - *Preparación de entrevista.* `InterviewPrepBuilder` genera preguntas probables con esquemas STAR que citan las viñetas del propio CV (tarea y resultado quedan en blanco), respuestas honestas para las habilidades que faltan y preguntas para la empresa. Con IA (tarea `interview_prep`) se redacta mejor, pero se vacía todo esquema que nombre una habilidad que el CV no respalda y las respuestas de carencias se limitan a las carencias reales. Se genera en la cola `high` y el contenido se guarda cifrado.
 - *Panorama* (`/insights`). `SkillGapReport` agrega las carencias de `job_matches` (ofertas seguidas y mejores afinidades) y las ordena por cuántas ofertas desbloquearían; `ApplicationFunnel` calcula la conversión entre etapas, los tiempos de respuesta y los resultados por fuente y área. Ambos leen datos ya guardados: ninguna llamada a IA.
+
+**Investigación de empresa.** Las notas sobre una empresa (`company_notes`, por usuario y empresa normalizada con `CompanyKey`, texto cifrado, siempre con su fuente) alimentan la carta y las preguntas para la entrevista, y **solo** las aprobadas (`ApprovedCompanyFacts`). Las escribe la persona o las propone `DiscoverCompanyFacts` leyendo la web pública de la empresa (inicio, quiénes somos, empleo): `PublicPageFetcher` aplica la guarda SSRF, fija la IP validada, sigue las redirecciones a mano y solo acepta texto pequeño; `RobotsTxt` respeta `robots.txt`; `CompanyFactExtractor` copia frases literales de la empresa (sin resumir con IA, sin datos de contacto). Lo encontrado nace sin aprobar y la persona decide qué se usa. La carta con IA recibe `company_facts` y tiene prohibido afirmar nada más de la empresa.
+
+**Aprender lo que falta.** `SkillGapReport` añade a cada habilidad que falta los cursos de `CourseCatalog` (`config/courses.php`: recursos oficiales o muy conocidos, más enlaces de búsqueda de respaldo) y las tres ofertas más cercanas al 100 % con lo que aún le falta a cada una. Los gratuitos van siempre antes que los de pago. `php artisan courses:check` avisa de los enlaces que ya no responden.
 
 **Alertas y tiempo real.**
 
