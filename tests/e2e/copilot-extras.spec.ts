@@ -172,3 +172,30 @@ test('follows a company from a job and finds it in the radar', async ({
         .click();
     await expect(page.getByText(/Aún no sigues ninguna empresa/)).toBeVisible();
 });
+
+test('plans four weeks of study and offers it as a calendar', async ({
+    page,
+}) => {
+    await page.goto('/insights');
+
+    await expect(
+        page.getByRole('heading', { name: 'Plan de estudio de 4 semanas' }),
+    ).toBeVisible();
+    await expect(
+        page.getByRole('heading', { name: /^Semana 1/ }),
+    ).toBeVisible();
+
+    await page.getByLabel('Horas por semana').selectOption('10');
+    await expect(page.getByLabel('Horas por semana')).toHaveValue('10');
+    const link = page.getByRole('link', {
+        name: 'Descargar calendario (.ics)',
+    });
+    await expect(link).toHaveAttribute('href', /hours=10/);
+
+    const [download] = await Promise.all([
+        page.waitForEvent('download'),
+        link.click(),
+    ]);
+    expect(download.suggestedFilename()).toMatch(/-study-plan\.ics$/);
+    await expectNoViolations(page);
+});

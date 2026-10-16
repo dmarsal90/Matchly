@@ -128,3 +128,22 @@ it('shows what to try next on the page and in the offline report', function (): 
     $this->actingAs($user)->get('/insights')->assertInertia(fn (Assert $page) => $page->where('experiments.0.key', 'more_volume'));
     expect($this->get('/insights/report')->getContent())->toContain('Qué probar a continuación')->toContain('Llevas 1 candidaturas');
 });
+
+it('plans the study hours of the missing skills and offers them as a calendar', function (): void {
+    $user = User::factory()->create(['locale' => 'es']);
+    $job = JobListing::factory()->create();
+    App\Modules\Matching\Infrastructure\Models\JobMatch::query()->create(['user_id' => $user->id, 'job_listing_id' => $job->id, 'score' => 80, 'level' => 'medium', 'eligible' => true, 'result' => ['missing_skills' => [['skill' => 'kubernetes', 'name' => 'Kubernetes', 'required' => true]]], 'computed_at' => now()]);
+
+    $this->actingAs($user)->get('/insights?hours=10')->assertInertia(fn (Assert $page) => $page
+        ->where('studyPlan.hours_per_week', 10)
+        ->where('studyPlan.weeks.0.items.0.skill', 'kubernetes'));
+    $this->get('/insights?hours=999')->assertInertia(fn (Assert $page) => $page->where('studyPlan.hours_per_week', 40));
+
+    $response = $this->get('/insights/plan.ics?hours=10')->assertOk();
+    expect($response->headers->get('Content-Type'))->toContain('text/calendar')
+        ->and($response->headers->get('Content-Disposition'))->toContain('-study-plan.ics')
+        ->and($response->getContent())->toContain('BEGIN:VEVENT')->toContain('SUMMARY:Estudiar Kubernetes');
+
+    auth()->logout();
+    $this->get('/insights/plan.ics')->assertRedirect();
+});
