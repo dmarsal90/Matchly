@@ -227,3 +227,34 @@ describe('practising answers', function (): void {
         expect(json_encode($export->data))->toContain('My practised answer');
     });
 });
+
+describe('mock interview', function (): void {
+    it('goes through the pack questions and reviews only the answered ones', function (): void {
+        $user = candidateWithProfile();
+        $application = appliedFor($user);
+        $this->actingAs($user)->get(route('applications.interview-prep.mock', $application))->assertRedirect(route('applications.interview-prep.show', $application));
+
+        $this->post(route('applications.interview-prep.store', $application), []);
+        $key = practiceKey($application);
+        $this->get(route('applications.interview-prep.mock', $application))->assertInertia(fn (Assert $page) => $page
+            ->component('applications/MockInterview')
+            ->where('secondsPerAnswer', 180)
+            ->has('questions')
+            ->where('questions.0.key', fn (string $value): bool => strlen($value) === 40));
+
+        $this->put(route('applications.interview-prep.answer', $application), ['key' => $key, 'answer' => 'Laravel.']);
+        $this->post(route('applications.interview-prep.mock.review', $application))->assertRedirect();
+
+        $answers = $application->interviewAnswers()->get();
+        expect($answers)->toHaveCount(1)
+            ->and($answers->first()->feedback_source->value)->toBe('rules')
+            ->and(array_column($answers->first()->feedback['improvements'], 'key'))->toContain('too_short');
+    });
+
+    it('is only for the owner', function (): void {
+        $application = preparedFor(candidateWithProfile());
+
+        $this->actingAs(User::factory()->create())->get(route('applications.interview-prep.mock', $application))->assertForbidden();
+        $this->post(route('applications.interview-prep.mock.review', $application))->assertForbidden();
+    });
+});

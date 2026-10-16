@@ -103,3 +103,45 @@ test('practises an answer and gets plain feedback on the text', async ({
     await expect(question.getByText(/Es muy corta/)).toBeVisible();
     await expectNoViolations(page);
 });
+
+test('runs a mock interview and sees where the answers are weakest', async ({
+    page,
+}) => {
+    await page.goto('/applications');
+    await page
+        .locator('article')
+        .filter({ hasText: 'Umbrella' })
+        .getByRole('link', { name: 'Preparar entrevista' })
+        .click();
+    // The pack of this application already exists (the practice test made it).
+    await page.getByRole('link', { name: 'Hacer un simulacro' }).click();
+
+    await page.getByRole('button', { name: 'Empezar el simulacro' }).click();
+    await expect(page.getByRole('timer')).toBeVisible();
+    await page.getByLabel('Tu respuesta').fill('Respuesta corta.');
+    await page.getByRole('button', { name: 'Guardar y siguiente' }).click();
+
+    // Leave the rest blank until the last question.
+    const progress = await page
+        .getByText(/^Pregunta \d+ de \d+$/)
+        .textContent();
+    const total = Number(progress?.match(/de (\d+)/)?.[1]);
+    for (let step = 2; step <= total; step++) {
+        await expect(
+            page.getByText(`Pregunta ${step} de ${total}`),
+        ).toBeVisible();
+        if (step < total) {
+            await page
+                .getByRole('button', { name: 'Guardar y siguiente' })
+                .click();
+        }
+    }
+    await page
+        .getByRole('button', { name: 'Terminar y ver el resumen' })
+        .click();
+
+    await expect(page.getByRole('status')).toContainText('Respondiste 1 de');
+    await expect(page.getByText('Sin responder').first()).toBeVisible();
+    await expect(page.getByText(/Es muy corta/)).toBeVisible();
+    await expectNoViolations(page);
+});
