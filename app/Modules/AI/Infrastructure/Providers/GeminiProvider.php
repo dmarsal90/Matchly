@@ -6,12 +6,36 @@ namespace App\Modules\AI\Infrastructure\Providers;
 
 use App\Modules\AI\Domain\Data\AiCompletion;
 use App\Modules\AI\Domain\Data\AiResult;
+use App\Modules\AI\Domain\Exceptions\AiProviderFailed;
 use Illuminate\Http\Client\PendingRequest;
 
 /** Google Gemini generateContent with JSON output. The key goes in a header, never in the URL. */
 final class GeminiProvider extends HttpAiProvider
 {
+    /**
+     * Every Gemini model has its own free quota and its own busy moments, so a
+     * rate limit or an overload moves on to the next model of the chain.
+     */
     public function complete(AiCompletion $completion): AiResult
+    {
+        $models = array_values(array_unique([$completion->model, ...($this->config['fallback_models'] ?? [])]));
+        $failure = new AiProviderFailed('gemini has no model configured.');
+
+        foreach ($models as $model) {
+            try {
+                return $this->completeWith($completion, $model);
+            } catch (AiProviderFailed $exception) {
+                $failure = $exception;
+                if (! $exception->retryable) {
+                    throw $exception;
+                }
+            }
+        }
+
+        throw $failure;
+    }
+
+    private function completeWith(AiCompletion $completion, string $model): AiResult
     {
         $generation = [
             'responseMimeType' => 'application/json',
@@ -19,11 +43,11 @@ final class GeminiProvider extends HttpAiProvider
             'temperature' => 0.2,
         ];
         // Gemini 3 "thinks" by default and the thinking eats the output budget: keep it light.
-        if (! str_starts_with($completion->model, 'gemini-2')) {
+        if (! str_starts_with($model, 'gemini-2')) {
             $generation['thinkingConfig'] = ['thinkingLevel' => 'low'];
         }
 
-        $json = $this->post($this->url('/models/'.rawurlencode($completion->model).':generateContent'), [
+        $json = $this->post($this->url('/models/'.rawurlencode($model).':generateContent'), [
             'systemInstruction' => ['parts' => [['text' => $this->systemWithSchema($completion)]]],
             'contents' => [['role' => 'user', 'parts' => [['text' => $completion->input]]]],
             'generationConfig' => $generation,

@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Cache;
 abstract class HttpAiProvider implements AiProvider
 {
     /**
-     * @param  array{api_key?: string|null, base_url?: string|null, models: array<string, string>, user_keys?: bool, keyless?: bool, version?: string}  $config
+     * @param  array{api_key?: string|null, base_url?: string|null, models: array<string, string>, fallback_models?: list<string>, user_keys?: bool, keyless?: bool, version?: string}  $config
      */
     public function __construct(
         protected readonly Http $http,

@@ -174,6 +174,8 @@ it('asks the AI again when the letter body is shorter than the chosen length', f
 
     expect($letterCalls)->toBe(2)
         ->and($package->cover_letter)->toContain('Construí APIs REST')
+        // The AI greeted with "Hola:" and left the company out: the template greeting names it.
+        ->and(strtok($package->cover_letter, "\n"))->toContain('Globex')
         ->and(collect($package->warnings)->pluck('key'))->not->toContain('letter_length');
 });
 

@@ -115,7 +115,7 @@ final readonly class CoverLetterWriter
             if ($gap < $bestGap) {
                 $bestGap = $gap;
                 $best = trim(implode("\n\n", [
-                    (string) $response->data['greeting'],
+                    $this->greeting((string) $response->data['greeting'], $job->company, $language, $tone),
                     $body,
                     (string) $response->data['closing']."\n".$resume->contact['name'],
                 ]));
@@ -135,6 +135,16 @@ final readonly class CoverLetterWriter
         }
 
         return (string) $best;
+    }
+
+    /** Addresses the company's team by name when the AI left it out and the template has the language. */
+    private function greeting(string $greeting, string $company, string $language, LetterTone $tone): string
+    {
+        if (mb_stripos($greeting, $company) !== false || ! in_array($language, self::TEMPLATE_LANGUAGES, true)) {
+            return $greeting;
+        }
+
+        return (string) __("quick_apply.letter.greeting.{$tone->value}", ['company' => $company], $language);
     }
 
     public static function wordCount(string $text): int
