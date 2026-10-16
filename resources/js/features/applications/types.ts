@@ -97,3 +97,11 @@ export type InterviewPrepData = {
     warnings: PackageWarning[];
     updated_at: string;
 };
+
+export type CompanyNoteEntry = {
+    id: number;
+    fact: string;
+    source_url: string | null;
+    origin: 'manual' | 'web';
+    approved: boolean;
+};
