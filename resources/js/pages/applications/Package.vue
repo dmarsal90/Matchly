@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Spinner } from '@/components/ui/spinner';
@@ -20,6 +27,7 @@ import {
     destroy,
     letter,
     resume as resumePdf,
+    resumePreview,
     retry,
     show,
     update,
@@ -30,6 +38,7 @@ import {
     CircleAlert,
     CircleCheck,
     ExternalLink,
+    Eye,
     FileDown,
     Send,
     Trash2,
@@ -91,6 +100,17 @@ watch(generating, (value) => (value ? start() : stop()), { immediate: true });
 const templates = ['classic', 'modern', 'compact'] as const;
 const template = ref<(typeof templates)[number]>('classic');
 
+const previewOpen = ref(false);
+// A new query string each time it opens, so the browser never shows a stale PDF.
+const previewVersion = ref(0);
+const previewUrl = computed(
+    () =>
+        `${resumePreview.url(props.package.id, { query: { template: template.value } })}&v=${previewVersion.value}#toolbar=0&navpanes=0`,
+);
+const openPreview = () => {
+    previewVersion.value = Date.now();
+    previewOpen.value = true;
+};
 const approved = computed(() => props.package.status === 'approved');
 const editable = computed(() =>
     ['draft', 'approved'].includes(props.package.status),
@@ -285,6 +305,11 @@ function remove(): void {
                         </option>
                     </NativeSelect>
                 </div>
+                <Button variant="outline" @click="openPreview">
+                    <Eye class="size-4" aria-hidden="true" />{{
+                        trans('quick_apply.preview.open')
+                    }}
+                </Button>
                 <Button v-if="approved" variant="outline" as-child>
                     <a
                         :href="
@@ -398,4 +423,25 @@ function remove(): void {
             </Button>
         </div>
     </div>
+
+    <Dialog v-model:open="previewOpen">
+        <DialogContent
+            class="flex h-[90vh] w-[calc(100vw-1.5rem)] max-w-4xl flex-col gap-3 sm:max-w-4xl"
+        >
+            <DialogHeader>
+                <DialogTitle>{{
+                    trans('quick_apply.preview.title')
+                }}</DialogTitle>
+                <DialogDescription>{{
+                    trans('quick_apply.preview.hint')
+                }}</DialogDescription>
+            </DialogHeader>
+            <iframe
+                v-if="previewOpen"
+                :src="previewUrl"
+                :title="trans('quick_apply.preview.title')"
+                class="min-h-0 w-full flex-1 rounded-md border bg-white"
+            />
+        </DialogContent>
+    </Dialog>
 </template>

@@ -12,6 +12,7 @@ use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Client\Factory as Http;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\Response;
+use Illuminate\Support\Facades\Cache;
 
 /** Shared configuration and HTTP plumbing of the vendor adapters. */
 abstract class HttpAiProvider implements AiProvider
@@ -52,9 +53,22 @@ abstract class HttpAiProvider implements AiProvider
         return (bool) ($this->config['user_keys'] ?? false);
     }
 
+    /** The user's own key, else the next configured key (a comma-separated list is rotated). */
     protected function key(AiCompletion $completion): string
     {
-        return (string) ($completion->apiKey ?? $this->config['api_key'] ?? '');
+        if ($completion->apiKey !== null) {
+            return $completion->apiKey;
+        }
+
+        $keys = array_values(array_filter(array_map(trim(...), explode(',', (string) ($this->config['api_key'] ?? '')))));
+        if (count($keys) < 2) {
+            return $keys[0] ?? '';
+        }
+
+        $cacheKey = "ai:key-rotation:{$this->providerName}";
+        Cache::add($cacheKey, 0, 86400);
+
+        return $keys[((int) Cache::increment($cacheKey)) % count($keys)];
     }
 
     protected function url(string $path): string

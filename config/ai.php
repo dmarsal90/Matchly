@@ -8,7 +8,10 @@ declare(strict_types=1);
 |--------------------------------------------------------------------------
 |
 | Providers are interchangeable behind the AiProvider contract and tried in
-| `fallback_order`; a provider without credentials is skipped. Each task
+| `fallback_order`; a provider without credentials is skipped. An API key
+| may be a comma-separated list: the keys are used in rotation and a rate
+| limit on one moves the next attempt to the next key (free tiers add up).
+| Each task
 | picks a model tier: "fast" (cheap: extraction, summaries) or "quality"
 | (letters, CV tailoring). Every call is logged with its tokens and cost.
 |
@@ -20,7 +23,7 @@ return [
 
     'enabled' => (bool) env('AI_ENABLED', true),
 
-    'fallback_order' => $list((string) env('AI_FALLBACK_ORDER', 'anthropic,gemini,groq,openrouter,mistral,ollama')),
+    'fallback_order' => $list((string) env('AI_FALLBACK_ORDER', 'anthropic,openai,deepseek,gemini,groq,huggingface,openrouter,mistral,ollama')),
 
     'timeout' => (int) env('AI_TIMEOUT', 60),
 
@@ -62,6 +65,35 @@ return [
             ],
             // Users may bring their own key (stored encrypted).
             'user_keys' => true,
+        ],
+        'openai' => [
+            'driver' => 'openai',
+            'api_key' => env('OPENAI_API_KEY'),
+            'base_url' => env('OPENAI_BASE_URL', 'https://api.openai.com/v1'),
+            'models' => [
+                'fast' => env('OPENAI_MODEL_FAST', 'gpt-4o-mini'),
+                'quality' => env('OPENAI_MODEL_QUALITY', 'gpt-4o'),
+            ],
+        ],
+        // Cheap, good at writing; new accounts get free credit.
+        'deepseek' => [
+            'driver' => 'openai',
+            'api_key' => env('DEEPSEEK_API_KEY'),
+            'base_url' => env('DEEPSEEK_BASE_URL', 'https://api.deepseek.com/v1'),
+            'models' => [
+                'fast' => env('DEEPSEEK_MODEL_FAST', 'deepseek-chat'),
+                'quality' => env('DEEPSEEK_MODEL_QUALITY', 'deepseek-chat'),
+            ],
+        ],
+        // Free Inference Providers tier: one read token per Hugging Face account, rotate several.
+        'huggingface' => [
+            'driver' => 'openai',
+            'api_key' => env('HUGGINGFACE_API_KEY'),
+            'base_url' => env('HUGGINGFACE_BASE_URL', 'https://router.huggingface.co/v1'),
+            'models' => [
+                'fast' => env('HUGGINGFACE_MODEL_FAST', 'meta-llama/Llama-3.3-70B-Instruct'),
+                'quality' => env('HUGGINGFACE_MODEL_QUALITY', 'Qwen/Qwen2.5-72B-Instruct'),
+            ],
         ],
         'gemini' => [
             'driver' => 'gemini',
@@ -120,6 +152,9 @@ return [
     'pricing' => [
         'claude-haiku-5-5' => ['input' => 1.00, 'output' => 5.00, 'cache_read' => 0.10, 'cache_write' => 1.25],
         'claude-sonnet-5-5' => ['input' => 3.00, 'output' => 15.00, 'cache_read' => 0.30, 'cache_write' => 3.75],
+        'gpt-4o-mini' => ['input' => 0.15, 'output' => 0.60],
+        'gpt-4o' => ['input' => 2.50, 'output' => 10.00],
+        'deepseek-chat' => ['input' => 0.27, 'output' => 1.10],
         'gemini-2.5-flash' => ['input' => 0.30, 'output' => 2.50],
         'gemini-2.5-pro' => ['input' => 1.25, 'output' => 10.00],
         'llama-3.1-8b-instant' => ['input' => 0.05, 'output' => 0.08],

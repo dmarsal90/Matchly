@@ -148,6 +148,19 @@ final class QuickApplyController
         ]);
     }
 
+    /** The CV as it would be exported, shown inline so it can be checked before approving. */
+    public function resumePreview(Request $request, ApplicationPackage $package, ResumePdfRenderer $renderer): HttpResponse
+    {
+        Gate::authorize('view', $package);
+        abort_unless($package->resumeData() !== null, 404);
+
+        return response($renderer->render($package->resumeData(), $package->language, ResumeTemplate::tryFrom($request->string('template')->toString()) ?? ResumeTemplate::Classic), 200, [
+            'Content-Type' => 'application/pdf',
+            'Content-Disposition' => 'inline; filename="'.$this->filename($package, 'pdf').'"',
+            'Cache-Control' => 'private, no-store',
+        ]);
+    }
+
     public function destroy(ApplicationPackage $package): RedirectResponse
     {
         Gate::authorize('delete', $package);
