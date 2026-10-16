@@ -6,6 +6,7 @@ use App\Modules\Alerts\Http\Controllers\AlertController;
 use App\Modules\Alerts\Http\Controllers\UnsubscribeController;
 use App\Modules\Applications\Http\Controllers\ApplicationController;
 use App\Modules\Applications\Http\Controllers\ApplicationEventController;
+use App\Modules\Applications\Http\Controllers\CompanyNoteController;
 use App\Modules\Applications\Http\Controllers\InsightsController;
 use App\Modules\Applications\Http\Controllers\InterviewPrepController;
 use App\Modules\Applications\Http\Controllers\QuickApplyController;
@@ -57,6 +58,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('dashboard', fn () => to_route('jobs.index'))->name('dashboard');
 
     Route::post('jobs/{job}/save', [SavedJobController::class, 'toggle'])->whereNumber('job')->middleware('throttle:60,1')->name('jobs.save');
+    Route::post('company-notes', [CompanyNoteController::class, 'store'])->middleware('throttle:60,1')->name('company-notes.store');
+    Route::delete('company-notes/{note}', [CompanyNoteController::class, 'destroy'])->whereNumber('note')->name('company-notes.destroy');
     Route::get('insights', [InsightsController::class, 'index'])->name('insights.index');
     Route::get('applications', [ApplicationController::class, 'index'])->name('applications.index');
     Route::patch('applications/{application}', [ApplicationController::class, 'update'])->name('applications.update');

@@ -7,6 +7,7 @@ namespace App\Modules\Applications\Application\Privacy;
 use App\Modules\Applications\Infrastructure\Models\Application;
 use App\Modules\Applications\Infrastructure\Models\ApplicationEvent;
 use App\Modules\Applications\Infrastructure\Models\ApplicationPackage;
+use App\Modules\Applications\Infrastructure\Models\CompanyNote;
 use App\Modules\Applications\Infrastructure\Models\InterviewPrep;
 use App\Modules\Identity\Domain\Contracts\PersonalDataContributor;
 use App\Modules\Identity\Domain\Data\PersonalData;
@@ -39,6 +40,9 @@ final class ApplicationDataContributor implements PersonalDataContributor
                     'status' => $prep->status->value,
                     'content' => $prep->content,
                 ])->values()->all(),
+            'company_notes' => CompanyNote::query()->where('user_id', $userId)->orderBy('id')->get()
+                ->map(fn (CompanyNote $note): array => ['company' => $note->company, 'fact' => $note->fact, 'source_url' => $note->source_url, 'origin' => $note->origin->value, 'approved' => $note->approved])
+                ->all(),
             'viewed_jobs' => DB::table('job_views')->where('user_id', $userId)->count(),
             'prepared_applications' => ApplicationPackage::query()->with('job:id,title,company')->where('user_id', $userId)->orderBy('id')->get()
                 ->map(fn (ApplicationPackage $package): array => [
