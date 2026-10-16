@@ -120,3 +120,11 @@ it('downloads the insights as one self-contained HTML file', function (): void {
     auth()->logout();
     $this->get('/insights/report')->assertRedirect();
 });
+
+it('shows what to try next on the page and in the offline report', function (): void {
+    $user = User::factory()->create(['locale' => 'es']);
+    trackedAt($user, ApplicationStatus::Applied, 3);
+
+    $this->actingAs($user)->get('/insights')->assertInertia(fn (Assert $page) => $page->where('experiments.0.key', 'more_volume'));
+    expect($this->get('/insights/report')->getContent())->toContain('Qué probar a continuación')->toContain('Llevas 1 candidaturas');
+});

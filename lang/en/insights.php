@@ -66,6 +66,17 @@ return [
         'paid' => 'Paid',
         'search' => '(search results)',
     ],
+    'experiments' => [
+        'title' => 'What to try next',
+        'description' => 'Ideas based only on your own figures, with a minimum number of applications behind them. They are suggestions to try, not rules.',
+        'lower_scores' => 'The jobs that got you an interview scored :interview / 100 on average, the same or less than the ones that did not (:closed / 100). Try also applying to jobs with a somewhat lower match.',
+        'aim_high' => 'The jobs that got you an interview scored :interview / 100 on average against :closed / 100 for the ones that did not. Keep prioritising high matches.',
+        'more_source' => 'You get more interviews from “:name” (:rate % of :applied applications). Try putting more effort there.',
+        'more_category' => 'You get more interviews in “:name” (:rate % of :applied applications). Try searching more there.',
+        'rethink_source' => 'You sent :applied applications from “:name” without a single interview. Try sending fewer, or changing how you present yourself there.',
+        'follow_up_sooner' => 'Companies take :days days to answer on average. Try following up earlier and use a deadline so you do not lose the thread.',
+        'more_volume' => 'You have :count applications: still too few to draw conclusions. Try sending more before changing strategy.',
+    ],
     'report' => [
         'title' => 'My job search report',
         'generated' => 'Generated on :date',
