@@ -61,6 +61,7 @@ return [
     'courses' => [
         'learn' => 'Where to learn :skill',
         'list' => 'Courses, free ones first',
+        'hours' => '≈ :hours h (rough estimate)',
         'free' => 'Free',
         'paid' => 'Paid',
         'search' => '(search results)',

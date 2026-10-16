@@ -32,7 +32,7 @@ final readonly class SkillGapReport
     public function __construct(private SkillCatalog $catalog, private CourseCatalog $courses) {}
 
     /**
-     * @return array{jobs: int, tracked: int, skills: list<array{skill: string, name: string, jobs: int, required: int, tracked: int, only_gap: int, courses: list<array{title: string, provider: string, url: string, price: string, curated: bool}>}>, closest: list<array{id: int, slug: string, title: string, company: string, score: int, missing: list<array{skill: string, name: string, required: bool, courses: list<array{title: string, provider: string, url: string, price: string, curated: bool}>}>}>}
+     * @return array{jobs: int, tracked: int, skills: list<array{skill: string, name: string, jobs: int, required: int, tracked: int, only_gap: int, courses: list<array{title: string, provider: string, url: string, price: string, curated: bool}>, hours: int}>, closest: list<array{id: int, slug: string, title: string, company: string, score: int, missing: list<array{skill: string, name: string, required: bool, courses: list<array{title: string, provider: string, url: string, price: string, curated: bool}>, hours: int}>}>}
      */
     public function for(int $userId): array
     {
@@ -81,7 +81,7 @@ final readonly class SkillGapReport
         return [
             'jobs' => $matches->count(),
             'tracked' => $matches->filter(fn (JobMatch $match): bool => isset($tracked[$match->job_listing_id]))->count(),
-            'skills' => array_map(fn (array $skill): array => [...$skill, 'courses' => $this->coursesFor($skill['skill'], $skill['name'])], array_slice($ranked, 0, self::MAX_SKILLS)),
+            'skills' => array_map(fn (array $skill): array => [...$skill, 'courses' => $this->coursesFor($skill['skill'], $skill['name']), 'hours' => $this->hoursFor($skill['skill'])], array_slice($ranked, 0, self::MAX_SKILLS)),
             'closest' => $closest,
         ];
     }
@@ -91,7 +91,7 @@ final readonly class SkillGapReport
      * missing (required or not), best score first. For each, what to learn.
      *
      * @param  Collection<int, JobMatch>  $matches
-     * @return list<array{id: int, slug: string, title: string, company: string, score: int, missing: list<array{skill: string, name: string, required: bool, courses: list<array{title: string, provider: string, url: string, price: string, curated: bool}>}>}>
+     * @return list<array{id: int, slug: string, title: string, company: string, score: int, missing: list<array{skill: string, name: string, required: bool, courses: list<array{title: string, provider: string, url: string, price: string, curated: bool}>, hours: int}>}>
      */
     private function closest(Collection $matches): array
     {
@@ -113,7 +113,7 @@ final readonly class SkillGapReport
             foreach ((array) $match->result['missing_skills'] as $skill) {
                 if (is_array($skill) && is_string($skill['skill'] ?? null)) {
                     $name = $this->catalog->label($skill['skill'], (string) ($skill['name'] ?? $skill['skill']));
-                    $missing[] = ['skill' => $skill['skill'], 'name' => $name, 'required' => (bool) ($skill['required'] ?? false), 'courses' => $this->coursesFor($skill['skill'], $name)];
+                    $missing[] = ['skill' => $skill['skill'], 'name' => $name, 'required' => (bool) ($skill['required'] ?? false), 'courses' => $this->coursesFor($skill['skill'], $name), 'hours' => $this->hoursFor($skill['skill'])];
                 }
             }
             // Required skills first: they are what stands between the person and the job.
@@ -130,5 +130,13 @@ final readonly class SkillGapReport
     private function coursesFor(string $slug, string $name): array
     {
         return array_map(fn ($course): array => $course->toArray(), $this->courses->for($slug, $name));
+    }
+
+    /** A rough size for the study plan, by skill type; see config/courses.php. */
+    private function hoursFor(string $slug): int
+    {
+        $hours = (array) config('courses.hours', []);
+
+        return (int) ($hours[$this->catalog->type($slug) ?? 'default'] ?? $hours['default'] ?? 20);
     }
 }

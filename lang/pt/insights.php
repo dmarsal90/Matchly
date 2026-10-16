@@ -61,6 +61,7 @@ return [
     'courses' => [
         'learn' => 'Onde aprender :skill',
         'list' => 'Cursos, primeiro os gratuitos',
+        'hours' => '≈ :hours h (estimativa orientativa)',
         'free' => 'Grátis',
         'paid' => 'Pago',
         'search' => '(resultados de pesquisa)',
