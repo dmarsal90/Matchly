@@ -19,7 +19,7 @@ Matchly es un monolito modular en Laravel 13 con Inertia 3 + Vue 3. Hay un solo 
 | `Jobs` | Ofertas: normalización, clasificación, deduplicación, frescura, búsqueda, filtros y moderación |
 | `Profiles` | Cuestionario, CV, importaciones de GitHub y LinkedIn, perfil de habilidades fusionado y perfil de búsqueda |
 | `Matching` | Requisitos de cada oferta (reglas y, opcionalmente, IA) y puntuación de compatibilidad explicable (0-100) |
-| `Applications` | Seguimiento de ofertas y solicitud rápida (CV adaptado, carta y PDF) |
+| `Applications` | Seguimiento de candidaturas con historial, solicitud rápida (CV adaptado, carta y PDF), recordatorios de seguimiento, preparación de entrevistas y panorama (embudo) |
 | `Alerts` | Búsquedas guardadas, emparejamiento de ofertas nuevas y resúmenes |
 | `Notifications` | Centro de notificaciones y emisión en tiempo real |
 | `AI` | `AiGateway`: proveedores intercambiables, prompts versionados, esquemas, presupuesto y coste |
@@ -58,6 +58,13 @@ La interfaz **siempre** lee de la base de datos, nunca de las APIs externas en v
 - Las habilidades con evidencia (GitHub, CV, LinkedIn) pesan más que las solo declaradas.
 
 **Solicitud rápida.** A partir del perfil confirmado se generan un CV maestro, un CV adaptado (reordenado con reglas o reescrito por la IA y verificado contra el original), una carta y los datos de contacto. La persona lo revisa y lo aprueba, y solo entonces puede descargar el PDF. **Nunca se envía nada automáticamente.**
+
+**Seguimiento y copiloto de carrera.** Todo lo que sigue es para la persona: nada se envía a una empresa.
+
+- *Historial.* Cada candidatura guarda sus estados (guardada, preparada, aplicada, entrevista, oferta, aceptada, declinada, rechazada, sin respuesta) y una tabla de eventos (`application_events`: cambios de estado, rondas de entrevista numeradas, seguimientos y notas cifradas). `RecordApplicationEvent` es el único punto que escribe en ella.
+- *Recordatorios.* `applications:follow-up` (diario, 09:00) avisa una sola vez de las candidaturas aplicadas sin respuesta tras `FOLLOW_UP_DAYS` (10) días, salvo las que ya tuvieron seguimiento o cuya oferta se cerró. `FollowUpReminderNotification` sale por base de datos, tiempo real y correo (con consentimiento); el borrador del mensaje (`FollowUpDraftWriter`, en el idioma y tono de la carta enviada) solo va en el correo y en el tablero.
+- *Preparación de entrevista.* `InterviewPrepBuilder` genera preguntas probables con esquemas STAR que citan las viñetas del propio CV (tarea y resultado quedan en blanco), respuestas honestas para las habilidades que faltan y preguntas para la empresa. Con IA (tarea `interview_prep`) se redacta mejor, pero se vacía todo esquema que nombre una habilidad que el CV no respalda y las respuestas de carencias se limitan a las carencias reales. Se genera en la cola `high` y el contenido se guarda cifrado.
+- *Panorama* (`/insights`). `SkillGapReport` agrega las carencias de `job_matches` (ofertas seguidas y mejores afinidades) y las ordena por cuántas ofertas desbloquearían; `ApplicationFunnel` calcula la conversión entre etapas, los tiempos de respuesta y los resultados por fuente y área. Ambos leen datos ya guardados: ninguna llamada a IA.
 
 **Alertas y tiempo real.**
 

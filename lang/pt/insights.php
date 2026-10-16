@@ -1,0 +1,46 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'title' => 'Panorama',
+    'description' => 'O que a tua procura de emprego diz sobre ti. Calculado com as tuas afinidades guardadas; nada sai da app.',
+    'skill_gaps' => [
+        'title' => 'O que aprender a seguir',
+        'description' => 'Tecnologias que as tuas ofertas seguidas e melhores afinidades pedem e que o teu perfil não tem, ordenadas por quantas ofertas te abririam.',
+        'basis' => 'Com base em :jobs ofertas (:tracked delas seguidas por ti).',
+        'empty' => 'Ainda não há nada para mostrar. Completa o teu perfil de skills e guarda algumas ofertas para ver o que vale a pena aprender.',
+        'next' => 'Começa por :skill',
+        'next_hint' => '{0} É pedida em :jobs ofertas.|{1} É a única tecnologia obrigatória que te falta em :count oferta, e é pedida em :jobs ofertas.|[2,*] É a única tecnologia obrigatória que te falta em :count ofertas, e é pedida em :jobs ofertas.',
+        'table' => 'Tecnologias em falta, ordenadas',
+        'skill' => 'Tecnologia',
+        'jobs' => 'Ofertas',
+        'required' => 'Obrigatória em',
+        'only_gap' => 'Única lacuna em',
+        'tracked' => 'Seguidas',
+    ],
+    'funnel' => [
+        'title' => 'Como vão as tuas candidaturas',
+        'description' => 'Até onde chegou cada candidatura, quanto tempo demoram as empresas e o que te funciona melhor.',
+        'empty' => 'Ainda não há nada para medir. Marca uma oferta como enviada e isto vai preenchendo.',
+        'stages_table' => 'Candidaturas por etapa alcançada',
+        'stage' => 'Etapa',
+        'count' => 'Candidaturas',
+        'stages' => ['applied' => 'Enviadas', 'interview' => 'Entrevista', 'offer' => 'Oferta', 'accepted' => 'Aceites'],
+        'conversion' => ':from → :to: :rate %',
+        'conversion_none' => ':from → :to: faltam dados',
+        'timing_response' => 'As empresas respondem em :days dias em média.',
+        'timing_interview' => 'A primeira entrevista chega :days dias depois de enviar, em média.',
+        'timing_none' => 'Ainda não há respostas suficientes para medir os tempos.',
+        'outcomes' => 'Em que ponto estão agora',
+        'outcome' => ['waiting' => 'À espera de resposta', 'interview' => 'Em entrevistas', 'offer' => 'Oferta recebida', 'accepted' => 'Aceite', 'declined' => 'Oferta recusada', 'rejected' => 'Rejeitada', 'no_response' => 'Sem resposta'],
+        'by_source' => 'Por fonte',
+        'by_category' => 'Por área',
+        'other' => 'Outras',
+        'name' => 'Nome',
+        'applied' => 'Enviadas',
+        'interviews' => 'Entrevistas',
+        'offers' => 'Ofertas',
+        'small_sample' => 'Estes números vêm de poucas candidaturas; lê-os como pistas, não como regras.',
+    ],
+];

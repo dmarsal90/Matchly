@@ -1,0 +1,67 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'title' => 'Interview preparation',
+    'description' => 'Questions, answer outlines and gaps for :title at :company, built from your own CV. Notes for you: nothing is sent anywhere.',
+    'back' => 'Back to my jobs',
+    'open' => 'Prepare for interview',
+    'start' => [
+        'title' => 'Build your pack',
+        'description' => 'We pick the questions this job is likely to ask, outline your answers with the STAR method from what your CV says, and give you honest answers for skills you do not have yet.',
+        'submit' => 'Build the pack',
+        'regenerate' => 'Build it again',
+        'use_ai' => 'Improve it with AI',
+        'ai_consent' => 'I agree to send my profile and the job posting to an AI provider to prepare this pack.',
+        'no_ai_hint' => 'Without AI the pack is built from templates and your CV.',
+    ],
+    'generating' => 'Preparing your pack…',
+    'failed' => 'The pack could not be prepared. Try again.',
+    'source' => ['ai' => 'Written with AI and checked against your CV', 'rules' => 'Built from templates and your CV'],
+    'questions' => [
+        'title' => 'Likely questions',
+        'categories' => ['technical' => 'Technical', 'behavioral' => 'Behavioral', 'motivation' => 'Motivation'],
+        'star_title' => 'Answer outline (STAR)',
+        'situation' => 'Situation',
+        'task' => 'Task',
+        'action' => 'Action',
+        'result' => 'Result',
+        'fill_in' => 'Fill this in with a real example of yours.',
+    ],
+    'gaps' => [
+        'title' => 'Skills you do not have yet',
+        'description' => 'Say it plainly and show how you would close the gap. Never claim a skill you lack.',
+        'required' => 'Required',
+        'nice' => 'Nice to have',
+    ],
+    'ask' => ['title' => 'Questions to ask them'],
+    'warnings' => [
+        'empty_profile' => 'Your profile is almost empty, so the outlines have little to quote. Complete your skills profile for a better pack.',
+        'ai_unavailable' => 'AI was not available (:reason), so the pack was built from templates.',
+        'star_removed' => '{1} :count outline was removed because it mentioned a skill your CV does not back.|[2,*] :count outlines were removed because they mentioned skills your CV does not back.',
+    ],
+    'template' => [
+        'and' => 'and',
+        'situation_at' => 'As :title at :company',
+        'technical' => 'Tell me about a time you used :skill to solve a real problem.',
+        'behavioral' => [
+            'conflict' => 'Tell me about a disagreement with a colleague and how you handled it.',
+            'failure' => 'Tell me about something that went wrong in a project and what you learned.',
+            'deadline' => 'Tell me about a time you had to deliver under a tight deadline.',
+        ],
+        'motivation' => [
+            'company' => 'Why do you want to work at :company?',
+            'role' => 'Why are you interested in the :title role?',
+        ],
+        'gap' => [
+            'close' => 'I have not worked with :skill professionally yet, and I prefer to say so openly. My closest experience is with :closest. I would get up to speed with the documentation and a small hands-on project in my first weeks.',
+            'none' => 'I have not worked with :skill professionally yet, and I prefer to say so openly. I would get up to speed with the documentation and a small hands-on project in my first weeks.',
+        ],
+        'ask' => [
+            'team' => 'How is the team organised, and who would I work with day to day?',
+            'success' => 'What would success look like in the first six months as :title?',
+            'process' => 'What are the next steps in the process at :company?',
+        ],
+    ],
+];

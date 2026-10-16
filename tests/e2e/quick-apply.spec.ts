@@ -64,5 +64,7 @@ test('prepares, reviews and approves a quick application', async ({ page }) => {
     ).toBeVisible();
 
     await page.goto('/applications');
-    await expect(page.getByText('Desarrollador Backend Senior')).toBeVisible();
+    await expect(
+        page.getByRole('link', { name: 'Desarrollador Backend Senior' }),
+    ).toBeVisible();
 });

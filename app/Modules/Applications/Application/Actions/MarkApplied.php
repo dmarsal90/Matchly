@@ -12,11 +12,13 @@ use Carbon\CarbonImmutable;
 /** The person tells us they sent the application on the employer's site. */
 final readonly class MarkApplied
 {
+    public function __construct(private RecordApplicationEvent $record) {}
+
     public function handle(ApplicationPackage $package): void
     {
         $application = Application::query()->where('user_id', $package->user_id)->where('job_listing_id', $package->job_listing_id)->first() ?? new Application;
 
-        if (in_array($application->status, [ApplicationStatus::Interview, ApplicationStatus::Rejected], true) && $application->exists) {
+        if ($application->exists && $application->status->isPastApplying()) {
             return;
         }
 
@@ -28,5 +30,6 @@ final readonly class MarkApplied
             'status_changed_at' => $now,
             'applied_at' => $application->applied_at ?? $now,
         ])->save();
+        $this->record->statusChanged($application, ApplicationStatus::Applied, $now);
     }
 }
