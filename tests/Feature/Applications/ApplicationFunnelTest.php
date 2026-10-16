@@ -147,3 +147,79 @@ it('plans the study hours of the missing skills and offers them as a calendar', 
     auth()->logout();
     $this->get('/insights/plan.ics')->assertRedirect();
 });
+
+describe('sharing the report', function (): void {
+    function sharedUrl(User $user, array $payload = ['days' => 7]): string
+    {
+        test()->actingAs($user)->post(route('insights.share'), $payload)->assertRedirect()->assertSessionHasNoErrors();
+
+        return (string) session('share_url');
+    }
+
+    it('serves a frozen copy to anyone with the link, without the name unless asked', function (): void {
+        $user = User::factory()->create(['name' => 'Ana Ruiz', 'locale' => 'es']);
+        trackedAt($user, ApplicationStatus::Interview, 20);
+
+        $private = sharedUrl($user);
+        $named = sharedUrl($user, ['days' => 1, 'with_name' => true]);
+        auth()->logout();
+        $this->flushSession();
+
+        $response = $this->get($private)->assertOk();
+        expect($response->getContent())->toContain('Mi informe de búsqueda')->not->toContain('Ana Ruiz')
+            ->and($response->headers->get('X-Robots-Tag'))->toContain('noindex')
+            ->and($this->get($named)->getContent())->toContain('Ana Ruiz');
+
+        $stored = DB::table('shared_reports')->first();
+        expect($stored->html)->not->toContain('Mi informe')->and(strlen($stored->token_hash))->toBe(64);
+        expect(DB::table('shared_reports')->where('token_hash', 'LIKE', '%'.basename($private).'%')->exists())->toBeFalse();
+    });
+
+    it('stops serving on expiry or revocation and never confirms what exists', function (): void {
+        $user = User::factory()->create();
+        $url = sharedUrl($user);
+        auth()->logout();
+        $this->flushSession();
+
+        $this->get($url)->assertOk();
+        expect(DB::table('shared_reports')->value('views'))->toBe(1);
+        $this->get('/shared/'.str_repeat('a', 48))->assertNotFound();
+        $this->get('/shared/short')->assertNotFound();
+
+        $this->travel(8)->days();
+        $this->get($url)->assertNotFound();
+        $this->travelBack();
+
+        $other = sharedUrl($user);
+        auth()->logout();
+        $this->flushSession();
+        $id = DB::table('shared_reports')->orderByDesc('id')->value('id');
+        $this->actingAs($user)->delete(route('insights.share.destroy', $id))->assertRedirect();
+        auth()->logout();
+        $this->flushSession();
+        $this->get($other)->assertNotFound();
+    });
+
+    it('limits lifetimes and active links, and keeps revocation to the owner', function (): void {
+        $user = User::factory()->create();
+
+        $this->actingAs($user)->post(route('insights.share'), ['days' => 365])->assertSessionHasErrors('days');
+        foreach (range(1, 5) as $_) {
+            $this->post(route('insights.share'), ['days' => 7])->assertSessionHasNoErrors();
+        }
+        $this->post(route('insights.share'), ['days' => 7])->assertSessionHasErrors('days');
+
+        $this->get('/insights')->assertInertia(fn (Assert $page) => $page->has('shares', 5));
+        $id = DB::table('shared_reports')->value('id');
+        $this->actingAs(User::factory()->create())->delete(route('insights.share.destroy', $id))->assertForbidden();
+    });
+
+    it('exports the shares\' dates, never their content', function (): void {
+        $user = User::factory()->create();
+        sharedUrl($user);
+
+        $export = json_encode(app(App\Modules\Applications\Application\Privacy\ApplicationDataContributor::class)->export($user->id)->data);
+
+        expect($export)->toContain('shared_reports')->toContain('expires_at')->not->toContain('<html');
+    });
+});

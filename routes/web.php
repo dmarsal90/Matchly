@@ -13,6 +13,7 @@ use App\Modules\Applications\Http\Controllers\InterviewAnswerController;
 use App\Modules\Applications\Http\Controllers\InterviewPrepController;
 use App\Modules\Applications\Http\Controllers\QuickApplyController;
 use App\Modules\Applications\Http\Controllers\SavedJobController;
+use App\Modules\Applications\Http\Controllers\SharedReportController;
 use App\Modules\Identity\Http\Controllers\OAuthController;
 use App\Modules\Jobs\Http\Controllers\JobController;
 use App\Modules\Matching\Http\Controllers\MarketController;
@@ -45,6 +46,9 @@ Route::inertia('privacy', 'legal/Privacy', ['retention' => [
 ]])->name('legal.privacy');
 Route::inertia('terms', 'legal/Terms')->name('legal.terms');
 
+// A shared insights report: the unguessable token in the link is the only credential.
+Route::get('shared/{token}', [SharedReportController::class, 'show'])->where('token', '[A-Za-z0-9]{48}')->middleware('throttle:60,1')->name('shared-report.show');
+
 // One-click unsubscribe from alert e-mails: signed links, no sign-in needed.
 Route::middleware(['signed', 'throttle:30,1'])->group(function () {
     Route::get('alerts/{savedSearch}/unsubscribe', [UnsubscribeController::class, 'show'])->name('alerts.unsubscribe');
@@ -67,6 +71,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::delete('company-notes/{note}', [CompanyNoteController::class, 'destroy'])->whereNumber('note')->name('company-notes.destroy');
     Route::get('insights', [InsightsController::class, 'index'])->name('insights.index');
     Route::get('insights/plan.ics', [InsightsController::class, 'plan'])->middleware('throttle:30,1')->name('insights.plan');
+    Route::post('insights/share', [SharedReportController::class, 'store'])->middleware('throttle:10,1')->name('insights.share');
+    Route::delete('insights/share/{report}', [SharedReportController::class, 'destroy'])->whereNumber('report')->name('insights.share.destroy');
     Route::get('insights/report', [InsightsController::class, 'report'])->middleware('throttle:30,1')->name('insights.report');
     Route::get('applications', [ApplicationController::class, 'index'])->name('applications.index');
     Route::patch('applications/{application}', [ApplicationController::class, 'update'])->name('applications.update');

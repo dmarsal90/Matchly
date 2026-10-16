@@ -16,7 +16,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
-    <title>{{ __('insights.report.title') }} · {{ $name }}</title>
+    <title>{{ __('insights.report.title') }}@if ($name) · {{ $name }}@endif</title>
     <style>
         :root { color-scheme: light dark; --fg: #1a1a1a; --muted: #5c5c5c; --line: #d6d6d6; --soft: #f4f4f5; --link: #1d4ed8; }
         @media (prefers-color-scheme: dark) { :root { --fg: #ececec; --muted: #a3a3a3; --line: #3a3a3a; --soft: #1f1f1f; --link: #8ab4ff; } body { background: #111; } }
@@ -37,7 +37,7 @@
 </head>
 <body>
     <h1>{{ __('insights.report.title') }}</h1>
-    <p class="muted">{{ $name }} · {{ __('insights.report.generated', ['date' => $generatedAt]) }}</p>
+    <p class="muted">@if ($name){{ $name }} · @endif{{ __('insights.report.generated', ['date' => $generatedAt]) }}</p>
     <p class="muted">{{ __('insights.report.offline') }}</p>
 
     <h2>{{ __('insights.funnel.title') }}</h2>

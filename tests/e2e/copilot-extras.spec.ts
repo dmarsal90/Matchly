@@ -233,3 +233,31 @@ test('creates a token for the browser extension and shows it once', async ({
         page.getByText('Aún no has creado ningún token.'),
     ).toBeVisible();
 });
+
+test('shares the report by a link anyone can open until it is revoked', async ({
+    page,
+    browser,
+}) => {
+    await page.goto('/insights');
+    await page.getByText('Compartir este panorama').click();
+    await page.getByRole('button', { name: 'Crear enlace' }).click();
+
+    const link = page.locator('code').filter({ hasText: '/shared/' });
+    await expect(link).toBeVisible();
+    const url = (await link.textContent()) ?? '';
+
+    // A visitor with no session sees the frozen report, without the owner's name.
+    const visitor = await browser.newContext();
+    const shared = await visitor.newPage();
+    await shared.goto(url);
+    await expect(
+        shared.getByRole('heading', { name: 'Mi informe de búsqueda' }),
+    ).toBeVisible();
+    await expect(shared.locator('body')).not.toContainText('Ana García');
+
+    await page.getByRole('button', { name: 'Revocar' }).click();
+    await expect(page.getByText('No has compartido nada.')).toBeVisible();
+    expect((await shared.goto(url))?.status()).toBe(404);
+    await visitor.close();
+    await expectNoViolations(page);
+});

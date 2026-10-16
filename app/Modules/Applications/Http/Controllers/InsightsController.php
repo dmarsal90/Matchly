@@ -6,6 +6,8 @@ namespace App\Modules\Applications\Http\Controllers;
 
 use App\Modules\Applications\Application\Queries\ApplicationFunnel;
 use App\Modules\Applications\Application\Queries\ExperimentAdvisor;
+use App\Modules\Applications\Application\Queries\InsightsReport;
+use App\Modules\Applications\Infrastructure\Models\SharedReport;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Matching\Application\Queries\SkillGapReport;
 use App\Modules\Matching\Application\Queries\StudyPlan;
@@ -35,6 +37,8 @@ final class InsightsController
             'studyPlan' => $plan->build($this->planSkills($skillGaps), $this->hoursPerWeek($request)),
             'funnel' => $figures,
             'experiments' => $advisor->advise($figures),
+            'shares' => SharedReport::query()->where('user_id', $user->id)->where('expires_at', '>', CarbonImmutable::now())->orderBy('id')->get()->map(fn (SharedReport $share): array => ['id' => $share->id, 'expires_at' => $share->expires_at->toIso8601String(), 'views' => $share->views])->all(),
+            'newShareUrl' => $request->session()->get('share_url'),
         ]);
     }
 
@@ -66,19 +70,11 @@ final class InsightsController
     }
 
     /** The same figures as one self-contained HTML file to keep, print or share. */
-    public function report(#[CurrentUser] User $user, SkillGapReport $gaps, ApplicationFunnel $funnel, ExperimentAdvisor $advisor): HttpResponse
+    public function report(#[CurrentUser] User $user, InsightsReport $report): HttpResponse
     {
         $now = CarbonImmutable::now();
-        $figures = $funnel->for($user->id);
-        $html = view('reports.insights', [
-            'name' => $user->name,
-            'generatedAt' => $now->settings(['locale' => app()->getLocale()])->isoFormat('LL'),
-            'gaps' => $gaps->for($user->id),
-            'funnel' => $figures,
-            'experiments' => $advisor->advise($figures),
-        ])->render();
 
-        return response($html, 200, [
+        return response($report->html($user), 200, [
             'Content-Type' => 'text/html; charset=UTF-8',
             'Content-Disposition' => 'attachment; filename="'.Str::slug((string) config('app.name')).'-report-'.$now->toDateString().'.html"',
             'Cache-Control' => 'private, no-store',
