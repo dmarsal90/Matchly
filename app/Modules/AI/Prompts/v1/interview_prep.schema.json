@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["questions", "gaps", "ask"],
+  "properties": {
+    "questions": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["category", "question", "skill", "situation", "task", "action", "result"],
+        "properties": {
+          "category": {"type": "string", "enum": ["technical", "behavioral", "motivation"]},
+          "question": {"type": "string", "minLength": 5, "maxLength": 300},
+          "skill": {"type": "string", "maxLength": 60},
+          "situation": {"type": "string", "maxLength": 600},
+          "task": {"type": "string", "maxLength": 600},
+          "action": {"type": "string", "maxLength": 800},
+          "result": {"type": "string", "maxLength": 600}
+        }
+      }
+    },
+    "gaps": {
+      "type": "array",
+      "maxItems": 10,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["skill", "answer"],
+        "properties": {
+          "skill": {"type": "string", "minLength": 1, "maxLength": 60},
+          "answer": {"type": "string", "minLength": 10, "maxLength": 800}
+        }
+      }
+    },
+    "ask": {
+      "type": "array",
+      "maxItems": 6,
+      "items": {"type": "string", "minLength": 5, "maxLength": 250}
+    }
+  }
+}

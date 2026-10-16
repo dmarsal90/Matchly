@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Attributes\UsePolicy;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 /**
  * @property int $id
@@ -60,6 +61,14 @@ final class Application extends Model
     public function events(): HasMany
     {
         return $this->hasMany(ApplicationEvent::class)->orderBy('occurred_at')->orderBy('id');
+    }
+
+    /**
+     * @return HasOne<InterviewPrep, $this>
+     */
+    public function interviewPrep(): HasOne
+    {
+        return $this->hasOne(InterviewPrep::class);
     }
 
     protected function casts(): array

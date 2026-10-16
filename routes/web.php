@@ -6,6 +6,7 @@ use App\Modules\Alerts\Http\Controllers\AlertController;
 use App\Modules\Alerts\Http\Controllers\UnsubscribeController;
 use App\Modules\Applications\Http\Controllers\ApplicationController;
 use App\Modules\Applications\Http\Controllers\ApplicationEventController;
+use App\Modules\Applications\Http\Controllers\InterviewPrepController;
 use App\Modules\Applications\Http\Controllers\QuickApplyController;
 use App\Modules\Applications\Http\Controllers\SavedJobController;
 use App\Modules\Identity\Http\Controllers\OAuthController;
@@ -59,6 +60,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::patch('applications/{application}', [ApplicationController::class, 'update'])->name('applications.update');
     Route::delete('applications/{application}', [ApplicationController::class, 'destroy'])->name('applications.destroy');
     Route::post('applications/{application}/events', [ApplicationEventController::class, 'store'])->name('applications.events.store');
+    Route::get('applications/{application}/interview-prep', [InterviewPrepController::class, 'show'])->whereNumber('application')->name('applications.interview-prep.show');
+    Route::post('applications/{application}/interview-prep', [InterviewPrepController::class, 'store'])->whereNumber('application')->middleware('throttle:quick-apply')->name('applications.interview-prep.store');
 
     // Quick apply: a package is prepared for review; the person applies on the employer's site.
     Route::post('jobs/{job}/quick-apply', [QuickApplyController::class, 'start'])->whereNumber('job')->middleware('throttle:quick-apply')->name('jobs.quick-apply');

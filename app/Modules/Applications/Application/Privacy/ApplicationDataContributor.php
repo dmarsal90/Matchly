@@ -7,6 +7,7 @@ namespace App\Modules\Applications\Application\Privacy;
 use App\Modules\Applications\Infrastructure\Models\Application;
 use App\Modules\Applications\Infrastructure\Models\ApplicationEvent;
 use App\Modules\Applications\Infrastructure\Models\ApplicationPackage;
+use App\Modules\Applications\Infrastructure\Models\InterviewPrep;
 use App\Modules\Identity\Domain\Contracts\PersonalDataContributor;
 use App\Modules\Identity\Domain\Data\PersonalData;
 use Illuminate\Support\Facades\DB;
@@ -32,6 +33,12 @@ final class ApplicationDataContributor implements PersonalDataContributor
                 ])->values()->all(),
                 'created_at' => $application->created_at->toIso8601String(),
             ])->values()->all(),
+            'interview_preps' => InterviewPrep::query()->with('application.job:id,title,company')->whereHas('application', fn ($application) => $application->where('user_id', $userId))->orderBy('id')->get()
+                ->map(fn (InterviewPrep $prep): array => [
+                    'job' => "{$prep->application->job->title} · {$prep->application->job->company}",
+                    'status' => $prep->status->value,
+                    'content' => $prep->content,
+                ])->values()->all(),
             'viewed_jobs' => DB::table('job_views')->where('user_id', $userId)->count(),
             'prepared_applications' => ApplicationPackage::query()->with('job:id,title,company')->where('user_id', $userId)->orderBy('id')->get()
                 ->map(fn (ApplicationPackage $package): array => [

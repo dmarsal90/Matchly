@@ -73,3 +73,27 @@ export type ApplicationEventEntry = {
     note: string | null;
     occurred_at: string;
 };
+
+export type InterviewStar = {
+    situation: string | null;
+    task: string | null;
+    action: string | null;
+    result: string | null;
+};
+
+export type InterviewPrepData = {
+    status: 'generating' | 'ready' | 'failed';
+    source: 'ai' | 'rules' | null;
+    content: {
+        questions: {
+            category: 'technical' | 'behavioral' | 'motivation';
+            question: string;
+            skill: string | null;
+            star: InterviewStar | null;
+        }[];
+        gaps: { skill: string; required: boolean; answer: string }[];
+        ask: string[];
+    } | null;
+    warnings: PackageWarning[];
+    updated_at: string;
+};

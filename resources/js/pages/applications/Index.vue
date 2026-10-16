@@ -8,6 +8,7 @@ import { NativeSelect } from '@/components/ui/native-select';
 import ApplicationTimeline from '@/features/applications/components/ApplicationTimeline.vue';
 import type { ApplicationEventEntry } from '@/features/applications/types';
 import ApplyButton from '@/features/jobs/components/ApplyButton.vue';
+import { show as showPrep } from '@/routes/applications/interview-prep';
 import { show as showPackage } from '@/routes/applications/packages';
 import type { Job } from '@/features/jobs/types';
 import {
@@ -17,7 +18,7 @@ import {
 } from '@/routes/applications';
 import { index as jobsIndex, show } from '@/routes/jobs';
 import { Head, Link, router } from '@inertiajs/vue3';
-import { FileText, Star, Trash2 } from '@lucide/vue';
+import { FileText, GraduationCap, Star, Trash2 } from '@lucide/vue';
 import { getActiveLanguage, trans } from 'laravel-vue-i18n';
 import { computed, reactive } from 'vue';
 
@@ -211,6 +212,24 @@ const formatDate = (iso: string): string =>
                                 v-if="item.job_open"
                                 :href="item.job.apply_url"
                             />
+                            <Button
+                                v-if="
+                                    ['applied', 'interview', 'offer'].includes(
+                                        item.status,
+                                    )
+                                "
+                                variant="outline"
+                                size="sm"
+                                as-child
+                            >
+                                <Link :href="showPrep(item.id)">
+                                    <GraduationCap
+                                        class="size-4"
+                                        aria-hidden="true"
+                                    />
+                                    {{ trans('interview_prep.open') }}
+                                </Link>
+                            </Button>
                             <Button
                                 v-if="item.package"
                                 variant="outline"
