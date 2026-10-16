@@ -66,4 +66,14 @@ return [
         'paid' => 'De pago',
         'search' => '(resultados de búsqueda)',
     ],
+    'report' => [
+        'title' => 'Mi informe de búsqueda',
+        'generated' => 'Generado el :date',
+        'offline' => 'Es un único archivo HTML: se abre sin conexión, se puede imprimir y no carga nada de internet.',
+        'hours' => 'Horas orientativas',
+        'hours_note' => 'Las horas son una estimación aproximada para llegar a un nivel de trabajo desde cero; dependen de tu punto de partida.',
+        'courses' => 'Cursos gratuitos',
+        'download' => 'Descargar informe',
+        'download_hint' => 'Archivo HTML autocontenido, para guardar o imprimir.',
+    ],
 ];

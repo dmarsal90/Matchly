@@ -66,4 +66,14 @@ return [
         'paid' => 'Paid',
         'search' => '(search results)',
     ],
+    'report' => [
+        'title' => 'My job search report',
+        'generated' => 'Generated on :date',
+        'offline' => 'A single HTML file: it opens offline, can be printed and loads nothing from the internet.',
+        'hours' => 'Rough hours',
+        'hours_note' => 'Hours are a rough estimate to reach a working level from scratch; they depend on where you start.',
+        'courses' => 'Free courses',
+        'download' => 'Download report',
+        'download_hint' => 'A self-contained HTML file to keep or print.',
+    ],
 ];

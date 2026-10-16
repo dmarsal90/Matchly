@@ -2,13 +2,14 @@
 import EmptyState from '@/components/EmptyState.vue';
 import Heading from '@/components/Heading.vue';
 import { Button } from '@/components/ui/button';
-import { index as insightsIndex } from '@/routes/insights';
+import { index as insightsIndex, report } from '@/routes/insights';
 import { index as skillsIndex } from '@/routes/skills';
 import { show as showJob } from '@/routes/jobs';
 import { Head, Link } from '@inertiajs/vue3';
 import { Badge } from '@/components/ui/badge';
 import {
     ChartNoAxesColumn,
+    Download,
     ExternalLink,
     Lightbulb,
     Target,
@@ -115,6 +116,18 @@ const stageMax = computed(() => Math.max(1, props.funnel.applied));
             :title="trans('insights.title')"
             :description="trans('insights.description')"
         />
+
+        <div class="flex flex-wrap items-center gap-3">
+            <Button as-child variant="outline" size="sm">
+                <a :href="report.url()" download>
+                    <Download class="size-4" aria-hidden="true" />
+                    {{ trans('insights.report.download') }}
+                </a>
+            </Button>
+            <span class="text-xs text-muted-foreground">{{
+                trans('insights.report.download_hint')
+            }}</span>
+        </div>
 
         <section class="space-y-4" aria-labelledby="funnel">
             <div>
