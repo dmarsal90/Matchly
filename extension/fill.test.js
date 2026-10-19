@@ -110,4 +110,23 @@ describe('fill', () => {
         document.querySelector('input[type=file]').files = [];
         expect(run({ ...payload, resume: null }).attached).toBe(0);
     });
+
+    it('collects empty open questions and writes the drafted answers only into empty boxes', () => {
+        document.body.insertAdjacentHTML(
+            'beforeend',
+            `<label for="q">What interests you about our product?</label><textarea id="q"></textarea>
+             <label for="d">What is your biggest achievement?</label><textarea id="d">Mine</textarea>`,
+        );
+
+        const { questions } = run({ ...payload, resume: null });
+
+        expect(questions.map((item) => item.text)).toEqual([
+            'What interests you about our product?',
+        ]);
+
+        const written = run({ answers: { [questions[0].id]: 'Because…' } });
+        expect(document.getElementById('q').value).toBe('Because…');
+        expect(document.getElementById('d').value).toBe('Mine');
+        expect(written.filled).toBe(1);
+    });
 });

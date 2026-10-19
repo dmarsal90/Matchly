@@ -6,6 +6,7 @@
 (function () {
     const payload = globalThis.__matchlyPayload || { fields: {}, resume: null };
     const { classify } = globalThis.MatchlyMatch;
+    const MIN_QUESTION = 12;
 
     function labelOf(element) {
         if (element.labels && element.labels.length > 0) {
@@ -57,8 +58,23 @@
         });
     }
 
+    // Second pass: put the drafted answers (keyed by the marker set in the first pass) into their boxes.
+    if (payload.answers) {
+        let written = 0;
+        for (const [id, answer] of Object.entries(payload.answers)) {
+            const box = document.querySelector(`[data-matchly-q="${id}"]`);
+            if (box && box.value.trim() === '') {
+                setValue(box, answer);
+                written++;
+            }
+        }
+
+        return { filled: written, attached: 0, questions: [] };
+    }
+
     let filled = 0;
     let attached = 0;
+    const questions = [];
     for (const element of document.querySelectorAll('input, textarea')) {
         if (
             element.disabled ||
@@ -78,6 +94,23 @@
             ariaLabel: element.getAttribute('aria-label'),
         });
         if (key === null) {
+            // An empty free-text box with a question as its label is an open question to draft an answer for.
+            const text = (
+                labelOf(element) ||
+                element.getAttribute('aria-label') ||
+                ''
+            )
+                .replace(/\s+/g, ' ')
+                .trim();
+            if (
+                element instanceof HTMLTextAreaElement &&
+                element.value.trim() === '' &&
+                text.length >= MIN_QUESTION
+            ) {
+                const id = Math.random().toString(36).slice(2, 10);
+                element.setAttribute('data-matchly-q', id);
+                questions.push({ id, text: text.slice(0, 500) });
+            }
             continue;
         }
 
@@ -101,5 +134,5 @@
         }
     }
 
-    return { filled, attached };
+    return { filled, attached, questions };
 })();
