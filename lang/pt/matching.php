@@ -73,4 +73,13 @@ return [
         ],
         'none' => 'Não detetámos requisitos concretos.',
     ],
+    'verdict' => [
+        'title' => 'Veredicto',
+        'out_of' => 'em 5',
+        'note' => 'Abaixo de 4,0 normalmente não compensa candidatar: é só um guia, decide você.',
+        'recommendation' => ['apply' => 'Candidatar', 'caution' => 'Candidatar com cautela', 'skip' => 'Não recomendado'],
+        'dimensions' => ['match' => 'Encaixe', 'north_star' => 'Norte (cargo e senioridade)', 'compensation' => 'Compensação', 'culture' => 'Cultura (localização e modalidade)', 'red_flags' => 'Sinais de alerta'],
+        'unknown' => 'A oferta não o indica',
+        'flags' => ['missing_required' => 'Faltam a maioria das competências obrigatórias.'],
+    ],
 ];
