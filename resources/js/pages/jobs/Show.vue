@@ -33,6 +33,7 @@ const props = defineProps<{
     followedCompanyId: number | null;
     quickApply: QuickApplyOptions | null;
     companyNotes: CompanyNoteEntry[];
+    ghost: { level: string; signals: string[] } | null;
 }>();
 
 // Public page: guests see the requirements, signed-in users their score too.
@@ -216,6 +217,26 @@ const description = computed(() => `${props.job.title} · ${props.job.company}`)
                     {{ tag }}
                 </li>
             </ul>
+        </section>
+
+        <section
+            v-if="ghost && isOpen"
+            class="rounded-xl border border-amber-500/50 bg-amber-500/5 p-4 text-sm"
+            role="note"
+            data-testid="ghost"
+        >
+            <h2 class="mb-1 flex items-center gap-2 font-semibold">
+                <AlertTriangle class="size-4" aria-hidden="true" />
+                {{ trans('jobs.show.ghost.title') }}
+            </h2>
+            <ul class="list-disc space-y-0.5 pl-6">
+                <li v-for="signal in ghost.signals" :key="signal">
+                    {{ trans(`jobs.show.ghost.${signal}`) }}
+                </li>
+            </ul>
+            <p class="mt-2 text-xs text-muted-foreground">
+                {{ trans('jobs.show.ghost.note') }}
+            </p>
         </section>
 
         <SalaryBenchmark v-if="salaryBenchmark" :benchmark="salaryBenchmark" />

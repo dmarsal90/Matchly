@@ -53,3 +53,11 @@ it('flags a job where half the required skills are missing', function (): void {
 
     expect($verdict['flags'])->toBe(['missing_required'])->and($verdict['dimensions']['red_flags']['grade'])->toBe(3.4);
 });
+
+it('counts a stale posting as one more red flag', function (): void {
+    $fresh = (new FitVerdict)->for(verdictResult(0.9));
+    $stale = (new FitVerdict)->for(verdictResult(0.9), possiblyStale: true);
+
+    expect($stale['flags'])->toBe(['possibly_stale'])
+        ->and($stale['dimensions']['red_flags']['grade'])->toBeLessThan($fresh['dimensions']['red_flags']['grade']);
+});

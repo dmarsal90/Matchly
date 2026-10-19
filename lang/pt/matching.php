@@ -80,6 +80,6 @@ return [
         'recommendation' => ['apply' => 'Candidatar', 'caution' => 'Candidatar com cautela', 'skip' => 'Não recomendado'],
         'dimensions' => ['match' => 'Encaixe', 'north_star' => 'Norte (cargo e senioridade)', 'compensation' => 'Compensação', 'culture' => 'Cultura (localização e modalidade)', 'red_flags' => 'Sinais de alerta'],
         'unknown' => 'A oferta não o indica',
-        'flags' => ['missing_required' => 'Faltam a maioria das competências obrigatórias.'],
+        'flags' => ['possibly_stale' => 'Oferta possivelmente desatualizada', 'missing_required' => 'Faltam a maioria das competências obrigatórias.'],
     ],
 ];

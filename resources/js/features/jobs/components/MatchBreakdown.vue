@@ -35,6 +35,8 @@ const DIMENSIONS: FitDimension[] = [
     'red_flags',
 ];
 
+const VERDICT_FLAGS = ['missing_required', 'possibly_stale'];
+
 const languageNames = computed(
     () => new Intl.DisplayNames([getActiveLanguage()], { type: 'language' }),
 );
@@ -154,13 +156,12 @@ const computedAt = computed(() =>
                         </dd>
                     </div>
                 </dl>
-                <ul
-                    v-if="match.verdict.flags.includes('missing_required')"
-                    class="mt-2 list-disc pl-5 text-sm text-destructive"
-                >
-                    <li>
-                        {{ trans('matching.verdict.flags.missing_required') }}
-                    </li>
+                <ul class="mt-2 list-disc pl-5 text-sm text-destructive">
+                    <template v-for="flag in VERDICT_FLAGS" :key="flag">
+                        <li v-if="match.verdict.flags.includes(flag)">
+                            {{ trans(`matching.verdict.flags.${flag}`) }}
+                        </li>
+                    </template>
                 </ul>
                 <p class="mt-2 text-xs text-muted-foreground">
                     {{ trans('matching.verdict.note') }}

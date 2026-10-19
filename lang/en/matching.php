@@ -80,6 +80,6 @@ return [
         'recommendation' => ['apply' => 'Apply', 'caution' => 'Apply with caution', 'skip' => 'Not recommended'],
         'dimensions' => ['match' => 'Match', 'north_star' => 'North star (role and seniority)', 'compensation' => 'Compensation', 'culture' => 'Culture (location and work mode)', 'red_flags' => 'Red flags'],
         'unknown' => 'Not stated in the posting',
-        'flags' => ['missing_required' => 'Most required skills are missing.'],
+        'flags' => ['possibly_stale' => 'Posting may be stale', 'missing_required' => 'Most required skills are missing.'],
     ],
 ];

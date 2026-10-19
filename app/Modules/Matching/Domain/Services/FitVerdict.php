@@ -37,9 +37,10 @@ final readonly class FitVerdict
 
     /**
      * @param  array<string, mixed>  $result  a MatchResult::toArray()
+     * @param  bool  $possiblyStale  the posting shows ghost-job signals: one more red flag
      * @return array{grade: float, recommendation: string, dimensions: array<string, array{grade: float|null, known: bool}>, flags: list<string>}
      */
-    public function for(array $result): array
+    public function for(array $result, bool $possiblyStale = false): array
     {
         /** @var array<string, array{max: float, ratio: float, known: bool}> $breakdown */
         $breakdown = (array) ($result['breakdown'] ?? []);
@@ -50,6 +51,9 @@ final readonly class FitVerdict
         }
 
         $flags = $this->flags($result);
+        if ($possiblyStale) {
+            $flags[] = 'possibly_stale';
+        }
         $dimensions['red_flags'] = ['grade' => $this->grade(max(0.0, 1.0 - 0.4 * count($flags))), 'known' => true];
 
         $total = 0.0;

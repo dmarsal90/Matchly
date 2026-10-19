@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 Route::middleware([AuthenticateExtensionToken::class, 'throttle:60,1'])->group(function (): void {
     Route::get('packages', [ExtensionApiController::class, 'index'])->name('extension.api.packages');
     Route::get('packages/{package}/fields', [ExtensionApiController::class, 'fields'])->whereNumber('package')->name('extension.api.fields');
+    Route::post('jobs', [ExtensionApiController::class, 'capture'])->middleware('throttle:30,60')->name('extension.api.capture');
     Route::post('packages/{package}/answer', [ExtensionApiController::class, 'answer'])->whereNumber('package')->middleware('throttle:20,1')->name('extension.api.answer');
     Route::get('packages/{package}/resume.pdf', [ExtensionApiController::class, 'resume'])->whereNumber('package')->name('extension.api.resume');
 });

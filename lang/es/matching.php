@@ -80,6 +80,6 @@ return [
         'recommendation' => ['apply' => 'Aplicar', 'caution' => 'Aplicar con cautela', 'skip' => 'No recomendado'],
         'dimensions' => ['match' => 'Encaje', 'north_star' => 'Norte (puesto y seniority)', 'compensation' => 'Compensación', 'culture' => 'Cultura (ubicación y modalidad)', 'red_flags' => 'Banderas rojas'],
         'unknown' => 'La oferta no lo indica',
-        'flags' => ['missing_required' => 'Faltan la mayoría de las skills obligatorias.'],
+        'flags' => ['possibly_stale' => 'La oferta puede estar desactualizada', 'missing_required' => 'Faltan la mayoría de las skills obligatorias.'],
     ],
 ];
