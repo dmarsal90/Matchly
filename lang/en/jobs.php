@@ -216,6 +216,13 @@ return [
         'page' => 'Page :page',
     ],
     'show' => [
+        'ghost' => [
+            'title' => 'This posting may be stale',
+            'old' => 'It has been up a long time.',
+            'very_old' => 'It has been up for more than two months.',
+            'reposted' => 'The same company has posted this title several times.',
+            'note' => 'These are hints, not proof: check the original posting before you spend an application.',
+        ],
         'back' => 'Back to jobs',
         'closed' => 'This job is no longer available.',
         'closed_hint' => 'The source removed it or its link stopped working.',

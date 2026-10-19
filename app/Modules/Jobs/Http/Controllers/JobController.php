@@ -107,6 +107,7 @@ final class JobController
             'followedCompanyId' => $user === null ? null : FollowedCompany::query()->where('user_id', $user->id)->where('company_key', CompanyKey::from($job->company))->value('id'),
             'requirements' => $details['requirements'],
             'match' => $details['match'],
+            'ghost' => $details['ghost'],
             'companyNotes' => $user === null ? [] : CompanyNote::query()
                 ->where('user_id', $user->id)
                 ->where('company_key', CompanyKey::from($job->company))

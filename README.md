@@ -218,7 +218,7 @@ Además de la solicitud rápida, Matchly acompaña la candidatura hasta el final
 
 ## Extensión del navegador
 
-La carpeta [`extension/`](extension/README.md) es una extensión (Chrome, Edge, Brave) que rellena los formularios de empleo con los datos de las solicitudes que ya aprobaste y adjunta el CV en PDF. Solo lee, solo rellena campos vacíos y **nunca envía el formulario**. Las preguntas abiertas del formulario (cajas de texto con una pregunta como etiqueta) las responde con un borrador hecho solo con tu CV y la oferta (con IA si ya diste tu consentimiento, con una plantilla si no), que tú revisas. Se conecta con un token que creas en *Ajustes › Extensión del navegador* y que solo ve las solicitudes aprobadas.
+La carpeta [`extension/`](extension/README.md) es una extensión (Chrome, Edge, Brave) que rellena los formularios de empleo con los datos de las solicitudes que ya aprobaste y adjunta el CV en PDF. Solo lee, solo rellena campos vacíos y **nunca envía el formulario**. Las preguntas abiertas del formulario (cajas de texto con una pregunta como etiqueta) las responde con un borrador hecho solo con tu CV y la oferta (con IA si ya diste tu consentimiento, con una plantilla si no), que tú revisas. Con el botón **Guardar esta oferta** guarda en tu lista la oferta de la página que estás viendo (LinkedIn, Indeed, la web de la empresa…): solo lee los datos públicos estructurados de la oferta (JSON-LD `JobPosting`), nunca nada tras un inicio de sesión, y si Matchly ya la tenía la reutiliza. Se conecta con un token que creas en *Ajustes › Extensión del navegador* y que solo ve las solicitudes aprobadas.
 
 ## Estructura
 

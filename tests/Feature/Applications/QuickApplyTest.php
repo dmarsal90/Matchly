@@ -473,6 +473,31 @@ describe('browser extension', function (): void {
         $this->postJson("/api/extension/packages/{$draft->id}/answer", ['question' => 'Why do you want this role?'], $headers)->assertNotFound();
     });
 
+    it('captures a posting from any public page, reuses one we already have and saves it for the person', function (): void {
+        $user = candidateWithProfile();
+        $headers = ['Authorization' => 'Bearer '.extensionToken($user)];
+        $posting = ['url' => 'https://careers.example.com/jobs/42?utm_source=x', 'title' => 'Backend Engineer', 'company' => 'Example Co', 'description' => '<p>Build APIs with Laravel.</p><script>alert(1)</script>', 'location' => 'Remote'];
+
+        $created = $this->postJson('/api/extension/jobs', $posting, $headers)->assertOk()->json();
+        $job = JobListing::query()->findOrFail($created['job_id']);
+        expect($job->company)->toBe('Example Co')
+            ->and($job->description)->not->toContain('<script')
+            ->and(Application::query()->where('user_id', $user->id)->where('job_listing_id', $job->id)->value('status'))->toBe(ApplicationStatus::Saved);
+
+        // The same page again (another tracking link) is the same job, and stays saved.
+        $again = $this->postJson('/api/extension/jobs', [...$posting, 'url' => 'https://careers.example.com/jobs/42'], $headers)->assertOk()->json();
+        expect($again['job_id'])->toBe($job->id)->and(JobListing::query()->count())->toBe(1)
+            ->and(Application::query()->where('user_id', $user->id)->count())->toBe(1);
+    });
+
+    it('refuses to capture internal addresses or a posting without a title', function (): void {
+        $headers = ['Authorization' => 'Bearer '.extensionToken(candidateWithProfile())];
+
+        $this->postJson('/api/extension/jobs', ['url' => 'http://127.0.0.1/admin', 'title' => 'Dev', 'company' => 'Evil'], $headers)->assertUnprocessable();
+        $this->postJson('/api/extension/jobs', ['url' => 'https://example.com/j', 'company' => 'Example'], $headers)->assertUnprocessable();
+        expect(JobListing::query()->count())->toBe(0);
+    });
+
     it('rejects missing, wrong and revoked tokens, and other people\'s packages', function (): void {
         $owner = candidateWithProfile();
         $package = prepare($owner, spanishLaravelJob());

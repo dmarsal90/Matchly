@@ -17,6 +17,7 @@ use App\Modules\Jobs\Domain\Enums\JobCategory;
 use App\Modules\Jobs\Domain\Enums\JobRole;
 use App\Modules\Jobs\Domain\Enums\RemoteScope;
 use App\Modules\Jobs\Domain\Enums\Seniority;
+use App\Modules\Jobs\Domain\Services\JobFingerprint;
 use App\Modules\Jobs\Infrastructure\Models\JobListing;
 use App\Modules\Matching\Application\Actions\ScoreJobsForUser;
 use App\Modules\Profiles\Domain\Enums\ImportStatus;
@@ -135,9 +136,16 @@ final class E2eSeeder extends Seeder
         }
 
         // Neither may show up: one is past the freshness window, the other closed.
+        // Fixed id: the ghost-job E2E opens it directly (it is outside the listing).
         JobListing::factory()->postedDaysAgo(45)->create([
-            'source_id' => $source->id, 'title' => 'Stale Backend Role', 'company' => 'Oldco',
+            'id' => 9001, 'source_id' => $source->id, 'title' => 'Stale Backend Role', 'company' => 'Oldco', 'fingerprint' => JobFingerprint::make('Stale Backend Role', 'Oldco'),
         ]);
+        // The same company posting the same title again and again.
+        foreach ([60, 100] as $daysAgo) {
+            JobListing::factory()->closed()->postedDaysAgo($daysAgo)->create([
+                'source_id' => $source->id, 'title' => 'Stale Backend Role', 'company' => 'Oldco', 'fingerprint' => JobFingerprint::make('Stale Backend Role', 'Oldco'),
+            ]);
+        }
         JobListing::factory()->closed()->create([
             'source_id' => $source->id, 'title' => 'Closed Backend Role', 'company' => 'Goneco',
         ]);
