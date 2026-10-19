@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { expectNoViolations } from './support/axe';
 import { CANDIDATE, logIn } from './support/users';
 
 test.beforeEach(async ({ page }) => {
@@ -90,4 +91,29 @@ test('prepares, reviews and approves a quick application', async ({ page }) => {
     await expect(
         page.getByRole('link', { name: 'Desarrollador Backend Senior' }),
     ).toBeVisible();
+});
+
+test('shows the 1-5 verdict in five dimensions on the offer', async ({
+    page,
+}) => {
+    await page.goto('/jobs');
+    await page
+        .getByRole('link', { name: 'Desarrollador Backend Senior' })
+        .click();
+
+    const verdict = page.getByTestId('verdict');
+    await expect(verdict).toContainText(/Veredicto: \d\.\d sobre 5/);
+    await expect(verdict).toContainText(
+        /Aplicar|Aplicar con cautela|No recomendado/,
+    );
+    for (const dimension of [
+        'Encaje',
+        'Norte (puesto y seniority)',
+        'Compensación',
+        'Cultura (ubicación y modalidad)',
+        'Banderas rojas',
+    ]) {
+        await expect(verdict.getByText(dimension)).toBeVisible();
+    }
+    await expectNoViolations(page);
 });
