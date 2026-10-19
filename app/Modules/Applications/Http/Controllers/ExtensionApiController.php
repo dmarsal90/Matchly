@@ -4,19 +4,25 @@ declare(strict_types=1);
 
 namespace App\Modules\Applications\Http\Controllers;
 
+use App\Modules\Applications\Application\Actions\ToggleSaved;
 use App\Modules\Applications\Application\Generators\FormAnswerWriter;
 use App\Modules\Applications\Domain\Contracts\ApplicationAssistant;
 use App\Modules\Applications\Domain\Enums\PackageStatus;
 use App\Modules\Applications\Domain\Enums\ResumeTemplate;
+use App\Modules\Applications\Infrastructure\Models\Application;
 use App\Modules\Applications\Infrastructure\Models\ApplicationPackage;
 use App\Modules\Applications\Infrastructure\Pdf\ResumePdfRenderer;
 use App\Modules\Identity\Domain\Enums\ConsentPurpose;
 use App\Modules\Identity\Infrastructure\Models\User;
+use App\Modules\Jobs\Application\Actions\CaptureJob;
+use App\Modules\Jobs\Domain\Enums\JobStatus;
 use App\Modules\Matching\Application\Actions\ResolveJobRequirements;
+use DateTimeImmutable;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Throwable;
 
 /**
  * What the browser extension can read: the applications the person approved,
@@ -55,6 +61,37 @@ final class ExtensionApiController
         $this->authorizeApproved($package, $user);
 
         return response()->json(['fields' => $assistant->fieldsFor($package)])->header('Cache-Control', 'private, no-store');
+    }
+
+    /** Saves the posting on the page the person is looking at (public data only) and tracks it as "saved" for them. */
+    public function capture(Request $request, #[CurrentUser] User $user, CaptureJob $capture, ToggleSaved $toggle): JsonResponse
+    {
+        $data = $request->validate([
+            'url' => ['required', 'string', 'max:2000'],
+            'title' => ['required', 'string', 'max:300'],
+            'company' => ['required', 'string', 'max:200'],
+            'description' => ['nullable', 'string', 'max:30000'],
+            'location' => ['nullable', 'string', 'max:300'],
+            'posted_at' => ['nullable', 'string', 'max:40'],
+        ]);
+
+        try {
+            $postedAt = isset($data['posted_at']) ? new DateTimeImmutable($data['posted_at']) : null;
+        } catch (Throwable) {
+            $postedAt = null;
+        }
+
+        $job = $capture->handle($data['url'], $data['title'], $data['company'], $data['description'] ?? null, $data['location'] ?? null, $postedAt);
+        abort_if($job === null, 422, 'The address is not a public web page.');
+
+        // Flagged jobs are held for moderation and do not exist for users.
+        abort_if($job->status === JobStatus::Flagged, 422, 'This posting was held for review.');
+
+        if (! Application::query()->where('user_id', $user->id)->where('job_listing_id', $job->id)->exists()) {
+            $toggle->handle($user, $job);
+        }
+
+        return response()->json(['job_id' => $job->id, 'url' => route('jobs.show', $job)])->header('Cache-Control', 'private, no-store');
     }
 
     /** A draft for an open question; AI only when the person already consented to it in the app. */
