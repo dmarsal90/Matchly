@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import MatchScore from '@/features/jobs/components/MatchScore.vue';
 import { relativeTime } from '@/features/jobs/lib/format';
 import type {
+    FitDimension,
     JobMatch,
     MatchCategory,
     MatchMessage,
@@ -24,6 +25,14 @@ const CATEGORIES: MatchCategory[] = [
     'languages',
     'salary',
     'education',
+];
+
+const DIMENSIONS: FitDimension[] = [
+    'match',
+    'north_star',
+    'compensation',
+    'culture',
+    'red_flags',
 ];
 
 const languageNames = computed(
@@ -107,6 +116,55 @@ const computedAt = computed(() =>
                         {{ message('ineligible', reason) }}
                     </li>
                 </ul>
+            </div>
+
+            <div class="rounded-lg border p-3" data-testid="verdict">
+                <h3 class="mb-1 text-sm font-medium">
+                    {{ trans('matching.verdict.title') }}:
+                    <span class="tabular-nums">{{
+                        match.verdict.grade.toFixed(1)
+                    }}</span>
+                    {{ trans('matching.verdict.out_of') }} ·
+                    {{
+                        trans(
+                            `matching.verdict.recommendation.${match.verdict.recommendation}`,
+                        )
+                    }}
+                </h3>
+                <dl class="grid gap-x-4 gap-y-1 text-sm sm:grid-cols-2">
+                    <div
+                        v-for="dimension in DIMENSIONS"
+                        :key="dimension"
+                        class="flex justify-between gap-3"
+                    >
+                        <dt>
+                            {{
+                                trans(
+                                    `matching.verdict.dimensions.${dimension}`,
+                                )
+                            }}
+                        </dt>
+                        <dd class="text-muted-foreground tabular-nums">
+                            {{
+                                match.verdict.dimensions[
+                                    dimension
+                                ].grade?.toFixed(1) ??
+                                trans('matching.verdict.unknown')
+                            }}
+                        </dd>
+                    </div>
+                </dl>
+                <ul
+                    v-if="match.verdict.flags.includes('missing_required')"
+                    class="mt-2 list-disc pl-5 text-sm text-destructive"
+                >
+                    <li>
+                        {{ trans('matching.verdict.flags.missing_required') }}
+                    </li>
+                </ul>
+                <p class="mt-2 text-xs text-muted-foreground">
+                    {{ trans('matching.verdict.note') }}
+                </p>
             </div>
 
             <div>

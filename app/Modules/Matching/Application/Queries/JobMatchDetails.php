@@ -10,6 +10,7 @@ use App\Modules\Jobs\Infrastructure\Models\JobListing;
 use App\Modules\Matching\Application\Actions\ResolveJobRequirements;
 use App\Modules\Matching\Application\Actions\ScoreJobsForUser;
 use App\Modules\Matching\Domain\Data\JobRequirements;
+use App\Modules\Matching\Domain\Services\FitVerdict;
 use App\Modules\Matching\Infrastructure\Models\JobMatch;
 use App\Modules\Matching\Infrastructure\Queue\RefineJobRequirementsJob;
 
@@ -23,6 +24,7 @@ final readonly class JobMatchDetails
     public function __construct(
         private ResolveJobRequirements $requirements,
         private ScoreJobsForUser $score,
+        private FitVerdict $verdict,
     ) {}
 
     /**
@@ -55,6 +57,6 @@ final readonly class JobMatchDetails
             $match = JobMatch::query()->where('user_id', $user->id)->where('job_listing_id', $job->id)->first();
         }
 
-        return $match !== null ? [...$match->result, 'computed_at' => $match->computed_at->toIso8601String()] : null;
+        return $match !== null ? [...$match->result, 'verdict' => $this->verdict->for($match->result), 'computed_at' => $match->computed_at->toIso8601String()] : null;
     }
 }
