@@ -10,6 +10,7 @@ use App\Modules\Applications\Domain\Enums\LetterLength;
 use App\Modules\Applications\Domain\Enums\PackageStatus;
 use App\Modules\Applications\Infrastructure\Models\Application;
 use App\Modules\Applications\Infrastructure\Models\ApplicationPackage;
+use App\Modules\Identity\Application\Actions\GrantConsent;
 use App\Modules\Identity\Domain\Enums\ConsentPurpose;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Jobs\Domain\Enums\JobStatus;
@@ -107,8 +108,11 @@ describe('with AI', function (): void {
         config(['ai.enabled' => true, 'ai.fallback_order' => ['anthropic'], 'ai.providers.anthropic.api_key' => 'server-key']);
 
         Http::fake(['api.anthropic.com/*' => function (Request $request) {
-            $isLetter = str_contains((string) json_encode($request->data()['tools'][0]['input_schema']), 'greeting');
-            $input = $isLetter
+            $schema = (string) json_encode($request->data()['tools'][0]['input_schema']);
+            $isLetter = str_contains($schema, 'greeting');
+            $input = str_contains($schema, '"answer"')
+                ? ['answer' => 'En Globex quiero aportar mi experiencia con Laravel y Golang a vuestro equipo backend.']
+                : ($isLetter
                 ? [
                     'greeting' => 'Estimado equipo de Globex:',
                     'body' => "Tengo 10 años de experiencia construyendo APIs REST con Laravel y PostgreSQL en Acme.\n\nTambién domino Kubernetes y Golang.",
@@ -122,10 +126,26 @@ describe('with AI', function (): void {
                         ['index' => 7, 'bullets' => ['Invented position.']],
                     ],
                     'keywords' => ['Laravel', 'Kubernetes'],
-                ];
+                ]);
 
             return Http::response(['content' => [['type' => 'tool_use', 'name' => 'submit_result', 'input' => $input]], 'usage' => ['input_tokens' => 900, 'output_tokens' => 300]]);
         }]);
+    });
+
+    it('drafts a form answer with AI only for a consenting user and flags skills the CV does not back', function (): void {
+        $user = candidateWithProfile();
+        $package = prepare($user, spanishLaravelJob());
+        $this->post(route('applications.packages.approve', $package));
+        $headers = ['Authorization' => 'Bearer '.extensionToken($user)];
+        $url = "/api/extension/packages/{$package->id}/answer";
+
+        // Without consent the answer comes from the template and nothing is sent to the provider.
+        $this->postJson($url, ['question' => 'Why do you want this role?'], $headers)->assertOk()->assertJsonPath('source', 'rules');
+        Http::assertNothingSent();
+
+        app(GrantConsent::class)->handle($user, ConsentPurpose::AiProcessing);
+        $response = $this->postJson($url, ['question' => 'Why do you want this role?'], $headers)->assertOk()->assertJsonPath('source', 'ai');
+        expect(array_column($response->json('warnings'), 'key'))->toContain('unbacked_skills');
     });
 
     it('keeps only faithful rewording and flags unbacked claims in the letter', function (): void {
@@ -437,6 +457,20 @@ describe('browser extension', function (): void {
         // A draft is never exposed.
         $this->getJson("/api/extension/packages/{$draft->id}/fields", $headers)->assertNotFound();
         expect(DB::table('extension_tokens')->value('last_used_at'))->not->toBeNull();
+    });
+
+    it('drafts an answer to an open form question from the approved package, never for a draft or without a question', function (): void {
+        $user = candidateWithProfile();
+        $approved = prepare($user, spanishLaravelJob());
+        $this->post(route('applications.packages.approve', $approved));
+        $draft = prepare($user, spanishLaravelJob(['company' => 'Initech']));
+        $headers = ['Authorization' => 'Bearer '.extensionToken($user)];
+
+        $answer = $this->postJson("/api/extension/packages/{$approved->id}/answer", ['question' => 'Why do you want this role?'], $headers)->assertOk()->json();
+        expect($answer['source'])->toBe('rules')->and($answer['answer'])->toContain('Globex');
+
+        $this->postJson("/api/extension/packages/{$approved->id}/answer", ['question' => 'x'], $headers)->assertUnprocessable();
+        $this->postJson("/api/extension/packages/{$draft->id}/answer", ['question' => 'Why do you want this role?'], $headers)->assertNotFound();
     });
 
     it('rejects missing, wrong and revoked tokens, and other people\'s packages', function (): void {

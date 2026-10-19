@@ -17,11 +17,12 @@ enum AiTask: string
     case CoverLetter = 'cover_letter';
     case InterviewPrep = 'interview_prep';
     case InterviewFeedback = 'interview_feedback';
+    case FormAnswer = 'form_answer';
 
     public function tier(): ModelTier
     {
         return match ($this) {
-            self::TailorCv, self::CoverLetter, self::InterviewPrep => ModelTier::Quality,
+            self::TailorCv, self::CoverLetter, self::InterviewPrep, self::FormAnswer => ModelTier::Quality,
             default => ModelTier::Fast,
         };
     }
@@ -36,6 +37,7 @@ enum AiTask: string
             self::CoverLetter => 1500,
             self::InterviewPrep => 3500,
             self::InterviewFeedback => 900,
+            self::FormAnswer => 700,
         };
     }
 
@@ -48,6 +50,7 @@ enum AiTask: string
             self::SummarizeGithub => 15000,
             self::TailorCv, self::CoverLetter, self::InterviewPrep => 20000,
             self::InterviewFeedback => 8000,
+            self::FormAnswer => 20000,
         };
     }
 
