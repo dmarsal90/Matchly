@@ -51,7 +51,18 @@ export type MatchCategory =
     | 'salary'
     | 'education';
 
+export type FitDimension =
+    'match' | 'north_star' | 'compensation' | 'culture' | 'red_flags';
+
+export type FitVerdict = {
+    grade: number;
+    recommendation: 'apply' | 'caution' | 'skip';
+    dimensions: Record<FitDimension, { grade: number | null; known: boolean }>;
+    flags: string[];
+};
+
 export type JobMatch = JobMatchSummary & {
+    verdict: FitVerdict;
     ineligible_reasons: MatchMessage[];
     breakdown: Record<
         MatchCategory,

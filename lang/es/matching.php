@@ -73,4 +73,13 @@ return [
         ],
         'none' => 'No hemos detectado requisitos concretos.',
     ],
+    'verdict' => [
+        'title' => 'Veredicto',
+        'out_of' => 'sobre 5',
+        'note' => 'Por debajo de 4,0 no suele merecer la pena aplicar: es solo una guía, decides tú.',
+        'recommendation' => ['apply' => 'Aplicar', 'caution' => 'Aplicar con cautela', 'skip' => 'No recomendado'],
+        'dimensions' => ['match' => 'Encaje', 'north_star' => 'Norte (puesto y seniority)', 'compensation' => 'Compensación', 'culture' => 'Cultura (ubicación y modalidad)', 'red_flags' => 'Banderas rojas'],
+        'unknown' => 'La oferta no lo indica',
+        'flags' => ['missing_required' => 'Faltan la mayoría de las skills obligatorias.'],
+    ],
 ];
