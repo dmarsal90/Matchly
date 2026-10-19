@@ -216,6 +216,13 @@ return [
         'page' => 'Página :page',
     ],
     'show' => [
+        'ghost' => [
+            'title' => 'Esta oferta puede estar desactualizada',
+            'old' => 'Lleva publicada bastante tiempo.',
+            'very_old' => 'Lleva publicada más de dos meses.',
+            'reposted' => 'La misma empresa ha publicado este puesto varias veces.',
+            'note' => 'Son indicios, no una prueba: comprueba el anuncio original antes de gastar una candidatura.',
+        ],
         'back' => 'Volver a las ofertas',
         'closed' => 'Esta oferta ya no está disponible.',
         'closed_hint' => 'La fuente la ha retirado o el enlace ya no funciona.',

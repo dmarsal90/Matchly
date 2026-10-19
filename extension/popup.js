@@ -19,6 +19,12 @@ const TEXT = {
         failed: 'Could not reach Matchly.',
         done: 'Filled {n} field(s){cv}. Review before you submit.',
         cv: ' and attached the CV',
+        saveJob: 'Save this job in Matchly',
+        saveJobNote:
+            'It reads only the public job data of the page and never anything behind a login.',
+        saved_job: 'Saved in Matchly.',
+        no_job: 'This page has no job posting Matchly can read.',
+        open_job: 'Open it in Matchly',
         drafting: 'Drafting answers to the open questions…',
         answers: ' Drafted {n} answer(s): they are suggestions, edit them.',
         nothing: 'Nothing to fill on this page.',
@@ -40,6 +46,12 @@ const TEXT = {
         failed: 'No se pudo conectar con Matchly.',
         done: 'Rellenados {n} campo(s){cv}. Revisa antes de enviar.',
         cv: ' y adjuntado el CV',
+        saveJob: 'Guardar esta oferta en Matchly',
+        saveJobNote:
+            'Solo lee los datos públicos de la oferta de la página, nunca nada que esté tras un inicio de sesión.',
+        saved_job: 'Guardada en Matchly.',
+        no_job: 'Esta página no tiene una oferta que Matchly pueda leer.',
+        open_job: 'Abrirla en Matchly',
         drafting: 'Redactando las respuestas a las preguntas abiertas…',
         answers: ' Redactadas {n} respuesta(s): son sugerencias, edítalas.',
         nothing: 'No hay nada que rellenar en esta página.',
@@ -61,6 +73,12 @@ const TEXT = {
         failed: 'Não foi possível ligar ao Matchly.',
         done: 'Preenchidos {n} campo(s){cv}. Revê antes de enviar.',
         cv: ' e anexado o CV',
+        saveJob: 'Guardar esta oferta no Matchly',
+        saveJobNote:
+            'Só lê os dados públicos da oferta da página, nunca nada que esteja atrás de um login.',
+        saved_job: 'Guardada no Matchly.',
+        no_job: 'Esta página não tem uma oferta que o Matchly consiga ler.',
+        open_job: 'Abri-la no Matchly',
         drafting: 'A redigir as respostas às perguntas abertas…',
         answers: ' Redigidas {n} resposta(s): são sugestões, edita-as.',
         nothing: 'Não há nada para preencher nesta página.',
@@ -130,6 +148,7 @@ async function load() {
                 }),
             ),
         );
+        $('capture').hidden = false;
         $('fill').hidden = packages.length === 0;
         status(packages.length === 0 ? t.none : '');
     } catch (error) {
@@ -162,6 +181,35 @@ $('save').addEventListener('click', async () => {
     });
     status(t.saved);
     await load();
+});
+
+$('save-job').addEventListener('click', async () => {
+    try {
+        const [tab] = await chrome.tabs.query({
+            active: true,
+            currentWindow: true,
+        });
+        const [result] = await chrome.scripting.executeScript({
+            target: { tabId: tab.id },
+            files: ['capture.js'],
+        });
+        if (!result.result) {
+            status(t.no_job, true);
+
+            return;
+        }
+        const { url } = await api('jobs', false, result.result);
+        status('');
+        const link = Object.assign(document.createElement('a'), {
+            href: url,
+            target: '_blank',
+            rel: 'noopener',
+            textContent: t.open_job,
+        });
+        $('status').append(`${t.saved_job} `, link);
+    } catch (error) {
+        status(t[error.message] || t.failed, true);
+    }
 });
 
 $('run').addEventListener('click', async () => {

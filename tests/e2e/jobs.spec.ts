@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test';
 import { expect, test } from '@playwright/test';
+import { expectNoViolations } from './support/axe';
 
 /** Job cards in the listing (database/seeders/E2eSeeder.php seeds eight open, fresh jobs). */
 const cards = (page: Page) => page.locator('main article');
@@ -129,4 +130,22 @@ test('opens an offer with a link to the original source', async ({ page }) => {
         'href',
         /^https?:\/\//,
     );
+});
+
+test('warns that a long-running, reposted offer may be stale', async ({
+    page,
+}) => {
+    await page.goto('/jobs/9001');
+
+    const ghost = page.getByTestId('ghost');
+    await expect(ghost).toContainText('Esta oferta puede estar desactualizada');
+    await expect(ghost).toContainText(
+        'La misma empresa ha publicado este puesto varias veces.',
+    );
+    await expectNoViolations(page);
+
+    // A fresh offer says nothing.
+    await page.goto('/jobs');
+    await cards(page).first().getByRole('link').first().click();
+    await expect(page.getByTestId('ghost')).toHaveCount(0);
 });
