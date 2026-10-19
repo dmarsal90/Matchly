@@ -60,7 +60,7 @@ function toggle(): void {
         variant="ghost"
         :size="withLabel ? 'sm' : 'icon'"
         :aria-pressed="saved"
-        :aria-label="label"
+        :aria-label="withLabel ? undefined : label"
         :title="label"
         :disabled="pending"
         @click="toggle"
