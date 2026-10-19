@@ -1,3 +1,5 @@
+const MAX_QUESTIONS = 5;
+
 const TEXT = {
     en: {
         choose: 'Approved application',
@@ -17,6 +19,8 @@ const TEXT = {
         failed: 'Could not reach Matchly.',
         done: 'Filled {n} field(s){cv}. Review before you submit.',
         cv: ' and attached the CV',
+        drafting: 'Drafting answers to the open questions…',
+        answers: ' Drafted {n} answer(s): they are suggestions, edit them.',
         nothing: 'Nothing to fill on this page.',
     },
     es: {
@@ -36,6 +40,8 @@ const TEXT = {
         failed: 'No se pudo conectar con Matchly.',
         done: 'Rellenados {n} campo(s){cv}. Revisa antes de enviar.',
         cv: ' y adjuntado el CV',
+        drafting: 'Redactando las respuestas a las preguntas abiertas…',
+        answers: ' Redactadas {n} respuesta(s): son sugerencias, edítalas.',
         nothing: 'No hay nada que rellenar en esta página.',
     },
     pt: {
@@ -55,6 +61,8 @@ const TEXT = {
         failed: 'Não foi possível ligar ao Matchly.',
         done: 'Preenchidos {n} campo(s){cv}. Revê antes de enviar.',
         cv: ' e anexado o CV',
+        drafting: 'A redigir as respostas às perguntas abertas…',
+        answers: ' Redigidas {n} resposta(s): são sugestões, edita-as.',
         nothing: 'Não há nada para preencher nesta página.',
     },
 };
@@ -72,13 +80,16 @@ for (const element of document.querySelectorAll('[data-i]')) {
     element.textContent = t[element.dataset.i];
 }
 
-async function api(path, asBlob = false) {
+async function api(path, asBlob = false, body = null) {
     const { base, token } = await chrome.storage.local.get(['base', 'token']);
     const response = await fetch(`${base}/api/extension/${path}`, {
+        method: body ? 'POST' : 'GET',
         headers: {
             Authorization: `Bearer ${token}`,
             Accept: 'application/json',
+            ...(body ? { 'Content-Type': 'application/json' } : {}),
         },
+        body: body ? JSON.stringify(body) : undefined,
     });
     if (response.status === 401) {
         throw new Error('badToken');
@@ -190,12 +201,51 @@ $('run').addEventListener('click', async () => {
             { filled: 0, attached: 0 },
         );
 
+        // Open questions: ask Matchly for a draft of each one (a few at most) and fill them as well.
+        const questions = results
+            .flatMap((item) => (item.result || {}).questions || [])
+            .slice(0, MAX_QUESTIONS);
+        if (questions.length > 0) {
+            status(t.drafting);
+            const answers = {};
+            for (const question of questions) {
+                try {
+                    const draft = await api(`packages/${id}/answer`, false, {
+                        question: question.text,
+                    });
+                    answers[question.id] = draft.answer;
+                } catch (error) {
+                    if (error.message === 'badToken') {
+                        throw error;
+                    }
+                }
+            }
+            await chrome.scripting.executeScript({
+                target,
+                func: (payload) => {
+                    globalThis.__matchlyPayload = payload;
+                },
+                args: [{ answers }],
+            });
+            const written = await chrome.scripting.executeScript({
+                target,
+                files: ['match.js', 'fill.js'],
+            });
+            total.answers = written.reduce(
+                (sum, item) => sum + ((item.result || {}).filled || 0),
+                0,
+            );
+        }
+
         status(
-            total.filled + total.attached === 0
+            total.filled + total.attached + (total.answers || 0) === 0
                 ? t.nothing
                 : t.done
                       .replace('{n}', total.filled)
-                      .replace('{cv}', total.attached > 0 ? t.cv : ''),
+                      .replace('{cv}', total.attached > 0 ? t.cv : '') +
+                      (total.answers
+                          ? t.answers.replace('{n}', total.answers)
+                          : ''),
         );
     } catch (error) {
         status(t[error.message] || t.failed, true);
