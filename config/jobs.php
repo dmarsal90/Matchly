@@ -24,12 +24,20 @@ use App\Modules\Providers\Infrastructure\Sources\Jobicy\JobicyNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Jobicy\JobicyProvider;
 use App\Modules\Providers\Infrastructure\Sources\Jooble\JoobleNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Jooble\JoobleProvider;
+use App\Modules\Providers\Infrastructure\Sources\PuenteTalent\PuenteTalentNormalizer;
+use App\Modules\Providers\Infrastructure\Sources\PuenteTalent\PuenteTalentProvider;
+use App\Modules\Providers\Infrastructure\Sources\RemoteJobsOrg\RemoteJobsOrgNormalizer;
+use App\Modules\Providers\Infrastructure\Sources\RemoteJobsOrg\RemoteJobsOrgProvider;
+use App\Modules\Providers\Infrastructure\Sources\RemoteLanders\RemoteLandersNormalizer;
+use App\Modules\Providers\Infrastructure\Sources\RemoteLanders\RemoteLandersProvider;
 use App\Modules\Providers\Infrastructure\Sources\RemoteOk\RemoteOkNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\RemoteOk\RemoteOkProvider;
 use App\Modules\Providers\Infrastructure\Sources\Remotive\RemotiveNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Remotive\RemotiveProvider;
 use App\Modules\Providers\Infrastructure\Sources\WeWorkRemotely\WeWorkRemotelyNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\WeWorkRemotely\WeWorkRemotelyProvider;
+use App\Modules\Providers\Infrastructure\Sources\WorkingNomads\WorkingNomadsNormalizer;
+use App\Modules\Providers\Infrastructure\Sources\WorkingNomads\WorkingNomadsProvider;
 
 return [
 
@@ -181,6 +189,57 @@ return [
             'options' => [
                 'url' => 'https://www.arbeitnow.com/api/job-board-api',
                 'max_pages' => 5,
+            ],
+        ],
+
+        'puentetalent' => [
+            'enabled' => (bool) env('JOBS_PUENTETALENT_ENABLED', true),
+            'provider' => PuenteTalentProvider::class,
+            'normalizer' => PuenteTalentNormalizer::class,
+            'interval' => 360,
+            'rate_limit' => 2,
+            'cache_ttl' => 3600,
+            'options' => [
+                'url' => 'https://puentetalent.com/api/jobs',
+                'pages' => 20,
+            ],
+        ],
+
+        'remotelanders' => [
+            'enabled' => (bool) env('JOBS_REMOTELANDERS_ENABLED', true),
+            'provider' => RemoteLandersProvider::class,
+            'normalizer' => RemoteLandersNormalizer::class,
+            'interval' => 240,
+            'rate_limit' => 10,
+            'cache_ttl' => 1800,
+            'options' => [
+                'url' => 'https://remotelanders.com/api/jobs',
+                'max_pages' => 5,
+            ],
+        ],
+
+        'remotejobsorg' => [
+            'enabled' => (bool) env('JOBS_REMOTEJOBSORG_ENABLED', true),
+            'provider' => RemoteJobsOrgProvider::class,
+            'normalizer' => RemoteJobsOrgNormalizer::class,
+            'interval' => 240,
+            'rate_limit' => 10,
+            'cache_ttl' => 1800,
+            'options' => [
+                'url' => 'https://remotejobs.org/api/v1/jobs',
+                'max_pages' => 6,
+            ],
+        ],
+
+        'workingnomads' => [
+            'enabled' => (bool) env('JOBS_WORKINGNOMADS_ENABLED', true),
+            'provider' => WorkingNomadsProvider::class,
+            'normalizer' => WorkingNomadsNormalizer::class,
+            'interval' => 120,
+            'rate_limit' => 10,
+            'cache_ttl' => 1800,
+            'options' => [
+                'url' => 'https://www.workingnomads.com/api/exposed_jobs/',
             ],
         ],
 

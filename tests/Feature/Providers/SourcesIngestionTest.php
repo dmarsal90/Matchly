@@ -45,6 +45,13 @@ it('ingests every source end to end', function (string $source, string $now, Clo
                 ->and($jobs->first()->remote_scope)->toBe(RemoteScope::CountryRestricted);
         }],
     'himalayas' => ['himalayas', '2026-10-14 13:00:00', fn () => Http::fake(['himalayas.app/*' => Http::response(providerFixtureRaw('himalayas.json'))]), 3, null],
+    'workingnomads' => ['workingnomads', '2026-10-20 13:00:00', fn () => Http::fake(['www.workingnomads.com/*' => Http::response(providerFixtureRaw('workingnomads.json'))]), 3, null],
+    'puentetalent' => ['puentetalent', '2026-10-16 13:00:00', fn () => Http::fake(['puentetalent.com/*' => Http::response(providerFixtureRaw('puentetalent.json'))]), 3,
+        function ($jobs): void {
+            expect($jobs->first()->allowed_regions)->toContain('MX');
+        }],
+    'remotelanders' => ['remotelanders', '2026-10-20 13:00:00', fn () => Http::fake(['remotelanders.com/*' => Http::response(providerFixtureRaw('remotelanders.json'))]), 3, null],
+    'remotejobsorg' => ['remotejobsorg', '2026-10-20 13:00:00', fn () => Http::fake(['remotejobs.org/*' => Http::response(providerFixtureRaw('remotejobsorg.json'))]), 3, null],
     'arbeitnow (on-site postings dropped)' => ['arbeitnow', '2026-10-14 13:00:00', fn () => Http::fake(['www.arbeitnow.com/*' => Http::response(providerFixtureRaw('arbeitnow.json'))]), 2, null],
     'we work remotely (deduplicated across feeds)' => ['weworkremotely', '2026-10-14 13:00:00', function (): void {
         config(['jobs.providers.weworkremotely.options.feeds' => ['https://weworkremotely.com/a.rss', 'https://weworkremotely.com/b.rss']]);
