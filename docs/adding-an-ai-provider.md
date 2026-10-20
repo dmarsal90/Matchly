@@ -11,7 +11,22 @@ Un proveedor solo tiene que hacer una cosa: recibir un `AiCompletion` (prompt de
 
 ## Proveedores incluidos, gratis y de pago
 
-Vienen configurados Anthropic y OpenAI (de pago, mejor redacción), DeepSeek (muy barato), Gemini, Groq, Hugging Face y OpenRouter con modelos `:free` (con capa gratuita) y Mistral u Ollama. Basta con poner la clave en `.env`; el que no tenga clave se salta.
+Puedes usar proveedores de pago, gratuitos o una mezcla: basta con poner la clave en `.env`, y el que no tenga clave se salta. Con solo proveedores gratis la app funciona igual, con límites de uso más bajos.
+
+| Tipo | Proveedor (variable) | Modelos por defecto |
+| --- | --- | --- |
+| De pago, mejor redacción | Anthropic (`ANTHROPIC_API_KEY`) | Claude Haiku 5.5 y Sonnet 5.5 |
+| De pago | OpenAI (`OPENAI_API_KEY`) | GPT-4o mini y GPT-4o |
+| Muy barato | DeepSeek (`DEEPSEEK_API_KEY`) | `deepseek-chat` |
+| De pago | Mistral (`MISTRAL_API_KEY`) | `mistral-small-latest`, `mistral-large-latest` |
+| Capa gratuita | Google Gemini (`GEMINI_API_KEY`) | Gemini Flash |
+| Capa gratuita | Groq (`GROQ_API_KEY`) | Llama 3.1 8B y Llama 3.3 70B |
+| Capa gratuita | OpenRouter (`OPENROUTER_API_KEY`) | Llama 3.3 70B `:free` |
+| Capa gratuita | Hugging Face (`HUGGINGFACE_API_KEY`) | modelos del router de HF |
+| Créditos gratis | NVIDIA (`NVIDIA_API_KEY`, en build.nvidia.com) | Llama 3.1 8B y Llama 3.3 70B |
+| Gratis y local | Ollama (`OLLAMA_BASE_URL`, sin clave) | `llama3.1:8b` |
+
+Los modelos de cada nivel (`fast` y `quality`) se cambian con variables como `GROQ_MODEL_QUALITY`. Los precios y las capas gratuitas cambian: compruébalos en cada proveedor.
 
 **Rotación de claves:** cualquier `*_API_KEY` admite varias claves separadas por comas (`HUGGINGFACE_API_KEY=hf_aaa,hf_bbb`). Se usan por turnos y, si una llega al límite de tasa, el siguiente reintento usa otra, de modo que las cuotas gratuitas se suman. Recuerda incluir el proveedor en `AI_FALLBACK_ORDER`.
 
