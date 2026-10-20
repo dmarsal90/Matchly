@@ -23,7 +23,7 @@ return [
 
     'enabled' => (bool) env('AI_ENABLED', true),
 
-    'fallback_order' => $list((string) env('AI_FALLBACK_ORDER', 'anthropic,openai,deepseek,gemini,groq,huggingface,openrouter,mistral,ollama')),
+    'fallback_order' => $list((string) env('AI_FALLBACK_ORDER', 'anthropic,openai,deepseek,gemini,groq,huggingface,openrouter,nvidia,mistral,ollama')),
 
     'timeout' => (int) env('AI_TIMEOUT', 60),
 
@@ -123,6 +123,16 @@ return [
             'models' => [
                 'fast' => env('OPENROUTER_MODEL_FAST', 'meta-llama/llama-3.3-70b-instruct:free'),
                 'quality' => env('OPENROUTER_MODEL_QUALITY', 'meta-llama/llama-3.3-70b-instruct:free'),
+            ],
+        ],
+        'nvidia' => [
+            'driver' => 'openai',
+            'api_key' => env('NVIDIA_API_KEY'),
+            'base_url' => env('NVIDIA_BASE_URL', 'https://integrate.api.nvidia.com/v1'),
+            // Free credits from build.nvidia.com; limits are low.
+            'models' => [
+                'fast' => env('NVIDIA_MODEL_FAST', 'meta/llama-3.1-8b-instruct'),
+                'quality' => env('NVIDIA_MODEL_QUALITY', 'meta/llama-3.3-70b-instruct'),
             ],
         ],
         'mistral' => [
