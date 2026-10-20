@@ -32,6 +32,21 @@ use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
 
+// Replaces public/robots.txt: the Sitemap line needs the absolute URL of each deployment
+Route::get('robots.txt', fn () => response(
+    "User-agent: *\nDisallow: /admin\nDisallow: /api/\nDisallow: /shared/\n\nSitemap: ".url('/sitemap.xml')."\n",
+    200,
+    ['Content-Type' => 'text/plain'],
+));
+
+// shortcut: static two-URL sitemap, list individual job pages here once they should rank on their own
+Route::get('sitemap.xml', fn () => response(
+    '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
+    .'<url><loc>'.e(url('/')).'</loc></url><url><loc>'.e(route('jobs.index')).'</loc></url></urlset>',
+    200,
+    ['Content-Type' => 'application/xml'],
+));
+
 Route::put('locale', [LocaleController::class, 'update'])
     ->middleware('throttle:30,1')
     ->name('locale.update');
