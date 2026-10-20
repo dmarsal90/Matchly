@@ -22,7 +22,7 @@ Otros comandos útiles: `make test-php a="--filter=Nombre"`, `make test-pgsql` (
 
 - Tests para lo que cambias. Un bug se arregla con un test que falle antes del arreglo.
 - `make check` en verde; la CI exige Pint, Larastan, Pest (SQLite y PostgreSQL), frontend y Playwright.
-- Textos de interfaz en los tres idiomas (`lang/es`, `lang/en`, `lang/pt`).
+- Textos de interfaz en los tres idiomas (`lang/es`, `lang/en`, `lang/pt`, `lang/fr`, `lang/it`, `lang/de`).
 - Nada de secretos, claves ni datos personales en el código, los fixtures o las capturas.
 
 ## Añadir una fuente de ofertas

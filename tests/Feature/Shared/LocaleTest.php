@@ -8,7 +8,7 @@ it('shares the configured product name and locales with every page', function ()
     $this->get('/')->assertInertia(fn (Assert $page) => $page
         ->component('Welcome')
         ->where('name', config('app.name'))
-        ->where('supportedLocales', ['es', 'en', 'pt'])
+        ->where('supportedLocales', ['es', 'en', 'pt', 'fr', 'it', 'de'])
     );
 });
 
@@ -19,7 +19,7 @@ it('negotiates the locale from the Accept-Language header', function (): void {
 });
 
 it('falls back to the default locale for unsupported languages', function (): void {
-    $this->withHeader('Accept-Language', 'de-DE')
+    $this->withHeader('Accept-Language', 'ja-JP')
         ->get('/')
         ->assertInertia(fn (Assert $page) => $page->where('locale', config('app.locale')));
 });

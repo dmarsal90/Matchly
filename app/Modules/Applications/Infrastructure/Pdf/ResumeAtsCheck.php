@@ -48,7 +48,7 @@ final readonly class ResumeAtsCheck
             }
         }
 
-        $locale = in_array($language, ['es', 'en', 'pt'], true) ? $language : 'en';
+        $locale = in_array($language, ['es', 'en', 'pt', 'fr', 'it', 'de'], true) ? $language : 'en';
         $sections = array_filter([
             'experience' => $resume->experience !== [],
             'skills' => $resume->skills !== [],

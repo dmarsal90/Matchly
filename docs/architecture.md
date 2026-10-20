@@ -117,7 +117,7 @@ Así una ingesta larga nunca retrasa un correo o una solicitud. Las tareas progr
 Las páginas Inertia están en `resources/js/pages` y los componentes por dominio en `resources/js/features/<dominio>`.
 
 - **Rutas:** las genera Wayfinder, tipadas y sin URLs escritas a mano.
-- **Textos:** salen de `lang/{es,en,pt}` mediante `laravel-vue-i18n`. Un test prohíbe el texto fijo en las plantillas y exige las mismas claves en los tres idiomas.
+- **Textos:** salen de `lang/{es,en,pt,fr,it,de}` mediante `laravel-vue-i18n`. Un test prohíbe el texto fijo en las plantillas y exige las mismas claves en los seis idiomas.
 - **Estilos:** Tailwind 4 con tokens de color en `resources/css/app.css`, en modo claro y oscuro, comprobados con axe (WCAG 2.2 AA).
 
 ## Calidad

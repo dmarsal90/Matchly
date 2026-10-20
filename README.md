@@ -56,7 +56,7 @@ Buscar trabajo es repetir lo mismo cien veces: mirar tableros, adivinar si encaj
   </tr>
 </table>
 
-<p align="center"><img src="docs/screenshots/jobs-dark.png" alt="Modo oscuro" width="720"><br><sub>Modo claro y oscuro, en español, inglés y portugués.</sub></p>
+<p align="center"><img src="docs/screenshots/jobs-dark.png" alt="Modo oscuro" width="720"><br><sub>Modo claro y oscuro, en español, inglés, portugués, francés, italiano y alemán.</sub></p>
 
 ## Qué hace
 
@@ -138,7 +138,7 @@ Los tests usan SQLite en memoria (`phpunit.xml`) y no necesitan servicios.
 | Capa | Herramienta | Qué cubre |
 | --- | --- | --- |
 | Unitarios y de feature | Pest (`tests/Unit`, `tests/Feature`) | Normalizadores de proveedores, clasificador, puntuación, ZIP de LinkedIn con fixtures, Actions y endpoints. IA, GitHub y HTTP externo con `Http::fake`. SQLite en memoria y, en CI, también PostgreSQL (`make test-pgsql`). |
-| Arquitectura | Pest (`tests/Architecture`) | Fronteras entre módulos, `strict_types`, marca solo desde `APP_NAME`, sin texto fijo en las plantillas Vue y mismas claves en es/en/pt. |
+| Arquitectura | Pest (`tests/Architecture`) | Fronteras entre módulos, `strict_types`, marca solo desde `APP_NAME`, sin texto fijo en las plantillas Vue y mismas claves en los seis idiomas (es, en, pt, fr, it, de). |
 | Frontend | Vitest | Composables y utilidades de `resources/js`. |
 | End-to-end | Playwright (`tests/e2e`) | Registro con verificación por correo, cuestionario, importación de LinkedIn, búsqueda (texto completo de PostgreSQL) y filtros en escritorio y móvil, recomendaciones, solicitud rápida con PDF, alertas con resumen por correo y baja en un clic, historial de candidaturas, recordatorios de seguimiento, preparación de entrevista, panorama y WCAG 2.2 AA con axe en modo claro y oscuro. |
 
