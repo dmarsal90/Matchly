@@ -1,0 +1,55 @@
+{
+ "total": 5994,
+ "page": 1,
+ "limit": 100,
+ "count": 3,
+ "jobs": [
+  {
+   "slug": "quality-evaluator-fluent-english-estonia-anyone-ai-1x5rtq",
+   "title": "Quality Evaluator \u2013 Fluent English (Estonia) ",
+   "company": "Anyone Ai",
+   "companyWebsite": "https://anyoneai.com",
+   "category": "Uncategorized",
+   "subtags": [],
+   "location": "Europe",
+   "type": "Full-time",
+   "level": "",
+   "salary": "$12 / hr",
+   "salaryVariesByRegion": false,
+   "postedDate": "2026-10-19",
+   "url": "https://remotelanders.com/remote-jobs/quality-evaluator-fluent-english-estonia-anyone-ai-1x5rtq"
+  },
+  {
+   "slug": "prior-authorization-assistant-cardiology-ascertain-14gq97",
+   "title": "Prior Authorization Assistant, Cardiology",
+   "company": "Ascertain",
+   "companyWebsite": null,
+   "category": "Healthcare",
+   "subtags": [],
+   "location": "Not stated",
+   "type": "Full-time",
+   "level": "",
+   "salary": "$45k\u201365k / yr",
+   "salaryVariesByRegion": false,
+   "postedDate": "2026-10-19",
+   "url": "https://remotelanders.com/remote-jobs/prior-authorization-assistant-cardiology-ascertain-14gq97"
+  },
+  {
+   "slug": "staff-software-engineer-auror-19nlfs",
+   "title": "Staff Software Engineer",
+   "company": "Auror",
+   "companyWebsite": "https://auror.co",
+   "category": "Engineering",
+   "subtags": [
+    "Software Engineer"
+   ],
+   "location": "Not stated",
+   "type": "Full-time",
+   "level": "",
+   "salary": "$150k\u2013175k / yr",
+   "salaryVariesByRegion": false,
+   "postedDate": "2026-10-19",
+   "url": "https://remotelanders.com/remote-jobs/staff-software-engineer-auror-19nlfs"
+  }
+ ]
+}

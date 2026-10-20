@@ -1,0 +1,106 @@
+{
+ "data": [
+  {
+   "id": "3a633e73-3aeb-4f50-8063-a405ef6ccfe5",
+   "title": "Partner Manager",
+   "url": "https://remotejobs.org/remote-jobs/partner-manager-saasgroup",
+   "apply_url": "https://remotejobs.org/remote-jobs/partner-manager-saasgroup",
+   "company": {
+    "name": "saas.group",
+    "logo_url": "https://assets.remotejobs.org/company-logos/scraped/b813dfcbd3ce2cbb27eb0324a8a6b5cc2d937b5e99ada2596b8dfa6906546cd0.png",
+    "website": "https://saasgroup.com",
+    "url": "https://remotejobs.org/companies/saasgroup"
+   },
+   "category": {
+    "name": "Sales",
+    "slug": "sales"
+   },
+   "location": "Remote",
+   "applicant_location_requirements": null,
+   "salary_min": null,
+   "salary_max": null,
+   "salary_text": null,
+   "salary_source_text": null,
+   "salary_currency": null,
+   "salary_period": null,
+   "type": null,
+   "employment_types": null,
+   "employer_job_id": "5010990101",
+   "direct_apply": null,
+   "description": "<p>This role is part of our\u00a0<a href=\"https://www.addsearch.com/\"><em>AddSearch</em></a><em> </em>team, one of our growing brands at saas.group.</p>\n<p>AddSearch is a ~15-person B2B SaaS company providing enterprise site search solutions to large customers with demanding compliance, custom contract, ",
+   "posted_at": "2026-10-20T11:27:38+00:00",
+   "is_translated": false,
+   "original_language": null
+  },
+  {
+   "id": "d62f509f-82bf-4c63-acbc-7afc6d7469a7",
+   "title": "Senior Software Engineer",
+   "url": "https://remotejobs.org/remote-jobs/senior-software-engineer-saasgroup",
+   "apply_url": "https://remotejobs.org/remote-jobs/senior-software-engineer-saasgroup",
+   "company": {
+    "name": "saas.group",
+    "logo_url": "https://assets.remotejobs.org/company-logos/scraped/b813dfcbd3ce2cbb27eb0324a8a6b5cc2d937b5e99ada2596b8dfa6906546cd0.png",
+    "website": "https://saasgroup.com",
+    "url": "https://remotejobs.org/companies/saasgroup"
+   },
+   "category": {
+    "name": "Programming",
+    "slug": "programming"
+   },
+   "location": "Remote, Europe",
+   "applicant_location_requirements": null,
+   "salary_min": null,
+   "salary_max": null,
+   "salary_text": null,
+   "salary_source_text": null,
+   "salary_currency": null,
+   "salary_period": null,
+   "type": null,
+   "employment_types": null,
+   "employer_job_id": "4997789101",
+   "direct_apply": null,
+   "description": "<p>This role is part of our <a href=\"https://www.scraperapi.com/?utm_mt=p&#x26;utm_device=d&#x26;utm_term=scraperapi&#x26;utm_campaign=geoT2-s-Branded&#x26;utm_source=google&#x26;utm_medium=cpc&#x26;utm_id=19560190532_146575612753&#x26;hsa_acc=5949818572&#x26;hsa_cam=19560190532&#x26;hsa_grp=1465756",
+   "posted_at": "2026-10-20T09:52:25+00:00",
+   "is_translated": false,
+   "original_language": null
+  },
+  {
+   "id": "adaff73a-17fb-4fb7-a7e3-0cad4b84a851",
+   "title": "Product Manager, Storage",
+   "url": "https://remotejobs.org/remote-jobs/product-manager-storage-vercel",
+   "apply_url": "https://remotejobs.org/remote-jobs/product-manager-storage-vercel",
+   "company": {
+    "name": "Vercel",
+    "logo_url": "https://assets.remotejobs.org/company-logos/scraped/b1c5068803c73dc874b1c53ba2ef40c27a37bf2cd981af0ed4e0a12086c4170c.png",
+    "website": "https://vercel.com",
+    "url": "https://remotejobs.org/companies/vercel"
+   },
+   "category": {
+    "name": "Product Management",
+    "slug": "product-management"
+   },
+   "location": "Remote - United States",
+   "applicant_location_requirements": null,
+   "salary_min": null,
+   "salary_max": null,
+   "salary_text": null,
+   "salary_source_text": null,
+   "salary_currency": null,
+   "salary_period": null,
+   "type": null,
+   "employment_types": null,
+   "employer_job_id": "6228301004",
+   "direct_apply": null,
+   "description": "<h2>About Vercel:</h2>\n<p>Vercel is the agentic infrastructure company, freeing people and agents to ship what's next. For more than a decade we've helped builders move from idea to production with speed, security, and exceptional developer experience.</p>\n<p>Now we're scaling our products for both ",
+   "posted_at": "2026-10-20T08:04:32+00:00",
+   "is_translated": false,
+   "original_language": null
+  }
+ ],
+ "pagination": {
+  "total": 19926,
+  "limit": 3,
+  "offset": 0,
+  "has_more": false
+ }
+}
