@@ -1,0 +1,15 @@
+name: Error
+description: Algo no funciona como debería
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes: { label: Qué ocurre, description: Y qué esperabas que ocurriera }
+    validations: { required: true }
+  - type: textarea
+    id: steps
+    attributes: { label: Pasos para reproducirlo }
+    validations: { required: true }
+  - type: input
+    id: env
+    attributes: { label: Entorno, description: Navegador, sistema o commit }
