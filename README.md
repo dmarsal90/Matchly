@@ -251,3 +251,7 @@ La misma imagen sirve para todos los procesos y entornos. [docs/deployment.md](d
 | Demo mínima (un servicio, cola `sync`, cron externo) | pasos en la guía |
 
 La guía también cubre cómo escalar los workers por separado, el rollback y la restauración de backups. `GET /up` es el endpoint de salud que usan los healthchecks y los balanceadores.
+
+## Contribuir
+
+Lee [CONTRIBUTING.md](CONTRIBUTING.md) y el [código de conducta](CODE_OF_CONDUCT.md). Las vulnerabilidades se reportan en privado según [SECURITY.md](SECURITY.md).
