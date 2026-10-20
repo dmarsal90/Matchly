@@ -32,6 +32,8 @@
   <img src="docs/screenshots/jobs-light.png" alt="Listado de ofertas con filtros y afinidad" width="860">
 </p>
 
+> **Matchly es una herramienta de búsqueda de empleo** (*job search*): agregador de ofertas de trabajo remoto, buscador de empleo con puntuación de compatibilidad con tu CV, seguimiento de candidaturas, cartas de presentación con IA y preparación de entrevistas. Código abierto, self-hosted. · *Open-source remote job search tool: job aggregator, CV match score, application tracker, AI cover letters and interview prep.*
+
 ## Por qué Matchly
 
 Buscar trabajo es repetir lo mismo cien veces: mirar tableros, adivinar si encajas, reescribir la carta, acordarte de hacer seguimiento. Matchly hace la parte mecánica y te deja el criterio.
