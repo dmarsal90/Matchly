@@ -5,6 +5,11 @@
         <meta name="viewport" content="width=device-width, initial-scale=1">
         <meta name="application-name" content="{{ config('app.name') }}">
         <meta name="description" content="{{ __('meta.description', ['app' => config('app.name')]) }}">
+        <link rel="canonical" href="{{ url()->current() }}">
+        <meta property="og:type" content="website">
+        <meta property="og:url" content="{{ url()->current() }}">
+        <meta property="og:description" content="{{ __('meta.description', ['app' => config('app.name')]) }}">
+        <meta name="twitter:card" content="summary_large_image">
         <meta property="og:image" content="{{ url('/og-image.png') }}">
         <meta property="og:site_name" content="{{ config('app.name') }}">
 
