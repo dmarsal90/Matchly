@@ -27,6 +27,7 @@ final class AtsCompanySeeder extends Seeder
         ['ashby', 'zapier', 'Zapier', 'https://zapier.com'],
         ['ashby', 'supabase', 'Supabase', 'https://supabase.com'],
         ['workable', 'huggingface', 'Hugging Face', 'https://huggingface.co'],
+        ['workable', 'assistant-launch', 'Assistant Launch', 'https://www.assistantlaunch.com'],
         ['smartrecruiters', 'Canva', 'Canva', 'https://www.canva.com'],
         ['smartrecruiters', 'Experian', 'Experian', 'https://www.experian.com'],
     ];
