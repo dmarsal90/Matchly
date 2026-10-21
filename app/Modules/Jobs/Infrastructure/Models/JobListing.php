@@ -22,6 +22,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Support\Str;
 
 /**
  * @property int $id
@@ -94,6 +95,11 @@ final class JobListing extends Model
     public function duplicateOf(): BelongsTo
     {
         return $this->belongsTo(self::class, 'duplicate_of_id');
+    }
+
+    public function slug(): string
+    {
+        return Str::slug(Str::limit($this->title.' '.$this->company, 80, ''));
     }
 
     /**

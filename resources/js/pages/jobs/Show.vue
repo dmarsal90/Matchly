@@ -19,6 +19,7 @@ import { relativeTime } from '@/features/jobs/lib/format';
 import type { Job, JobMatch, JobRequirements } from '@/features/jobs/types';
 import { index } from '@/routes/jobs';
 import { destroy as unfollow, store as follow } from '@/routes/radar';
+import { jobPostingJsonLd } from '@/features/jobs/lib/jobPosting';
 import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import { AlertTriangle, ArrowLeft, Radar } from '@lucide/vue';
 import { getActiveLanguage, trans } from 'laravel-vue-i18n';
@@ -70,6 +71,9 @@ const regions = computed(() => {
         .join(', ');
 });
 const description = computed(() => `${props.job.title} · ${props.job.company}`);
+const jsonLd = computed(() =>
+    props.isOpen ? jobPostingJsonLd(props.job) : null,
+);
 </script>
 
 <template>
@@ -79,6 +83,19 @@ const description = computed(() => `${props.job.title} · ${props.job.company}`)
             name="description"
             :content="description"
         />
+        <meta head-key="og:title" property="og:title" :content="job.title" />
+        <meta
+            head-key="og:description"
+            property="og:description"
+            :content="description"
+        />
+        <component
+            :is="'script'"
+            v-if="jsonLd"
+            head-key="job-posting"
+            type="application/ld+json"
+            >{{ jsonLd }}</component
+        >
         <meta
             v-if="!isOpen"
             head-key="robots"
