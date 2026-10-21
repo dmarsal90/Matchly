@@ -18,7 +18,7 @@ async function change(event: Event): Promise<void> {
 
 <template>
     <label
-        class="relative inline-flex h-9 items-center gap-1.5 rounded-md px-2 max-sm:w-9 max-sm:justify-center max-sm:px-0 text-sm text-muted-foreground focus-within:ring-2 focus-within:ring-ring hover:bg-accent hover:text-accent-foreground"
+        class="relative inline-flex h-9 items-center gap-1.5 rounded-md px-2 text-sm text-muted-foreground focus-within:ring-2 focus-within:ring-ring hover:bg-accent hover:text-accent-foreground max-sm:w-9 max-sm:justify-center max-sm:px-0"
     >
         <Languages class="size-4" aria-hidden="true" />
         <span class="sr-only">{{ trans('app.language') }}</span>
