@@ -1,6 +1,6 @@
 @php
     // These pages can render when nothing else works (no session, no database): decide the language only from what is at hand.
-    $supported = ['es', 'en', 'pt'];
+    $supported = ['es', 'en', 'pt', 'fr', 'it', 'de'];
     try {
         $locale = auth()->user()?->locale;
     } catch (\Throwable) {

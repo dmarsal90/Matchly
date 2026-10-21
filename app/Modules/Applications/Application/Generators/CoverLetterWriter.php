@@ -29,7 +29,7 @@ use Locale;
 final readonly class CoverLetterWriter
 {
     /** Languages the template exists in; the AI can write in any. */
-    public const array TEMPLATE_LANGUAGES = ['es', 'en', 'pt'];
+    public const array TEMPLATE_LANGUAGES = ['es', 'en', 'pt', 'fr', 'it', 'de'];
 
     public function __construct(
         private AiGateway $ai,

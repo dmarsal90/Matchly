@@ -6,4 +6,7 @@ return [
     'es' => 'Español',
     'en' => 'English',
     'pt' => 'Português',
+    'fr' => 'Français',
+    'it' => 'Italiano',
+    'de' => 'Deutsch',
 ];
