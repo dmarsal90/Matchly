@@ -39,6 +39,8 @@ export default defineConfig(({ mode }) => {
             }),
             i18n(),
         ],
+        // The production image ships the SSR bundle without node_modules, so it must carry its own dependencies.
+        ssr: { noExternal: true },
         server: {
             host: inDocker ? '0.0.0.0' : undefined,
             port,

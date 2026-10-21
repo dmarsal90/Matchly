@@ -140,7 +140,13 @@ function onSet(key: keyof JobFilters, value: string | number | null): void {
 </script>
 
 <template>
-    <Head :title="trans('jobs.title')" />
+    <Head :title="trans('jobs.title')">
+        <meta
+            head-key="og:title"
+            property="og:title"
+            :content="trans('jobs.title')"
+        />
+    </Head>
 
     <div class="mx-auto w-full max-w-6xl space-y-6 px-4 py-6">
         <header class="space-y-4">

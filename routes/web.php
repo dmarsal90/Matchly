@@ -16,6 +16,7 @@ use App\Modules\Applications\Http\Controllers\SavedJobController;
 use App\Modules\Applications\Http\Controllers\SharedReportController;
 use App\Modules\Identity\Http\Controllers\OAuthController;
 use App\Modules\Jobs\Http\Controllers\JobController;
+use App\Modules\Jobs\Http\Controllers\SitemapController;
 use App\Modules\Matching\Http\Controllers\MarketController;
 use App\Modules\Notifications\Http\Controllers\NotificationController;
 use App\Modules\Profiles\Domain\Enums\QuestionnaireStep;
@@ -39,13 +40,7 @@ Route::get('robots.txt', fn () => response(
     ['Content-Type' => 'text/plain'],
 ));
 
-// shortcut: static two-URL sitemap, list individual job pages here once they should rank on their own
-Route::get('sitemap.xml', fn () => response(
-    '<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'
-    .'<url><loc>'.e(url('/')).'</loc></url><url><loc>'.e(route('jobs.index')).'</loc></url></urlset>',
-    200,
-    ['Content-Type' => 'application/xml'],
-));
+Route::get('sitemap.xml', SitemapController::class)->name('sitemap');
 
 Route::put('locale', [LocaleController::class, 'update'])
     ->middleware('throttle:30,1')

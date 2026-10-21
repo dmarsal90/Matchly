@@ -11,6 +11,10 @@ import { configureEcho } from '@laravel/echo-vue';
 import { i18nVue } from 'laravel-vue-i18n';
 import { createPinia } from 'pinia';
 
+const resolveLanguageSync = import.meta.env.SSR
+    ? (await import('@/lib/i18n-ssr')).resolveLanguageSync
+    : undefined;
+
 void createInertiaApp({
     title: pageTitle,
     layout: (name, page) => {
@@ -54,7 +58,7 @@ void createInertiaApp({
         app.use(i18nVue, {
             lang: page.props.locale,
             fallbackLang: 'en',
-            resolve: resolveLanguage,
+            resolve: resolveLanguageSync ?? resolveLanguage,
         });
 
         app.directive('focus', {

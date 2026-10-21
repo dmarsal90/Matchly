@@ -12,7 +12,13 @@ const points = ['collect', 'match', 'prepare'] as const;
 </script>
 
 <template>
-    <Head :title="trans('app.tagline')" />
+    <Head :title="trans('app.tagline')">
+        <meta
+            head-key="og:title"
+            property="og:title"
+            :content="trans('app.tagline')"
+        />
+    </Head>
 
     <div class="flex min-h-dvh flex-col bg-background text-foreground">
         <PublicHeader />

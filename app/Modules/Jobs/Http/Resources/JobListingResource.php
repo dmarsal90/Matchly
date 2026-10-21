@@ -7,7 +7,6 @@ namespace App\Modules\Jobs\Http\Resources;
 use App\Modules\Jobs\Infrastructure\Models\JobListing;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Support\Str;
 
 /**
  * @mixin JobListing
@@ -53,7 +52,7 @@ final class JobListingResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'slug' => Str::slug(Str::limit($this->title.' '.$this->company, 80, '')),
+            'slug' => $this->slug(),
             'title' => $this->title,
             'company' => $this->company,
             'company_logo_url' => $this->company_logo_url,

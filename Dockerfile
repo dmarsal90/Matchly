@@ -70,7 +70,7 @@ RUN --mount=type=cache,target=/root/.npm \
     npm ci --no-audit --no-fund
 
 COPY --from=vendor /var/www/html ./
-RUN npm run build
+RUN npm run build:ssr
 
 #──────────────────────────────────────────────────────────────────────────────
 # dev: tooling for local development; source is bind-mounted at runtime
@@ -125,6 +125,9 @@ RUN mv "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 
 COPY --from=vendor --chown=www-data:www-data /var/www/html ./
 COPY --from=frontend --chown=www-data:www-data /var/www/html/public/build ./public/build
+# Server-side rendering: the bundle plus the node binary that runs it (supervisord starts it).
+COPY --from=frontend --chown=www-data:www-data /var/www/html/bootstrap/ssr ./bootstrap/ssr
+COPY --from=node-bin /usr/local/bin/node /usr/local/bin/node
 
 RUN rm -rf tests docker .github \
     && chown -R www-data:www-data storage bootstrap/cache
