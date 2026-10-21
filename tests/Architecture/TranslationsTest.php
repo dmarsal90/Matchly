@@ -3,12 +3,12 @@
 declare(strict_types=1);
 
 /*
- * Every user-facing text lives in lang/{es,en,pt}: the three languages must
+ * Every user-facing text lives in lang/{es,en,pt,fr,it,de}: the six languages must
  * offer the same keys, with the same :placeholders, and Vue templates must
  * not contain literal text.
  */
 
-const LOCALES = ['es', 'en', 'pt'];
+const LOCALES = ['es', 'en', 'pt', 'fr', 'it', 'de'];
 
 /** Groups published by laravel-lang: kept in sync by `php artisan lang:update`, not by hand. */
 const VENDOR_GROUPS = ['actions', 'auth', 'http-statuses', 'pagination', 'passwords', 'validation'];
@@ -54,7 +54,7 @@ it('offers the same translation groups in every language', function (): void {
 it('offers the same keys and placeholders in every language', function (string $group): void {
     $reference = flattenTranslations(require lang_path("es/{$group}.php"));
 
-    foreach (['en', 'pt'] as $locale) {
+    foreach (array_diff(LOCALES, ['es']) as $locale) {
         $other = flattenTranslations(require lang_path("{$locale}/{$group}.php"));
 
         expect(array_keys($other))->toEqualCanonicalizing(array_keys($reference), "{$locale}/{$group}.php keys differ from es");
@@ -72,8 +72,9 @@ it('offers the same keys and placeholders in every language', function (string $
 it('keeps the JSON translations aligned', function (): void {
     $keys = fn (string $locale): array => array_keys(json_decode((string) file_get_contents(lang_path("{$locale}.json")), true));
 
-    expect($keys('en'))->toEqualCanonicalizing($keys('es'))
-        ->and($keys('pt'))->toEqualCanonicalizing($keys('es'));
+    foreach (array_diff(LOCALES, ['es']) as $locale) {
+        expect($keys($locale))->toEqualCanonicalizing($keys('es'));
+    }
 });
 
 it('has no literal text in Vue templates', function (): void {
