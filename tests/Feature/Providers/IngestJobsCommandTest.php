@@ -17,7 +17,7 @@ beforeEach(function (): void {
 it('queues one job per enabled source', function (): void {
     $this->artisan('jobs:ingest')->assertSuccessful();
 
-    Queue::assertPushed(IngestProviderJob::class, 15);
+    Queue::assertPushed(IngestProviderJob::class, 16);
     Queue::assertPushed(IngestProviderJob::class, fn (IngestProviderJob $job): bool => $job->source === 'remotive' && $job->queue === 'ingestion');
     Queue::assertNotPushed(IngestProviderJob::class, fn (IngestProviderJob $job): bool => $job->source === 'adzuna');
 });

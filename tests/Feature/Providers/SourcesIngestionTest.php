@@ -50,6 +50,9 @@ it('ingests every source end to end', function (string $source, string $now, Clo
         function ($jobs): void {
             expect($jobs->first()->allowed_regions)->toContain('MX');
         }],
+    'getonboard' => ['getonboard', '2026-08-29 13:00:00', fn () => Http::fake(['www.getonbrd.com/*' => Http::response(providerFixtureRaw('getonboard.json'))]), 3, function ($jobs): void {
+        expect($jobs->first()->apply_url)->toStartWith('https://www.getonbrd.com/jobs/');
+    }],
     'remotelanders' => ['remotelanders', '2026-10-20 13:00:00', fn () => Http::fake(['remotelanders.com/*' => Http::response(providerFixtureRaw('remotelanders.json'))]), 3, null],
     'remotejobsorg' => ['remotejobsorg', '2026-10-20 13:00:00', fn () => Http::fake(['remotejobs.org/*' => Http::response(providerFixtureRaw('remotejobsorg.json'))]), 3, null],
     'arbeitnow (on-site postings dropped)' => ['arbeitnow', '2026-10-14 13:00:00', fn () => Http::fake(['www.arbeitnow.com/*' => Http::response(providerFixtureRaw('arbeitnow.json'))]), 2, null],

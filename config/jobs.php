@@ -18,6 +18,8 @@ use App\Modules\Providers\Infrastructure\Sources\Ats\SmartRecruiters\SmartRecrui
 use App\Modules\Providers\Infrastructure\Sources\Ats\SmartRecruiters\SmartRecruitersProvider;
 use App\Modules\Providers\Infrastructure\Sources\Ats\Workable\WorkableNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Ats\Workable\WorkableProvider;
+use App\Modules\Providers\Infrastructure\Sources\GetOnBoard\GetOnBoardNormalizer;
+use App\Modules\Providers\Infrastructure\Sources\GetOnBoard\GetOnBoardProvider;
 use App\Modules\Providers\Infrastructure\Sources\Himalayas\HimalayasNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Himalayas\HimalayasProvider;
 use App\Modules\Providers\Infrastructure\Sources\Jobicy\JobicyNormalizer;
@@ -202,6 +204,19 @@ return [
             'options' => [
                 'url' => 'https://puentetalent.com/api/jobs',
                 'pages' => 20,
+            ],
+        ],
+
+        'getonboard' => [
+            'enabled' => (bool) env('JOBS_GETONBOARD_ENABLED', true),
+            'provider' => GetOnBoardProvider::class,
+            'normalizer' => GetOnBoardNormalizer::class,
+            'interval' => 240,
+            'rate_limit' => 10,
+            'cache_ttl' => 1800,
+            'options' => [
+                'url' => 'https://www.getonbrd.com/api/v0/search/jobs',
+                'max_pages' => 5,
             ],
         ],
 

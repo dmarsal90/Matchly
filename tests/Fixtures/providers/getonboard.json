@@ -1,0 +1,495 @@
+{
+ "data": [
+  {
+   "id": "mid-level-graphic-designer-everything-bagel-remote-0932",
+   "type": "job",
+   "attributes": {
+    "title": "Mid Level Graphic Designer",
+    "description_headline": "📚 Experience & qualifications",
+    "description": "<ul><li>4+ years experience in digital graphic design with strong portfolio demonstrating UI, ad and motion work (static + motion).</li><li>Strong Figma proficiency: component systems, auto layout, variants, shared libraries, prototyping and handoff.</li><li>Adobe Creative Suite (Photoshop, Illustrator, After Effects) for complex composite work.</li><li>Solid design fundamentals: layout, color, typography, composition, and motion principles.</li><li>Comfortable creating creative variations at scale and iterating quickly based on performance and feedback.</li><li>Clear written and verbal English communication; collaborative approach to working with cross-functional partners.</li></ul>",
+    "projects": "<div>We’re hiring a hands-on <strong>Mid-Level Graphic Designer</strong> to create high-quality static and animated assets for paid social, organic, email, and web. This is a <strong>Figma-first</strong> role — you’ll build and maintain component libraries, produce high-velocity ad creative and UI layouts, and craft lightweight Jitter animations for 2–4 brands. The role supports the <strong>North American market</strong> and requires someone <strong>practical and fast yet methodical and organized</strong> — not just an “artist.” The ideal candidate is production-minded: they <strong>document design decisions, build reusable templates and motion systems, track assets and versions, deliver concise status and test reports, and plug cleanly into existing workflows</strong>. In short — craft-driven but operational: they ship work quickly without sacrificing repeatability, QA, or clarity. You’ll report to an Art Director and work closely with strategists to translate briefs into visual solutions.</div>",
+    "functions_headline": "🛠 Key responsibilities",
+    "functions": "<ul><li>Produce on-brand static and animated assets for paid social, organic, email, and web (Meta, TikTok, YouTube, Amazon, OTT).</li><li><strong>Design and maintain scalable Figma systems</strong>: components, tokens, variants, layout grids, and export specs shared across teams.</li><li>Create lightweight, purposeful motion using <strong>Jitter</strong> (or similar) — hand off optimized files for ad build or export as required.</li><li><strong>Design and implement UI/UX for websites and landing pages</strong>: create responsive layouts, wireframes, and high-fidelity prototypes in Figma and Claude Design.</li><li>Rapidly iterate creative concepts and produce multiple variations for A/B testing and platform specs.</li><li>Conduct careful QA: pixel-perfect exports, correct copy placement, safe zones, and ad policy compliance.</li><li>Maintain an organized asset library and versioning system for quick repurposing and future use.</li><li><strong>Work closely with the Art Director and cross-functional strategists</strong> to ensure visual work reflects strategic intent and performs against goals.</li></ul>",
+    "benefits_headline": "What We Offer",
+    "benefits": "<div>Our team is a group of creative, passionate contractors and full-time employees based all over the world. Our goal is to grow our team worldwide and provide space for ideas, growth and autonomy.</div><div>At Everything Bagel, we believe in valuing our team members and offer:</div><ul><li>A fully remote and collaborative work environment where creativity thrives.</li><li>Opportunities for professional growth within a dynamic and ambitious team.</li><li>High-growth agency focused on performance-driven design.</li><li>Competitive salary that reflects the expertise and value you bring.</li></ul>",
+    "desirable_headline": "Nice-to-Haves",
+    "desirable": "<ul><li>Experience with paid media setups (PDP + landing pages, email templates, ad policies).</li><li>Familiarity with AI tools for ideation/asset generation (Claude, Claude Design, etc.) and integrating them into production workflows.</li></ul>",
+    "remote": true,
+    "remote_modality": "fully_remote",
+    "remote_zone": null,
+    "countries": [
+     "Remote"
+    ],
+    "lang": "en",
+    "category_name": "Design / UX",
+    "perks": [
+     "remote_full",
+     "informal_dresscode"
+    ],
+    "min_salary": 1600,
+    "max_salary": 1800,
+    "published_at": 1787946713,
+    "response_time_in_days": {
+     "min": null,
+     "max": null
+    },
+    "applications_count": 310,
+    "location_regions": {
+     "data": []
+    },
+    "location_tenants": {
+     "data": []
+    },
+    "location_cities": {
+     "data": []
+    },
+    "modality": {
+     "data": {
+      "id": "1",
+      "type": "modality",
+      "attributes": {
+       "name": "Full time",
+       "locale_key": "full_time"
+      }
+     }
+    },
+    "seniority": {
+     "data": {
+      "id": "4",
+      "type": "seniority",
+      "attributes": {
+       "name": "Senior",
+       "locale_key": "senior"
+      }
+     }
+    },
+    "tags": {
+     "data": [
+      {
+       "id": "figma",
+       "type": "tag",
+       "attributes": {
+        "name": "Figma",
+        "keywords": "Figma Libraries, Figma Mockups, Figma Tokens, Figma Jam, Figma FigJam, Figma Components, Figma Dev Mode, Figma Integration, FigJam"
+       }
+      },
+      {
+       "id": "ui-ux-design",
+       "type": "tag",
+       "attributes": {
+        "name": "UI/UX Design",
+        "keywords": "UI Design Collaboration, UI/UX Collaboration, UI/UX Design Collaboration, UI/UX Development, User Experience Design, UX/UI Design"
+       }
+      },
+      {
+       "id": "a-b-testing",
+       "type": "tag",
+       "attributes": {
+        "name": "A/B Testing",
+        "keywords": ""
+       }
+      },
+      {
+       "id": "motion-design",
+       "type": "tag",
+       "attributes": {
+        "name": "Motion Design",
+        "keywords": "Motion Animation"
+       }
+      },
+      {
+       "id": "adobe-creative-suite",
+       "type": "tag",
+       "attributes": {
+        "name": "Adobe Creative Suite",
+        "keywords": "Suite Adobe, Photoshop, Illustrator, Creative Suite, InDesign, XD, Adobe Creative, Premiere, AfterEffects, Adobe Suite"
+       }
+      },
+      {
+       "id": "responsive-design",
+       "type": "tag",
+       "attributes": {
+        "name": "Responsive Design",
+        "keywords": "Responsive Web Design, Responsive UI Design, Responsive UX Design, Responsive CSS, Responsive HTML, Responsive Layouts, Responsive Web Apps, Responsive Web Development"
+       }
+      },
+      {
+       "id": "digital-advertising",
+       "type": "tag",
+       "attributes": {
+        "name": "Digital Advertising",
+        "keywords": null
+       }
+      },
+      {
+       "id": "visual-design",
+       "type": "tag",
+       "attributes": {
+        "name": "Visual Design",
+        "keywords": "Visual Designs"
+       }
+      }
+     ]
+    },
+    "company": {
+     "data": {
+      "id": "everything-bagel",
+      "type": "company",
+      "attributes": {
+       "name": "Everything Bagel",
+       "description": "Everything Bagel is the extra arm you need to make sure you are hyper-aware of your audience behaviors while identifying the tools it takes to access and maintain them.\n\nEverything Bagel is not an agency.\n‍We are Growth Partners.",
+       "long_description": "",
+       "projects": "<div><strong>Company overview</strong><br>Everything Bagel Partners is a Growth Partner focused on scaling medium DTC brands across beauty, food, apparel, home, and higher education. We combine data-driven growth, testing, and collaborative creativity to drive measurable results for partner brands. This role sits within our retention practice, partnering with client brands to maximize LTV and repurchase rate through automated, personalized email and SMS programs.</div><div><strong>Project/department context</strong><br>You will contribute to a dedicated client portfolio, designing and executing retention strategies that align with business goals. You’ll work cross-functionally with copywriters, designers, and technical teams to deliver on-brand communications that deepen customer relationships, increase engagement, and improve long-term value. This role emphasizes operational excellence, data-informed decision making, and scalable processes that support rapid growth for multiple accounts simultaneously.</div>",
+       "benefits": "<p>At Everything Bagel, we believe in valuing our team members and offer:</p><ul><li>A fully remote and collaborative work environment where creativity thrives.</li><li>Opportunities for professional growth within a dynamic and ambitious team.</li><li>Competitive salary that reflects the expertise and value you bring.</li></ul><p>Join us on this exciting journey and help us grow into new horizons!</p>",
+       "web": "https://www.everythingbagel.com/",
+       "twitter": "",
+       "github": "",
+       "facebook": "everythingbagelpartners",
+       "angellist": "",
+       "country": "US",
+       "response_time_in_days": {
+        "min": 4,
+        "max": 8
+       },
+       "logo": "https://getonbrd-prod.s3.amazonaws.com/uploads/users/logo/14084/EB_Icon_Tile_Square.png"
+      }
+     }
+    }
+   },
+   "links": {
+    "public_url": "https://www.getonbrd.com/jobs/mid-level-graphic-designer-everything-bagel-remote-0932"
+   }
+  },
+  {
+   "id": "senior-full-stack-engineer-go-react-native-california-injury-group-apc-remote",
+   "type": "job",
+   "attributes": {
+    "title": "Senior Full-Stack Engineer (Go + Next.JS + React Native)",
+    "description_headline": "Qualifications and requirements",
+    "description": "<ul><li>5+ years of full-stack experience; strong in Go (or deep TypeScript experience and proven ability to pick up Go fast).</li><li>Solid React/Next.js; React Native experience is a major plus.</li><li>Comfortable with webhook-driven / telephony / event-based systems — you've debugged async flows across service boundaries.</li><li>Able to read and navigate a large, unfamiliar codebase independently.</li><li>Strong SQL and comfort operating PostgreSQL in production.</li><li>English C1+ written and spoken.</li><li>Based in Latin America with at least 6 hours of overlap with US Pacific time.</li></ul>",
+    "projects": "<p>California Injury Group, APC (CIG Law) is a growing personal injury law firm in Los Angeles. We built our own all-in-one practice platform in-house — CRM and case management, a complete VoIP phone system (web softphone + iOS and Android apps), SMS/MMS, fax, email pipelines, e-signature, trust accounting, and AI-powered document processing. The entire firm runs on it every day.</p><p>You'll be our first full-time engineer, working directly with the firm's owner — no PM layer, no ticket bureaucracy. The product has real daily users (our staff) who report bugs and request features constantly, so your work ships fast and gets used immediately.</p><p>The stack: Go backend (REST API, PostgreSQL, Redis, webhook-driven telephony), Next.js/React/TypeScript web, React Native (Expo) with CallKit and VoIP push, Telnyx Call Control/WebRTC/SMS/fax, Microsoft 365 integrations, LLM pipelines (Anthropic), Linux/PM2/Caddy/S3 infrastructure.</p>",
+    "functions_headline": "Job functions",
+    "functions": "<ul><li>Fix bugs at the root cause: triage reports from live users, trace them through the full stack, and fix the underlying problem — not the symptom.</li><li>Harden reliability: improve test coverage, observability, and error handling across a system built at high velocity.</li><li>Ship features: case-opening automation, workflow tooling, telephony improvements, AI-assisted document workflows.</li><li>Own production: deploys, database migrations, and occasional on-call for critical issues.</li></ul>",
+    "benefits_headline": "Conditions",
+    "benefits": "<ul><li>USD $3,500–$5,500/month depending on experience (full-time contractor).</li><li>Fully remote, long-term position; direct hire with no agency in the middle.</li><li>Hiring process: application with screening questions → 30-minute video call → paid trial project (about one week, a real item from our backlog, paid pro-rated at your monthly rate) → offer.</li></ul>",
+    "desirable_headline": "Desirable skills",
+    "desirable": "<ul><li>Telnyx or Twilio programmable voice/messaging experience.</li><li>Expo native modules / config plugins.</li><li>Experience building LLM-powered features.</li><li>Legal, medical, or insurance domain exposure.</li></ul>",
+    "remote": true,
+    "remote_modality": "fully_remote",
+    "remote_zone": null,
+    "countries": [
+     "Remote"
+    ],
+    "lang": "en",
+    "category_name": "Programming",
+    "perks": [
+     "remote_full"
+    ],
+    "min_salary": 3500,
+    "max_salary": 5500,
+    "published_at": 1787938276,
+    "response_time_in_days": {
+     "min": 2,
+     "max": 2
+    },
+    "applications_count": 307,
+    "location_regions": {
+     "data": []
+    },
+    "location_tenants": {
+     "data": []
+    },
+    "location_cities": {
+     "data": []
+    },
+    "modality": {
+     "data": {
+      "id": "1",
+      "type": "modality",
+      "attributes": {
+       "name": "Full time",
+       "locale_key": "full_time"
+      }
+     }
+    },
+    "seniority": {
+     "data": {
+      "id": "4",
+      "type": "seniority",
+      "attributes": {
+       "name": "Senior",
+       "locale_key": "senior"
+      }
+     }
+    },
+    "tags": {
+     "data": [
+      {
+       "id": "go",
+       "type": "tag",
+       "attributes": {
+        "name": "Go",
+        "keywords": "Golang, Go Chi, Echo, Gin, Godep, Go, Go Frameworks, Go Modules, Go High Level, GoInstant"
+       }
+      },
+      {
+       "id": "typescript",
+       "type": "tag",
+       "attributes": {
+        "name": "TypeScript",
+        "keywords": "Typesafe"
+       }
+      },
+      {
+       "id": "react",
+       "type": "tag",
+       "attributes": {
+        "name": "React",
+        "keywords": "ReactJS, React-Native, GatsbyJS, react.js, React JS, React.ts, React Web, React 18, React ES6, React Community, React Programming, React.js"
+       }
+      },
+      {
+       "id": "react-native",
+       "type": "tag",
+       "attributes": {
+        "name": "React Native",
+        "keywords": "React Native, Reactnative, react_native, ReactNative, React-Native"
+       }
+      },
+      {
+       "id": "postgresql",
+       "type": "tag",
+       "attributes": {
+        "name": "PostgreSQL",
+        "keywords": "postgres, psql, postgre, Postgres, Postgres SQL, POSGRESQL, Postgres Extensions, PostgreSQL PL/pgSQL, PostgreSQL Queries, PostgreSQL Optimization, PostGIS, PL/pgSQL, PLpgSQL"
+       }
+      },
+      {
+       "id": "sql",
+       "type": "tag",
+       "attributes": {
+        "name": "SQL",
+        "keywords": "PL SQL, SQLServer, SQL server, SPSQL, SP SQL, SQL Coding, SQL DB2, SQL Oracle, SQL RDMS, SQL400"
+       }
+      },
+      {
+       "id": "webhooks",
+       "type": "tag",
+       "attributes": {
+        "name": "Webhooks",
+        "keywords": "Web Hooks, Webhook"
+       }
+      },
+      {
+       "id": "telephony",
+       "type": "tag",
+       "attributes": {
+        "name": "Telephony",
+        "keywords": "Telephone Communication, Telephone Systems, Telephony Systems, Telephony Services, Telefonia, Telefónica IP, Telefonía"
+       }
+      },
+      {
+       "id": "next-js",
+       "type": "tag",
+       "attributes": {
+        "name": "Next.js",
+        "keywords": "Next JS, NextJS, Next.js 13, Next.js Frontend, Next"
+       }
+      },
+      {
+       "id": "large-language-models",
+       "type": "tag",
+       "attributes": {
+        "name": "Large Language Models",
+        "keywords": "LLM, Large Language Model"
+       }
+      }
+     ]
+    },
+    "company": {
+     "data": {
+      "id": "california-injury-group-apc",
+      "type": "company",
+      "attributes": {
+       "name": "California Injury Group, APC",
+       "description": "California Injury Group is a Los Angeles personal injury law firm that built its own all-in-one practice platform (CRM, VoIP phone system, mobile apps, e-signature, AI document processing). We're hiring our first full-time engineer to own it.",
+       "long_description": "",
+       "projects": null,
+       "benefits": "<ul><li>USD $3,500–$5,500/month depending on experience (full-time contractor).</li><li>Fully remote, long-term position; direct hire with no agency in the middle.</li><li>Hiring process: application with screening questions → 30-minute video call → paid trial project (about one week, a real item from our backlog, paid pro-rated at your monthly rate) → offer.</li></ul>",
+       "web": "http://ciglaw.com",
+       "twitter": null,
+       "github": null,
+       "facebook": null,
+       "angellist": null,
+       "country": "US",
+       "response_time_in_days": {
+        "min": 2,
+        "max": 2
+       },
+       "logo": "https://getonbrd-prod.s3.amazonaws.com/uploads/users/logo/20406/logo-512.png"
+      }
+     }
+    }
+   },
+   "links": {
+    "public_url": "https://www.getonbrd.com/jobs/senior-full-stack-engineer-go-react-native-california-injury-group-apc-remote"
+   }
+  },
+  {
+   "id": "especialista-qa-senior-latam-bc-tecnologia-remote",
+   "type": "job",
+   "attributes": {
+    "title": "Especialista QA Senior LATAM",
+    "description_headline": "Requisitos",
+    "description": "<ul><li>Experiencia comprobable como QA Senior, QA Analyst Senior, Test Analyst o similar.</li><li>Certificación ISTQB Foundation Level, Advanced Test Analyst o equivalente.</li><li>Experiencia avanzada en elaboración de Planes de Prueba bajo estándares ISTQB / IEEE 829.</li><li>Dominio en diseño y estructuración de casos de prueba exhaustivos.</li><li>Experiencia trabajando bajo enfoques Shift-Left / Early QA.</li><li>Experiencia en definición y manejo de criterios de entrada y salida, DoR / DoD.</li><li>Dominio de matrices de trazabilidad de requisitos (RTM).</li><li>Experiencia en pruebas de APIs y servicios.</li><li>Manejo de Postman, SoapUI o Insomnia.</li><li>Conocimiento de endpoints, collections, payloads JSON/XML y códigos de respuesta HTTP.</li><li>Conocimientos sólidos de SQL, incluyendo joins, agregaciones y validación de datos.</li><li>Experiencia en pruebas de UI, integraciones y persistencia de información.</li><li>Manejo avanzado de Jira y experiencia trabajando con Agile Testing.</li><li>Capacidad de análisis de reglas de negocio complejas.</li><li>Experiencia trabajando de manera coordinada con equipos multidisciplinarios.</li></ul>",
+    "projects": "<div>Buscamos un/a Especialista QA Senior con sólida experiencia en la definición, diseño y estructuración de Planes de Prueba y Casos de Prueba exhaustivos, alineados a buenas prácticas y metodologías ISTQB.</div><div>La posición tendrá un rol clave dentro del ciclo de desarrollo, trabajando bajo un enfoque Early QA / Shift-Left, participando desde etapas tempranas del proyecto y diseñando la estrategia de pruebas antes del inicio de la construcción del software. El objetivo será asegurar una cobertura integral de las reglas de negocio, reducir defectos tempranamente y contribuir a la calidad de las soluciones desde su concepción.</div>",
+    "functions_headline": "Principales responsabilidades",
+    "functions": "<div>Diseñar y ejecutar la estrategia de Early QA / Shift-Left, participando desde las primeras etapas del ciclo de desarrollo. Elaborar Planes de Prueba, documentación QA, matrices de trazabilidad y casos de prueba detallados antes del inicio de la codificación. Analizar requerimientos funcionales y reglas de negocio, identificando escenarios positivos, negativos, alternativos y casos límite. Diseñar casos de prueba aplicando técnicas formales de ISTQB, incluyendo particiones de equivalencia, valores límite, tablas de decisión, transiciones de estado y técnicas de caja negra/blanca. Definir criterios de entrada y salida de pruebas, además de participar en la definición y validación de DoR / DoD. Construir y mantener matrices de trazabilidad de requisitos (RTM), asegurando cobertura completa entre requerimientos y pruebas. Ejecutar pruebas funcionales y no funcionales sobre APIs, bases de datos y UI. Validar integraciones entre sistemas, persistencia, consistencia e integridad de los datos. Ejecutar pruebas de servicios y APIs utilizando herramientas como Postman, SoapUI o Insomnia. Validar endpoints, collections, payloads JSON/XML, códigos de respuesta y reglas asociadas a servicios. Realizar consultas y validaciones sobre bases de datos utilizando SQL, incluyendo joins, agregaciones y comprobación de persistencia. Registrar, documentar y realizar seguimiento de defectos e incidencias. Trabajar colaborativamente con equipos de desarrollo, producto, negocio y arquitectura durante todo el ciclo de construcción. Participar activamente en refinamientos, revisiones de historias de usuario y definición de criterios de aceptación. Proponer mejoras en procesos, estándares y prácticas de aseguramiento de calidad. Apoyar la incorporación de automatización de pruebas cuando sea necesario.</div>",
+    "benefits_headline": "",
+    "benefits": "",
+    "desirable_headline": "Deseable",
+    "desirable": "<ul><li>Experiencia en proyectos relacionados con Inversiones, banca, servicios financieros o mercados de capitales.</li><li>Experiencia con herramientas o frameworks de automatización como Cypress o Playwright.</li><li>Conocimientos de procesos y arquitecturas CI/CD.</li><li>Experiencia en ambientes corporativos con alta exigencia en calidad y trazabilidad.</li></ul>",
+    "remote": true,
+    "remote_modality": "fully_remote",
+    "remote_zone": null,
+    "countries": [
+     "Remote"
+    ],
+    "lang": "lang_not_specified",
+    "category_name": "SysAdmin / DevOps / QA",
+    "perks": [
+     "remote_full"
+    ],
+    "min_salary": null,
+    "max_salary": null,
+    "published_at": 1787862149,
+    "response_time_in_days": {
+     "min": null,
+     "max": null
+    },
+    "applications_count": 313,
+    "location_regions": {
+     "data": []
+    },
+    "location_tenants": {
+     "data": []
+    },
+    "location_cities": {
+     "data": []
+    },
+    "modality": {
+     "data": {
+      "id": "1",
+      "type": "modality",
+      "attributes": {
+       "name": "Full time",
+       "locale_key": "full_time"
+      }
+     }
+    },
+    "seniority": {
+     "data": {
+      "id": "4",
+      "type": "seniority",
+      "attributes": {
+       "name": "Senior",
+       "locale_key": "senior"
+      }
+     }
+    },
+    "tags": {
+     "data": [
+      {
+       "id": "test-planning",
+       "type": "tag",
+       "attributes": {
+        "name": "Test Planning",
+        "keywords": "Test Plan Creation, Testing Plans, Test Preparation"
+       }
+      },
+      {
+       "id": "api-testing",
+       "type": "tag",
+       "attributes": {
+        "name": "API Testing",
+        "keywords": "API Simulation, API Mocking"
+       }
+      },
+      {
+       "id": "sql",
+       "type": "tag",
+       "attributes": {
+        "name": "SQL",
+        "keywords": "PL SQL, SQLServer, SQL server, SPSQL, SP SQL, SQL Coding, SQL DB2, SQL Oracle, SQL RDMS, SQL400"
+       }
+      },
+      {
+       "id": "agile-testing",
+       "type": "tag",
+       "attributes": {
+        "name": "Agile Testing",
+        "keywords": "Agile Tools, Agile Training"
+       }
+      },
+      {
+       "id": "istqb",
+       "type": "tag",
+       "attributes": {
+        "name": "ISTQB",
+        "keywords": "ISQTB, ISTQI, ISTQB Certification, ISTQB Certified, ISTQB Agile Tester, ISTQB Certified Foundation Level, ISTQB Certified Tester, ISTQB Foundation Level, ISTQB Foundation, ISTQB Practices, ISTQB Standards"
+       }
+      },
+      {
+       "id": "test-automation",
+       "type": "tag",
+       "attributes": {
+        "name": "Test Automation",
+        "keywords": "Testing Automation, Test Automation Scripts, Test Automation Scripting, Test Automation Design, Test Automation Framework, Test Automation Strategy, TestComplete"
+       }
+      },
+      {
+       "id": "ui-testing",
+       "type": "tag",
+       "attributes": {
+        "name": "UI Testing",
+        "keywords": null
+       }
+      }
+     ]
+    },
+    "company": {
+     "data": {
+      "id": "bctecnologia",
+      "type": "company",
+      "attributes": {
+       "name": "BC Tecnología",
+       "description": "Somos una consultora de TI con personal experto en diferentes áreas de tecnología.",
+       "long_description": "<p>Somos una consultora de Servicios IT. Administramos portafolio, desarrollamos proyectos, realizamos outsourcing y selección de profesionales.</p><p>Creamos equipos de trabajos ágiles para áreas de Infraestructura Tecnología, Desarrollo de Software y Unidades de Negocio, en clientes de servicios financieros, seguros, retail y gobierno.</p><p>Desde hace 6 años diseñamos soluciones acorde a las necesidades de nuestros clientes. Nuestras principales áreas de negocio son:</p><p>- Consultoría y diseño de soluciones.<br>- Formación de equipos de trabajo, outsourcing de personal.<br>- Desarrollo de proyectos.<br>- Servicios de soporte y administración IT </p><p>Tenemos un enfoque claro en el cliente, metodologías ágiles, cambio organizacional y desarrollo de productos. </p>",
+       "projects": "<div>En BC Tecnología gestionamos portafolios, desarrollamos proyectos y ofrecemos servicios de outsourcing y selección de profesionales para clientes de sectores como servicios financieros, seguros, retail y gobierno. Participarás en iniciativas estratégicas de transformación digital para LATAM Airlines, una organización líder en la industria aeronáutica, en un entorno que combina trabajo remoto con presencia ocasional en oficina. Serás parte de la Gerencia de Arquitectura, colaborando en la definición de la arquitectura empresarial y su evolución ante cambios tecnológicos y de negocio, asegurando alineación con la estrategia corporativa y con estándares de gobernanza.</div>",
+       "benefits": "<div>En BC Tecnología promovemos un ambiente de trabajo colaborativo que valora el compromiso y el aprendizaje constante. Nuestra cultura se orienta al crecimiento profesional a través de la integración y el intercambio de conocimientos entre equipos.</div><div>La modalidad híbrida que ofrecemos, ubicada en Las Condes, permite combinar la flexibilidad del trabajo remoto con la colaboración presencial, facilitando un mejor equilibrio y dinamismo laboral.</div><div>Participarás en proyectos innovadores con clientes de alto nivel y sectores diversos, en un entorno que fomenta la inclusión, el respeto y el desarrollo técnico y profesional.</div>",
+       "web": "http://www.bctecnologia.com",
+       "twitter": "",
+       "github": "",
+       "facebook": "",
+       "angellist": "",
+       "country": "CL",
+       "response_time_in_days": {
+        "min": 8,
+        "max": 22
+       },
+       "logo": "https://getonbrd-prod.s3.amazonaws.com/uploads/users/logo/9458/Copia_de_logo.png"
+      }
+     }
+    }
+   },
+   "links": {
+    "public_url": "https://www.getonbrd.com/jobs/especialista-qa-senior-latam-bc-tecnologia-remote"
+   }
+  }
+ ],
+ "meta": {
+  "page": 2,
+  "per_page": 100,
+  "total_pages": 2
+ }
+}
