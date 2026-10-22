@@ -7,7 +7,7 @@
 # Build:  docker build -t app:latest .
 #         docker build --target dev -t app:dev .
 
-ARG PHP_VERSION=8.4.26
+ARG PHP_VERSION=8.4.27
 ARG NODE_VERSION=22.22.2
 ARG COMPOSER_VERSION=2.10.3
 ARG EXTENSION_INSTALLER_VERSION=2.12.0
