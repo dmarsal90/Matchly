@@ -45,7 +45,7 @@ services:
       start_period: 120s
 
   web:
-    image: nginx:1.31.7-alpine
+    image: nginx:1.31.8-alpine
     ports:
       - ${APP_PORT:-8000}:80
     volumes:
