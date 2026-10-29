@@ -25,7 +25,7 @@ COPY --from=extension-installer /usr/bin/install-php-extensions /usr/local/bin/
 
 RUN install-php-extensions pdo_pgsql pgsql redis intl zip opcache pcntl bcmath gd exif \
     && apt-get update \
-    && apt-get install -y --no-install-recommends curl procps unzip ca-certificates \
+    && apt-get install -y --no-install-recommends curl procps unzip ca-certificates tzdata \
     && rm -rf /var/lib/apt/lists/*
 
 ENV PHP_FPM_MAX_CHILDREN=20
