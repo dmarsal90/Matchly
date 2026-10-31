@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Modules\Providers\Infrastructure\Http;
 
+use App\Modules\Providers\Application\MonthlyQuota;
 use App\Modules\Providers\Domain\Exceptions\ProviderRequestFailed;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -14,6 +15,7 @@ use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Http\Client\RequestException;
 use Illuminate\Http\Client\Response;
 use JsonException;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -31,15 +33,17 @@ final class ProviderHttpClient
         private readonly Cache $cache,
         private readonly RateLimiter $limiter,
         private readonly Config $config,
+        private readonly MonthlyQuota $quota,
     ) {}
 
     /**
      * @param  array<string, scalar|null>  $query
+     * @param  array<string, string>  $headers
      * @return array<mixed>
      */
-    public function getJson(string $provider, string $url, array $query = []): array
+    public function getJson(string $provider, string $url, array $query = [], array $headers = []): array
     {
-        $body = $this->get($provider, $url, $query, 'application/json');
+        $body = $this->get($provider, $url, $query, 'application/json', $headers);
         $decoded = json_decode($body, true);
 
         if (! is_array($decoded)) {
@@ -83,8 +87,9 @@ final class ProviderHttpClient
 
     /**
      * @param  array<string, scalar|null>  $query
+     * @param  array<string, string>  $headers
      */
-    private function get(string $provider, string $url, array $query, string $accept): string
+    private function get(string $provider, string $url, array $query, string $accept, array $headers = []): string
     {
         $cacheKey = $this->cacheKey('GET', $url, $query);
 
@@ -97,8 +102,8 @@ final class ProviderHttpClient
         /** @var array{etag: string, body: string}|null $validator */
         $validator = $this->cache->get($etagKey);
 
-        $response = $this->send($provider, $url, function (PendingRequest $request) use ($url, $query, $accept, $validator): Response {
-            $request->accept($accept);
+        $response = $this->send($provider, $url, function (PendingRequest $request) use ($url, $query, $accept, $validator, $headers): Response {
+            $request->accept($accept)->withHeaders($headers);
 
             if (is_array($validator)) {
                 $request->withHeaders(['If-None-Match' => $validator['etag']]);
@@ -124,7 +129,13 @@ final class ProviderHttpClient
      */
     private function send(string $provider, string $url, callable $call): Response
     {
+        if ($this->quota->exhausted($provider)) {
+            throw ProviderRequestFailed::for($provider, $url, 429, new RuntimeException('monthly request quota used up'));
+        }
+
         $this->throttle($provider);
+        // shortcut: counts calls, not retries; revisit if the provider bills retried requests.
+        $this->quota->hit($provider);
 
         $request = $this->http
             ->withUserAgent($this->userAgent())
