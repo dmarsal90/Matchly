@@ -29,6 +29,7 @@ use App\Modules\Providers\Infrastructure\Sources\Jooble\JoobleNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Jooble\JoobleProvider;
 use App\Modules\Providers\Infrastructure\Sources\JSearch\JSearchNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\JSearch\JSearchProvider;
+use App\Modules\Providers\Infrastructure\Sources\LinkedIn\LinkedInProvider;
 use App\Modules\Providers\Infrastructure\Sources\PuenteTalent\PuenteTalentNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\PuenteTalent\PuenteTalentProvider;
 use App\Modules\Providers\Infrastructure\Sources\RemoteJobsOrg\RemoteJobsOrgNormalizer;
@@ -351,6 +352,24 @@ return [
             'options' => [
                 'api_key' => env('GOOGLEJOBS_API_KEY', env('JSEARCH_API_KEY')),
                 'query' => env('GOOGLEJOBS_QUERY', 'remote developer'),
+                'num_pages' => 1,
+            ],
+        ],
+
+        'linkedin' => [
+            // Same OpenWeb Ninja account key as JSearch. 200 requests per 30-day window.
+            'enabled' => (bool) env('JOBS_LINKEDIN_ENABLED', env('LINKEDIN_API_KEY', env('JSEARCH_API_KEY')) !== null && env('LINKEDIN_API_KEY', env('JSEARCH_API_KEY')) !== ''),
+            'provider' => LinkedInProvider::class,
+            'normalizer' => JSearchNormalizer::class,
+            'interval' => 1440,
+            'monthly_limit' => 200,
+            'quota_resets_on' => env('LINKEDIN_QUOTA_RESETS_ON'),
+            'quota_days' => 30,
+            'rate_limit' => 10,
+            'cache_ttl' => 3600,
+            'options' => [
+                'api_key' => env('LINKEDIN_API_KEY', env('JSEARCH_API_KEY')),
+                'query' => env('LINKEDIN_QUERY', 'remote developer'),
                 'num_pages' => 1,
             ],
         ],
