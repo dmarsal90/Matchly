@@ -108,6 +108,15 @@ it('ingests every source end to end', function (string $source, string $now, Clo
     }, 1, function (): void {
         Http::assertSent(fn ($request) => $request->hasHeader('X-API-Key', 'secret') && str_contains($request->url(), 'work_from_home=true'));
     }],
+    'googlejobs' => ['googlejobs', '2026-10-30 13:00:00', function (): void {
+        config(['jobs.providers.googlejobs.options' => [...config('jobs.providers.googlejobs.options'), 'api_key' => 'secret']]);
+        Http::fake(['api.openwebninja.com/*' => Http::response(['data' => [[
+            'job_id' => 'g1', 'job_title' => 'Remote Laravel Developer', 'employer_name' => 'Acme', 'job_apply_link' => 'https://example.com/apply/1',
+            'job_description' => 'Join us', 'job_is_remote' => true, 'job_location' => 'Anywhere', 'job_posted_at_datetime_utc' => '2026-10-29T10:00:00.000Z',
+        ]]])]);
+    }, 1, function (): void {
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'google-jobs/search') && $request->hasHeader('X-API-Key', 'secret'));
+    }],
     'adzuna' => ['adzuna', '2026-10-14 13:00:00', function (): void {
         config(['jobs.providers.adzuna.options' => [...config('jobs.providers.adzuna.options'), 'app_id' => 'id', 'app_key' => 'key', 'countries' => ['gb'], 'max_pages' => 1]]);
         Http::fake(['api.adzuna.com/*' => Http::response(['results' => [[
