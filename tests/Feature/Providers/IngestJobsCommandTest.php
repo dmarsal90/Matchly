@@ -3,6 +3,8 @@
 declare(strict_types=1);
 
 use App\Modules\Jobs\Infrastructure\Models\JobListing;
+use App\Modules\Providers\Application\MonthlyQuota;
+use App\Modules\Providers\Application\ProviderRegistry;
 use App\Modules\Providers\Infrastructure\Models\Source;
 use App\Modules\Providers\Infrastructure\Queue\IngestProviderJob;
 use Illuminate\Support\Facades\Http;
@@ -11,7 +13,7 @@ use Illuminate\Support\Facades\Queue;
 
 beforeEach(function (): void {
     Queue::fake();
-    config(['jobs.providers.adzuna.enabled' => false, 'jobs.providers.jooble.enabled' => false]);
+    config(['jobs.providers.adzuna.enabled' => false, 'jobs.providers.jooble.enabled' => false, 'jobs.providers.jsearch.enabled' => false]);
 });
 
 it('queues one job per enabled source', function (): void {
@@ -84,4 +86,31 @@ it('logs the error when every retry failed', function (): void {
     (new IngestProviderJob('remotive'))->failed(new RuntimeException('upstream down'));
 
     Log::shouldHaveReceived('error')->with('Job source ingestion failed', ['source' => 'remotive', 'error' => 'upstream down']);
+});
+
+it('drops a source from the run once its monthly quota is used up', function (): void {
+    config(['jobs.providers.jsearch.enabled' => true, 'jobs.providers.jsearch.monthly_limit' => 2]);
+    $quota = app(MonthlyQuota::class);
+    $registry = app(ProviderRegistry::class);
+
+    $quota->hit('jsearch');
+    expect($registry->enabled())->toContain('jsearch');
+
+    $quota->hit('jsearch');
+    expect($registry->enabled())->not->toContain('jsearch');
+});
+
+it('resets the quota on the provider reset date window', function (): void {
+    config(['jobs.providers.googlejobs.quota_resets_on' => '2026-12-01', 'jobs.providers.googlejobs.quota_days' => 31]);
+    $quota = app(MonthlyQuota::class);
+
+    $this->travelTo('2026-11-15');
+    $quota->hit('googlejobs');
+    expect($quota->used('googlejobs'))->toBe(1);
+
+    $this->travelTo('2026-11-30');
+    expect($quota->used('googlejobs'))->toBe(1);
+
+    $this->travelTo('2026-12-01');
+    expect($quota->used('googlejobs'))->toBe(0);
 });

@@ -26,6 +26,8 @@ use App\Modules\Providers\Infrastructure\Sources\Jobicy\JobicyNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Jobicy\JobicyProvider;
 use App\Modules\Providers\Infrastructure\Sources\Jooble\JoobleNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Jooble\JoobleProvider;
+use App\Modules\Providers\Infrastructure\Sources\JSearch\JSearchNormalizer;
+use App\Modules\Providers\Infrastructure\Sources\JSearch\JSearchProvider;
 use App\Modules\Providers\Infrastructure\Sources\PuenteTalent\PuenteTalentNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\PuenteTalent\PuenteTalentProvider;
 use App\Modules\Providers\Infrastructure\Sources\RemoteJobsOrg\RemoteJobsOrgNormalizer;
@@ -311,6 +313,25 @@ return [
                 'api_key' => env('JOOBLE_API_KEY'),
                 'keywords' => 'remote',
                 'max_pages' => 3,
+            ],
+        ],
+
+        'jsearch' => [
+            // Google Jobs aggregator (LinkedIn, Indeed, Glassdoor...). Key at https://app.openwebninja.com.
+            // The free plan allows 200 requests a month, so one ingestion run = one request.
+            'enabled' => (bool) env('JOBS_JSEARCH_ENABLED', env('JSEARCH_API_KEY') !== null && env('JSEARCH_API_KEY') !== ''),
+            'provider' => JSearchProvider::class,
+            'normalizer' => JSearchNormalizer::class,
+            'interval' => 1440,
+            'monthly_limit' => 200,
+            'quota_resets_on' => env('JSEARCH_QUOTA_RESETS_ON'),
+            'quota_days' => 30,
+            'rate_limit' => 10,
+            'cache_ttl' => 3600,
+            'options' => [
+                'api_key' => env('JSEARCH_API_KEY'),
+                'query' => env('JSEARCH_QUERY', 'remote developer'),
+                'num_pages' => 1,
             ],
         ],
 

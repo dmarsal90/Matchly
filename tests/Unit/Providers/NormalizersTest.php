@@ -18,6 +18,7 @@ use App\Modules\Providers\Infrastructure\Sources\Ats\Workable\WorkableNormalizer
 use App\Modules\Providers\Infrastructure\Sources\Himalayas\HimalayasNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Jobicy\JobicyNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Jooble\JoobleNormalizer;
+use App\Modules\Providers\Infrastructure\Sources\JSearch\JSearchNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\RemoteOk\RemoteOkNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Remotive\RemotiveNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\WeWorkRemotely\WeWorkRemotelyNormalizer;
@@ -211,6 +212,22 @@ it('normalizes Jooble results', function (): void {
         ->and($draft?->salary?->period)->toBe(SalaryPeriod::Month)
         ->and($draft?->salary?->min)->toBe(1800.0)
         ->and($draft?->postedAt?->format('Y-m-d'))->toBe('2026-10-13');
+});
+
+it('normalizes JSearch results', function (): void {
+    $draft = (new JSearchNormalizer)->normalize(new RawJob('jsearch', 'abc', [
+        'job_id' => 'abc', 'job_title' => 'Remote Software Developer', 'employer_name' => 'Turing', 'job_employment_type' => 'Full-time',
+        'job_apply_link' => 'https://www.monster.com/job-openings/1', 'job_description' => "Line one\nLine two", 'job_is_remote' => true,
+        'job_location' => 'Anywhere', 'job_posted_at_datetime_utc' => '2026-10-28T00:00:00.000Z',
+        'job_min_salary' => 200, 'job_max_salary' => 300, 'job_salary_period' => 'HOUR',
+    ]));
+
+    expect($draft?->title)->toBe('Remote Software Developer')
+        ->and($draft?->locationText)->toBe('Anywhere')
+        ->and($draft?->employmentType)->toBe(EmploymentType::FullTime)
+        ->and($draft?->salary?->period)->toBe(SalaryPeriod::Hour)
+        ->and($draft?->remoteByDefault)->toBeTrue()
+        ->and($draft?->postedAt?->format('Y-m-d'))->toBe('2026-10-28');
 });
 
 it('skips payloads missing required fields', function (): void {
