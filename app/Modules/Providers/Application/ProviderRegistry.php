@@ -15,7 +15,7 @@ use InvalidArgumentException;
  */
 final readonly class ProviderRegistry
 {
-    public function __construct(private Container $container, private Config $config) {}
+    public function __construct(private Container $container, private Config $config, private MonthlyQuota $quota) {}
 
     /**
      * @return list<string> keys of every configured source
@@ -26,11 +26,11 @@ final readonly class ProviderRegistry
     }
 
     /**
-     * @return list<string> keys of sources switched on in config
+     * @return list<string> keys of sources switched on in config and still within their monthly quota
      */
     public function enabled(): array
     {
-        return array_values(array_filter($this->keys(), fn (string $key): bool => (bool) $this->setting($key, 'enabled')));
+        return array_values(array_filter($this->keys(), fn (string $key): bool => (bool) $this->setting($key, 'enabled') && ! $this->quota->exhausted($key)));
     }
 
     public function has(string $key): bool
