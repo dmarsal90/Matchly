@@ -18,6 +18,7 @@ use App\Modules\Providers\Infrastructure\Sources\Ats\SmartRecruiters\SmartRecrui
 use App\Modules\Providers\Infrastructure\Sources\Ats\SmartRecruiters\SmartRecruitersProvider;
 use App\Modules\Providers\Infrastructure\Sources\Ats\Workable\WorkableNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Ats\Workable\WorkableProvider;
+use App\Modules\Providers\Infrastructure\Sources\BingJobs\BingJobsProvider;
 use App\Modules\Providers\Infrastructure\Sources\GetOnBoard\GetOnBoardNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\GetOnBoard\GetOnBoardProvider;
 use App\Modules\Providers\Infrastructure\Sources\GoogleJobs\GoogleJobsProvider;
@@ -370,6 +371,24 @@ return [
             'options' => [
                 'api_key' => env('LINKEDIN_API_KEY', env('JSEARCH_API_KEY')),
                 'query' => env('LINKEDIN_QUERY', 'remote developer'),
+                'num_pages' => 1,
+            ],
+        ],
+
+        'bingjobs' => [
+            // Same OpenWeb Ninja account key as JSearch. 200 requests per 30-day window.
+            'enabled' => (bool) env('JOBS_BINGJOBS_ENABLED', env('BINGJOBS_API_KEY', env('JSEARCH_API_KEY')) !== null && env('BINGJOBS_API_KEY', env('JSEARCH_API_KEY')) !== ''),
+            'provider' => BingJobsProvider::class,
+            'normalizer' => JSearchNormalizer::class,
+            'interval' => 1440,
+            'monthly_limit' => 200,
+            'quota_resets_on' => env('BINGJOBS_QUOTA_RESETS_ON'),
+            'quota_days' => 30,
+            'rate_limit' => 5,
+            'cache_ttl' => 3600,
+            'options' => [
+                'api_key' => env('BINGJOBS_API_KEY', env('JSEARCH_API_KEY')),
+                'query' => env('BINGJOBS_QUERY', 'remote developer'),
                 'num_pages' => 1,
             ],
         ],
