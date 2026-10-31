@@ -20,6 +20,7 @@ use App\Modules\Providers\Infrastructure\Sources\Ats\Workable\WorkableNormalizer
 use App\Modules\Providers\Infrastructure\Sources\Ats\Workable\WorkableProvider;
 use App\Modules\Providers\Infrastructure\Sources\GetOnBoard\GetOnBoardNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\GetOnBoard\GetOnBoardProvider;
+use App\Modules\Providers\Infrastructure\Sources\GoogleJobs\GoogleJobsProvider;
 use App\Modules\Providers\Infrastructure\Sources\Himalayas\HimalayasNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Himalayas\HimalayasProvider;
 use App\Modules\Providers\Infrastructure\Sources\Jobicy\JobicyNormalizer;
@@ -331,6 +332,25 @@ return [
             'options' => [
                 'api_key' => env('JSEARCH_API_KEY'),
                 'query' => env('JSEARCH_QUERY', 'remote developer'),
+                'num_pages' => 1,
+            ],
+        ],
+
+        'googlejobs' => [
+            // Same OpenWeb Ninja account key as JSearch. 100 requests per 31-day window;
+            // set GOOGLEJOBS_QUOTA_RESETS_ON (a date from the dashboard) so the window matches the plan.
+            'enabled' => (bool) env('JOBS_GOOGLEJOBS_ENABLED', env('GOOGLEJOBS_API_KEY', env('JSEARCH_API_KEY')) !== null && env('GOOGLEJOBS_API_KEY', env('JSEARCH_API_KEY')) !== ''),
+            'provider' => GoogleJobsProvider::class,
+            'normalizer' => JSearchNormalizer::class,
+            'interval' => 1440,
+            'monthly_limit' => 100,
+            'quota_resets_on' => env('GOOGLEJOBS_QUOTA_RESETS_ON'),
+            'quota_days' => 31,
+            'rate_limit' => 10,
+            'cache_ttl' => 3600,
+            'options' => [
+                'api_key' => env('GOOGLEJOBS_API_KEY', env('JSEARCH_API_KEY')),
+                'query' => env('GOOGLEJOBS_QUERY', 'remote developer'),
                 'num_pages' => 1,
             ],
         ],

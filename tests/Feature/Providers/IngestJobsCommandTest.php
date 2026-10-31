@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Queue;
 
 beforeEach(function (): void {
     Queue::fake();
-    config(['jobs.providers.adzuna.enabled' => false, 'jobs.providers.jooble.enabled' => false, 'jobs.providers.jsearch.enabled' => false]);
+    config(['jobs.providers.adzuna.enabled' => false, 'jobs.providers.jooble.enabled' => false, 'jobs.providers.jsearch.enabled' => false, 'jobs.providers.googlejobs.enabled' => false]);
 });
 
 it('queues one job per enabled source', function (): void {
