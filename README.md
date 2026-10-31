@@ -179,7 +179,7 @@ make prod-image          # construir la imagen de producción en local
 
 ## Ingesta de ofertas
 
-Fuentes gratuitas: Remotive, Remote OK, Jobicy, Himalayas, Arbeitnow, We Work Remotely (RSS), Working Nomads, Remote Landers, RemoteJobs.org, Puente Talent, Adzuna y Jooble (con clave gratuita), y los tableros públicos de Greenhouse, Lever, Ashby, Workable y SmartRecruiters de las empresas de la tabla `ats_companies`.
+Fuentes gratuitas: Remotive, Remote OK, Jobicy, Himalayas, Arbeitnow, We Work Remotely (RSS), Working Nomads, Remote Landers, RemoteJobs.org, Puente Talent, Adzuna, Jooble, JSearch, Google Jobs y LinkedIn (con clave gratuita), y los tableros públicos de Greenhouse, Lever, Ashby, Workable y SmartRecruiters de las empresas de la tabla `ats_companies`.
 
 - El scheduler ejecuta `jobs:ingest` cada 10 minutos. Cada fuente solo se lanza cuando ha pasado su `interval` (que respeta sus términos de uso) y el back-off por fallos. Se encola un job por fuente en la cola `ingestion`.
 - Flujo: normalizar → descartar lo antiguo, lo presencial o lo incompleto → sanear HTML → clasificar modalidad, alcance, regiones, categoría, rol y seniority → marcar sospechosas → upsert idempotente → cerrar lo que la fuente ya no lista → evento `JobsIngested`.
