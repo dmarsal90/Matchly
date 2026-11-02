@@ -522,3 +522,12 @@ describe('browser extension', function (): void {
         $this->actingAs($owner)->delete(route('extension.destroy', $tokenId))->assertForbidden();
     });
 });
+
+it('shows no ATS score while the package has no CV yet', function (): void {
+    $user = candidateWithProfile();
+    $package = prepare($user, spanishLaravelJob());
+    $package->forceFill(['status' => PackageStatus::Generating, 'resume' => null, 'master_resume' => null])->save();
+
+    $this->actingAs($user)->get(route('applications.packages.show', $package))
+        ->assertInertia(fn (Assert $page) => $page->where('ats', null));
+});
