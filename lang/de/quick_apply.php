@@ -84,6 +84,27 @@ return [
     ],
     'download_resume' => 'Lebenslauf herunterladen (PDF)',
     'download_requires_approval' => 'Gib die Bewerbung frei, um den Lebenslauf herunterzuladen.',
+    'ats' => [
+        'title' => 'ATS-Kompatibilität',
+        'score' => ':score von 100',
+        'ok' => 'In Ordnung',
+        'kw' => 'Schlüsselwörter der Stelle: :matched von :total',
+        'kwm' => 'Es fehlen',
+        'checks' => [
+            'sections' => 'Standardabschnitte (Erfahrung, Kenntnisse, Ausbildung)',
+            'dates' => 'Startdatum bei jeder Position',
+            'results' => 'Erfolge mit Zahlen',
+            'keywords' => 'Schlüsselwörter der Stelle',
+            'pdf' => 'PDF für ein ATS lesbar',
+        ],
+        'fix' => [
+            'sections' => 'Ergänze die fehlenden Abschnitte: Erfahrung, Kenntnisse und Ausbildung.',
+            'dates' => 'Bei :count Position(en) fehlt das Startdatum.',
+            'results' => 'Ergänze Zahlen bei deinen Erfolgen (Prozente, Beträge, Teamgrößen).',
+            'keywords' => 'Wenn du sie hast, erwähne: :missing.',
+            'pdf' => 'Beachte den Hinweis zum PDF: Ein ATS würde es schlecht lesen.',
+        ],
+    ],
     'editor' => [
         'summary' => 'Berufliches Profil',
         'skills' => 'Kompetenzen (eine pro Zeile, in Reihenfolge)',

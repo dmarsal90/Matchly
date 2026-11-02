@@ -11,11 +11,13 @@ import {
 import { Label } from '@/components/ui/label';
 import { NativeSelect } from '@/components/ui/native-select';
 import { Spinner } from '@/components/ui/spinner';
+import AtsScore from '@/features/applications/components/AtsScore.vue';
 import ContactCard from '@/features/applications/components/ContactCard.vue';
 import CoverLetterEditor from '@/features/applications/components/CoverLetterEditor.vue';
 import CvEditor from '@/features/applications/components/CvEditor.vue';
 import type {
     ApplicationPackage,
+    AtsReport,
     PackageWarning,
     Resume,
 } from '@/features/applications/types';
@@ -57,6 +59,7 @@ const props = defineProps<{
         is_open: boolean;
     };
     missingKeywords: string[];
+    ats: AtsReport | null;
     history: { id: number; status: string; created_at: string }[];
 }>();
 
@@ -251,6 +254,8 @@ function remove(): void {
                     }}
                 </p>
             </div>
+
+            <AtsScore v-if="ats" :ats="ats" />
 
             <section
                 v-if="package.warnings.length"
