@@ -155,4 +155,66 @@ it('ingests every source end to end', function (string $source, string $now, Clo
     }, 1, function (): void {
         Http::assertSent(fn ($request) => $request->method() === 'POST' && $request['keywords'] === 'remote');
     }],
+    'themuse' => ['themuse', '2026-10-30 13:00:00', function (): void {
+        Http::fake(['themuse.com/*' => Http::response(['page' => 1, 'page_count' => 1, 'results' => [[
+            'id' => 22302737, 'name' => 'Staff Software Engineer, Backend', 'contents' => '<p>Build things</p>', 'publication_date' => '2026-10-29T19:14:51Z',
+            'locations' => [['name' => 'Flexible / Remote']], 'categories' => [['name' => 'Software Engineering']], 'levels' => [['name' => 'Senior Level', 'short_name' => 'senior']],
+            'refs' => ['landing_page' => 'https://www.themuse.com/jobs/celonis/staff-engineer'], 'company' => ['name' => 'Celonis'],
+        ]]])]);
+    }, 1, function ($jobs): void {
+        expect($jobs->first()->company)->toBe('Celonis');
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'location=Flexible'));
+    }],
+    'arbetsformedlingen' => ['arbetsformedlingen', '2026-10-30 13:00:00', function (): void {
+        Http::fake(['jobsearch.api.jobtechdev.se/*' => Http::response(['hits' => [[
+            'id' => '31666659', 'headline' => 'Arbeta remote som mötesbokare', 'webpage_url' => 'https://arbetsformedlingen.se/platsbanken/annonser/31666659',
+            'publication_date' => '2026-10-28T08:00:00', 'description' => ['text' => 'Om jobbet', 'text_formatted' => '<p>Om jobbet</p>'],
+            'employer' => ['name' => 'P94 Group'], 'working_hours_type' => ['label' => 'Heltid'], 'occupation_field' => ['label' => 'Försäljning'],
+            'workplace_address' => ['municipality' => 'Stockholm', 'country' => 'Sverige'], 'application_details' => ['url' => 'https://p94group.se/karriar'],
+        ]]])]);
+    }, 1, function ($jobs): void {
+        expect($jobs->first()->allowed_regions)->toBe(['SE'])
+            ->and($jobs->first()->apply_url)->toBe('https://p94group.se/karriar');
+        Http::assertSent(fn ($request) => str_contains($request->url(), 'remote=true'));
+    }],
+    'reed' => ['reed', '2026-10-30 13:00:00', function (): void {
+        config(['jobs.providers.reed.options' => [...config('jobs.providers.reed.options'), 'api_key' => 'secret', 'max_pages' => 1]]);
+        Http::fake(['reed.co.uk/*' => Http::response(['results' => [[
+            'jobId' => 55, 'jobTitle' => 'Remote PHP Developer', 'employerName' => 'Acme', 'locationName' => 'London', 'jobDescription' => 'Build APIs',
+            'minimumSalary' => 50000, 'maximumSalary' => 65000, 'currency' => 'GBP', 'date' => '28/10/2026', 'jobUrl' => 'https://www.reed.co.uk/jobs/remote-php/55',
+        ]]])]);
+    }, 1, function ($jobs): void {
+        expect($jobs->first()->allowed_regions)->toBe(['GB'])
+            ->and($jobs->first()->salary_annual_min)->toBe('50000.00');
+        Http::assertSent(fn ($request) => $request->hasHeader('Authorization', 'Basic '.base64_encode('secret:')));
+    }],
+    'usajobs' => ['usajobs', '2026-10-30 13:00:00', function (): void {
+        config(['jobs.providers.usajobs.options' => [...config('jobs.providers.usajobs.options'), 'api_key' => 'k', 'email' => 'me@example.com', 'max_pages' => 1]]);
+        Http::fake(['data.usajobs.gov/*' => Http::response(['SearchResult' => ['SearchResultItems' => [[
+            'MatchedObjectId' => '800123', 'MatchedObjectDescriptor' => [
+                'PositionID' => 'IT-1', 'PositionTitle' => 'IT Specialist (Remote)', 'PositionURI' => 'https://www.usajobs.gov/job/800123',
+                'ApplyURI' => ['https://www.usajobs.gov/job/800123/apply'], 'OrganizationName' => 'Department of Energy', 'PositionLocationDisplay' => 'Anywhere in the U.S.',
+                'PositionRemuneration' => [['MinimumRange' => '92108', 'MaximumRange' => '119746', 'RateIntervalCode' => 'PA']],
+                'PublicationStartDate' => '2026-10-27T00:00:00Z', 'UserArea' => ['Details' => ['JobSummary' => 'Support systems']],
+            ],
+        ]]]])]);
+    }, 1, function ($jobs): void {
+        expect($jobs->first()->allowed_regions)->toBe(['US'])
+            ->and($jobs->first()->salary_annual_max)->toBe('119746.00');
+        Http::assertSent(fn ($request) => $request->hasHeader('Authorization-Key', 'k') && $request->hasHeader('User-Agent', 'me@example.com') && str_contains($request->url(), 'RemoteIndicator=True'));
+    }],
+    'francetravail' => ['francetravail', '2026-10-30 13:00:00', function (): void {
+        config(['jobs.providers.francetravail.options' => [...config('jobs.providers.francetravail.options'), 'client_id' => 'id', 'client_secret' => 'secret', 'max_pages' => 1]]);
+        Http::fake([
+            'entreprise.francetravail.fr/*' => Http::response(['access_token' => 'tok', 'expires_in' => 1499]),
+            'api.francetravail.io/*' => Http::response(['resultats' => [[
+                'id' => '195XYZ', 'intitule' => 'Développeur PHP en télétravail', 'description' => 'Missions...', 'dateCreation' => '2026-10-28T10:00:00.000Z',
+                'lieuTravail' => ['libelle' => '75 - Paris'], 'entreprise' => ['nom' => 'Société Acme'], 'typeContrat' => 'CDI',
+                'origineOffre' => ['urlOrigine' => 'https://candidat.francetravail.fr/offres/recherche/detail/195XYZ'],
+            ]]]),
+        ]);
+    }, 1, function ($jobs): void {
+        expect($jobs->first()->allowed_regions)->toBe(['FR']);
+        Http::assertSent(fn ($request) => $request->hasHeader('Authorization', 'Bearer tok'));
+    }],
 ]);
