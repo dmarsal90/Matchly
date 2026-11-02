@@ -84,6 +84,27 @@ return [
     ],
     'download_resume' => 'Scarica il CV (PDF)',
     'download_requires_approval' => 'Approva la candidatura per scaricare il CV.',
+    'ats' => [
+        'title' => 'Compatibilità ATS',
+        'score' => ':score su 100',
+        'ok' => 'Corretto',
+        'kw' => 'Parole chiave dell\'offerta: :matched su :total',
+        'kwm' => 'Mancano',
+        'checks' => [
+            'sections' => 'Sezioni standard (esperienza, competenze, formazione)',
+            'dates' => 'Date di inizio per ogni ruolo',
+            'results' => 'Risultati con cifre',
+            'keywords' => 'Parole chiave dell\'offerta',
+            'pdf' => 'PDF leggibile da un ATS',
+        ],
+        'fix' => [
+            'sections' => 'Aggiungi le sezioni mancanti: esperienza, competenze e formazione.',
+            'dates' => 'Mancano le date di inizio in :count ruolo/i.',
+            'results' => 'Aggiungi cifre ai tuoi risultati (percentuali, importi, dimensione del team).',
+            'keywords' => 'Se le hai, menzionale: :missing.',
+            'pdf' => 'Controlla l\'avviso sul PDF: un ATS lo leggerebbe male.',
+        ],
+    ],
     'editor' => [
         'summary' => 'Sintesi professionale',
         'skills' => 'Competenze (una per riga, in ordine)',

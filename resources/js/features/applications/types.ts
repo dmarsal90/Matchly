@@ -41,6 +41,17 @@ export type ContentSource = 'ai' | 'rules' | 'user';
 
 export type PackageWarning = { key: string; params: Record<string, string> };
 
+export type AtsReport = {
+    score: number;
+    checks: {
+        key: string;
+        points: number;
+        max: number;
+        params: Record<string, string>;
+    }[];
+    keywords: { matched: string[]; missing: string[] };
+};
+
 export type ApplicationPackage = {
     id: number;
     status: PackageStatus;

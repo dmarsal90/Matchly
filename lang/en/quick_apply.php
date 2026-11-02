@@ -84,6 +84,27 @@ return [
     ],
     'download_resume' => 'Download CV (PDF)',
     'download_requires_approval' => 'Approve the application to download the CV.',
+    'ats' => [
+        'title' => 'ATS compatibility',
+        'score' => ':score out of 100',
+        'ok' => 'Good',
+        'kw' => 'Job keywords: :matched of :total',
+        'kwm' => 'Missing',
+        'checks' => [
+            'sections' => 'Standard sections (experience, skills, education)',
+            'dates' => 'Start dates on every position',
+            'results' => 'Achievements with figures',
+            'keywords' => 'Job keywords',
+            'pdf' => 'PDF readable by an ATS',
+        ],
+        'fix' => [
+            'sections' => 'Add the missing sections: experience, skills and education.',
+            'dates' => 'Start dates are missing on :count position(s).',
+            'results' => 'Add figures to your achievements (percentages, amounts, team sizes).',
+            'keywords' => 'If you have them, mention: :missing.',
+            'pdf' => 'Check the PDF warning: an ATS would not read it well.',
+        ],
+    ],
     'editor' => [
         'summary' => 'Professional summary',
         'skills' => 'Skills (one per line, in order)',
