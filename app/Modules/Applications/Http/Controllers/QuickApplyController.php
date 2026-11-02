@@ -10,6 +10,7 @@ use App\Modules\Applications\Application\Actions\StartQuickApply;
 use App\Modules\Applications\Application\Actions\UpdatePackage;
 use App\Modules\Applications\Domain\Enums\PackageStatus;
 use App\Modules\Applications\Domain\Enums\ResumeTemplate;
+use App\Modules\Applications\Domain\Services\ResumeScorer;
 use App\Modules\Applications\Http\Requests\StartQuickApplyRequest;
 use App\Modules\Applications\Http\Requests\UpdatePackageRequest;
 use App\Modules\Applications\Http\Resources\PackageResource;
@@ -20,6 +21,7 @@ use App\Modules\Identity\Domain\Enums\ConsentPurpose;
 use App\Modules\Identity\Infrastructure\Models\User;
 use App\Modules\Jobs\Domain\Enums\JobStatus;
 use App\Modules\Jobs\Infrastructure\Models\JobListing;
+use App\Modules\Matching\Application\Actions\ResolveJobRequirements;
 use App\Modules\Matching\Infrastructure\Models\JobMatch;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
@@ -45,15 +47,23 @@ final class QuickApplyController
         return to_route('applications.packages.show', $package);
     }
 
-    public function show(ApplicationPackage $package): Response
+    public function show(ApplicationPackage $package, ResumeScorer $scorer, ResolveJobRequirements $requirements): Response
     {
         Gate::authorize('view', $package);
 
         $job = $package->job()->firstOrFail();
         $match = JobMatch::query()->where('user_id', $package->user_id)->where('job_listing_id', $job->id)->first();
 
+        $resume = $package->resumeData();
+        $warnings = array_column((array) $package->warnings, 'key');
+
         return Inertia::render('applications/Package', [
             'package' => (new PackageResource($package))->resolve(),
+            'ats' => $resume === null ? null : $scorer->score(
+                $resume,
+                $requirements->handle($job),
+                in_array('ats_unreadable', $warnings, true) ? false : (in_array('ats_missing', $warnings, true) ? null : true),
+            ),
             'job' => [
                 'id' => $job->id,
                 'slug' => Str::slug(Str::limit($job->title.' '.$job->company, 80, '')),

@@ -75,7 +75,9 @@ it('prepares a package without AI: tailored CV and a template letter in the post
         ->where('package.status', 'draft')
         ->where('job.company', 'Globex')
         ->has('package.resume.experience', 1)
-        ->has('package.master_resume'));
+        ->has('package.master_resume')
+        ->has('ats.checks', 5)
+        ->where('ats.score', fn (int $score): bool => $score > 0 && $score <= 100));
 });
 
 it('keeps later tracking statuses when preparing again', function (): void {
