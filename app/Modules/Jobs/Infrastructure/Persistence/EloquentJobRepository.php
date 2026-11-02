@@ -153,7 +153,7 @@ final readonly class EloquentJobRepository implements JobRepository
     }
 
     /**
-     * @return array<string, mixed>
+     * @return array<model-property<JobListing>, mixed>
      */
     private function attributes(JobData $job): array
     {
