@@ -218,3 +218,14 @@ it('ingests every source end to end', function (string $source, string $now, Clo
         Http::assertSent(fn ($request) => $request->hasHeader('Authorization', 'Bearer tok'));
     }],
 ]);
+
+it('treats an empty France Travail answer (204) as no offers', function (): void {
+    $this->travelTo('2026-10-30 13:00:00');
+    config(['jobs.providers.francetravail.options' => [...config('jobs.providers.francetravail.options'), 'client_id' => 'id', 'client_secret' => 'secret']]);
+    Http::fake([
+        'entreprise.francetravail.fr/*' => Http::response(['access_token' => 'tok']),
+        'api.francetravail.io/*' => Http::response('', 204),
+    ]);
+
+    expect(app(IngestProvider::class)->handle('francetravail')->createdIds)->toBeEmpty();
+});
