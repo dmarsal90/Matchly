@@ -23,6 +23,11 @@ updates:
       # of the type checker and the linter breaks). Revisit when both do.
       - dependency-name: typescript
         update-types: ['version-update:semver-major']
+      # vue-tsc 3.3.14 reports 15 false TS2339 errors on resources/js/pages/profile/Edit.vue
+      # ("Property 'value' does not exist on type 'InertiaForm<CareerProfile>'"); 3.3.13 is clean.
+      # Retry with the next release and drop this entry.
+      - dependency-name: vue-tsc
+        versions: ['3.3.14']
     commit-message: { prefix: 'chore(deps)' }
 
   - package-ecosystem: github-actions
