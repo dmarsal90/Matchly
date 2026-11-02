@@ -8,6 +8,8 @@ use App\Modules\Providers\Infrastructure\Sources\Adzuna\AdzunaNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Adzuna\AdzunaProvider;
 use App\Modules\Providers\Infrastructure\Sources\Arbeitnow\ArbeitnowNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Arbeitnow\ArbeitnowProvider;
+use App\Modules\Providers\Infrastructure\Sources\Arbetsformedlingen\ArbetsformedlingenNormalizer;
+use App\Modules\Providers\Infrastructure\Sources\Arbetsformedlingen\ArbetsformedlingenProvider;
 use App\Modules\Providers\Infrastructure\Sources\Ats\Ashby\AshbyNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Ats\Ashby\AshbyProvider;
 use App\Modules\Providers\Infrastructure\Sources\Ats\Greenhouse\GreenhouseNormalizer;
@@ -19,6 +21,8 @@ use App\Modules\Providers\Infrastructure\Sources\Ats\SmartRecruiters\SmartRecrui
 use App\Modules\Providers\Infrastructure\Sources\Ats\Workable\WorkableNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Ats\Workable\WorkableProvider;
 use App\Modules\Providers\Infrastructure\Sources\BingJobs\BingJobsProvider;
+use App\Modules\Providers\Infrastructure\Sources\FranceTravail\FranceTravailNormalizer;
+use App\Modules\Providers\Infrastructure\Sources\FranceTravail\FranceTravailProvider;
 use App\Modules\Providers\Infrastructure\Sources\GetOnBoard\GetOnBoardNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\GetOnBoard\GetOnBoardProvider;
 use App\Modules\Providers\Infrastructure\Sources\GoogleJobs\GoogleJobsProvider;
@@ -33,6 +37,8 @@ use App\Modules\Providers\Infrastructure\Sources\JSearch\JSearchProvider;
 use App\Modules\Providers\Infrastructure\Sources\LinkedIn\LinkedInProvider;
 use App\Modules\Providers\Infrastructure\Sources\PuenteTalent\PuenteTalentNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\PuenteTalent\PuenteTalentProvider;
+use App\Modules\Providers\Infrastructure\Sources\Reed\ReedNormalizer;
+use App\Modules\Providers\Infrastructure\Sources\Reed\ReedProvider;
 use App\Modules\Providers\Infrastructure\Sources\RemoteJobsOrg\RemoteJobsOrgNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\RemoteJobsOrg\RemoteJobsOrgProvider;
 use App\Modules\Providers\Infrastructure\Sources\RemoteLanders\RemoteLandersNormalizer;
@@ -41,6 +47,10 @@ use App\Modules\Providers\Infrastructure\Sources\RemoteOk\RemoteOkNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\RemoteOk\RemoteOkProvider;
 use App\Modules\Providers\Infrastructure\Sources\Remotive\RemotiveNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\Remotive\RemotiveProvider;
+use App\Modules\Providers\Infrastructure\Sources\TheMuse\TheMuseNormalizer;
+use App\Modules\Providers\Infrastructure\Sources\TheMuse\TheMuseProvider;
+use App\Modules\Providers\Infrastructure\Sources\UsaJobs\UsaJobsNormalizer;
+use App\Modules\Providers\Infrastructure\Sources\UsaJobs\UsaJobsProvider;
 use App\Modules\Providers\Infrastructure\Sources\WeWorkRemotely\WeWorkRemotelyNormalizer;
 use App\Modules\Providers\Infrastructure\Sources\WeWorkRemotely\WeWorkRemotelyProvider;
 use App\Modules\Providers\Infrastructure\Sources\WorkingNomads\WorkingNomadsNormalizer;
@@ -394,6 +404,87 @@ return [
         ],
 
         // Public ATS boards: one request per company listed in the ats_companies table.
+
+        'themuse' => [
+            // Works without a key (500 requests/hour); a free key at https://www.themuse.com/developers/api/v2 raises it to 3,600.
+            'enabled' => (bool) env('JOBS_THEMUSE_ENABLED', true),
+            'provider' => TheMuseProvider::class,
+            'normalizer' => TheMuseNormalizer::class,
+            'interval' => 360,
+            'rate_limit' => 10,
+            'cache_ttl' => 3600,
+            'options' => [
+                'url' => 'https://www.themuse.com/api/public/jobs',
+                'api_key' => env('THEMUSE_API_KEY'),
+                'max_pages' => 5,
+            ],
+        ],
+
+        'arbetsformedlingen' => [
+            // Swedish public employment service, open data without a key.
+            'enabled' => (bool) env('JOBS_ARBETSFORMEDLINGEN_ENABLED', true),
+            'provider' => ArbetsformedlingenProvider::class,
+            'normalizer' => ArbetsformedlingenNormalizer::class,
+            'interval' => 360,
+            'rate_limit' => 10,
+            'cache_ttl' => 3600,
+            'options' => [
+                'url' => 'https://jobsearch.api.jobtechdev.se/search',
+                'per_page' => 100,
+                'max_pages' => 3,
+            ],
+        ],
+
+        'reed' => [
+            // Free key at https://www.reed.co.uk/developers
+            'enabled' => (bool) env('JOBS_REED_ENABLED', env('REED_API_KEY') !== null && env('REED_API_KEY') !== ''),
+            'provider' => ReedProvider::class,
+            'normalizer' => ReedNormalizer::class,
+            'interval' => 360,
+            'rate_limit' => 10,
+            'cache_ttl' => 3600,
+            'options' => [
+                'url' => 'https://www.reed.co.uk/api/1.0/search',
+                'api_key' => env('REED_API_KEY'),
+                'keywords' => 'remote',
+                'per_page' => 100,
+                'max_pages' => 3,
+            ],
+        ],
+
+        'usajobs' => [
+            // Free key at https://developer.usajobs.gov/apirequest; the email is the one used to request it.
+            'enabled' => (bool) env('JOBS_USAJOBS_ENABLED', env('USAJOBS_API_KEY') !== null && env('USAJOBS_API_KEY') !== ''),
+            'provider' => UsaJobsProvider::class,
+            'normalizer' => UsaJobsNormalizer::class,
+            'interval' => 720,
+            'rate_limit' => 10,
+            'cache_ttl' => 3600,
+            'options' => [
+                'url' => 'https://data.usajobs.gov/api/search',
+                'api_key' => env('USAJOBS_API_KEY'),
+                'email' => env('USAJOBS_EMAIL'),
+                'per_page' => 100,
+                'max_pages' => 3,
+            ],
+        ],
+
+        'francetravail' => [
+            // Free registration at https://francetravail.io (API "Offres d'emploi"); the source must be cited.
+            'enabled' => (bool) env('JOBS_FRANCETRAVAIL_ENABLED', env('FRANCETRAVAIL_CLIENT_ID') !== null && env('FRANCETRAVAIL_CLIENT_ID') !== ''),
+            'provider' => FranceTravailProvider::class,
+            'normalizer' => FranceTravailNormalizer::class,
+            'interval' => 360,
+            'rate_limit' => 5,
+            'cache_ttl' => 3600,
+            'options' => [
+                'token_url' => 'https://entreprise.francetravail.fr/connexion/oauth2/access_token?realm=%2Fpartenaire',
+                'url' => 'https://api.francetravail.io/partenaire/offresdemploi/v2/offres/search',
+                'client_id' => env('FRANCETRAVAIL_CLIENT_ID'),
+                'client_secret' => env('FRANCETRAVAIL_CLIENT_SECRET'),
+                'max_pages' => 3,
+            ],
+        ],
 
         'greenhouse' => [
             'enabled' => (bool) env('JOBS_GREENHOUSE_ENABLED', true),
