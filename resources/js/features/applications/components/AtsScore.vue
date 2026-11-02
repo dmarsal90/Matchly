@@ -74,9 +74,12 @@ const fix = (check: AtsReport['checks'][number]): string =>
                 <li v-for="keyword in ats.keywords.matched" :key="keyword">
                     <Badge variant="secondary">{{ keyword }}</Badge>
                 </li>
-                <li v-for="keyword in ats.keywords.missing" :key="keyword">
+                <li
+                    v-for="(keyword, index) in ats.keywords.missing"
+                    :key="keyword"
+                >
                     <Badge variant="outline" class="text-muted-foreground">
-                        <span class="sr-only">
+                        <span v-if="index === 0" class="sr-only">
                             {{ trans('quick_apply.ats.kwm') }}:
                         </span>
                         {{ keyword }}
