@@ -531,3 +531,27 @@ it('shows no ATS score while the package has no CV yet', function (): void {
     $this->actingAs($user)->get(route('applications.packages.show', $package))
         ->assertInertia(fn (Assert $page) => $page->where('ats', null));
 });
+
+it('opening a package does not rewrite the job requirements, and fills them in only if they are missing', function (): void {
+    $user = candidateWithProfile();
+    $job = spanishLaravelJob();
+    $package = prepare($user, $job);
+
+    // Generating the package already extracted them: viewing it must not touch the job.
+    $extractedAt = $job->fresh()->requirements_extracted_at;
+    expect($extractedAt)->not->toBeNull();
+    $this->travel(1)->hour();
+    $this->actingAs($user)->get(route('applications.packages.show', $package))->assertOk();
+    expect($job->fresh()->requirements_extracted_at->equalTo($extractedAt))->toBeTrue();
+
+    // Only a job that lost them gets them again, once, and the page still works.
+    $job->forceFill(['requirements' => null, 'requirements_extracted_at' => null])->saveQuietly();
+    $this->get(route('applications.packages.show', $package))
+        ->assertInertia(fn (Assert $page) => $page->has('ats.checks', 5));
+    $refilled = $job->fresh()->requirements_extracted_at;
+    expect($refilled)->not->toBeNull();
+
+    $this->travel(1)->hour();
+    $this->get(route('applications.packages.show', $package))->assertOk();
+    expect($job->fresh()->requirements_extracted_at->equalTo($refilled))->toBeTrue();
+});
