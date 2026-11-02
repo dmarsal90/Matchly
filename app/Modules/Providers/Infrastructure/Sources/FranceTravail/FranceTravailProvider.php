@@ -7,10 +7,12 @@ namespace App\Modules\Providers\Infrastructure\Sources\FranceTravail;
 use App\Modules\Providers\Domain\Contracts\JobProvider;
 use App\Modules\Providers\Domain\Data\ProviderDefinition;
 use App\Modules\Providers\Domain\Data\RawJob;
+use App\Modules\Providers\Domain\Exceptions\ProviderRequestFailed;
 use App\Modules\Providers\Infrastructure\Http\ProviderHttpClient;
 use App\Modules\Providers\Infrastructure\Sources\Support\Payload;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Http\Client\Factory as Http;
+use JsonException;
 use RuntimeException;
 
 /**
@@ -55,11 +57,20 @@ final readonly class FranceTravailProvider implements JobProvider
         }
 
         for ($page = 0; $page < (int) ($options['max_pages'] ?? 3); $page++) {
-            $response = Payload::of($this->client->getJson('francetravail', (string) $options['url'], [
-                'motsCles' => 'télétravail',
-                'minCreationDate' => now()->subDays((int) $this->config->get('jobs.max_age_days'))->utc()->format('Y-m-d\TH:i:s\Z'),
-                'range' => ($page * self::PAGE).'-'.(($page + 1) * self::PAGE - 1),
-            ], ['Authorization' => 'Bearer '.$token]));
+            try {
+                $response = Payload::of($this->client->getJson('francetravail', (string) $options['url'], [
+                    'motsCles' => 'télétravail',
+                    'minCreationDate' => now()->subDays((int) $this->config->get('jobs.max_age_days'))->utc()->format('Y-m-d\TH:i:s\Z'),
+                    'range' => ($page * self::PAGE).'-'.(($page + 1) * self::PAGE - 1),
+                ], ['Authorization' => 'Bearer '.$token]));
+            } catch (ProviderRequestFailed $exception) {
+                // No matches is answered with 204 and an empty body.
+                if ($exception->getPrevious() instanceof JsonException) {
+                    return;
+                }
+
+                throw $exception;
+            }
 
             $offers = $response->array('resultats');
             foreach ($offers as $offer) {
