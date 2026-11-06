@@ -11,7 +11,7 @@ use Laravel\Horizon\HorizonApplicationServiceProvider;
 final class HorizonServiceProvider extends HorizonApplicationServiceProvider
 {
     /**
-     * Who can open /horizon outside the local environment: admins, plus the
+     * Who can open /horizon (and /pulse) outside the local environment: admins, plus the
      * e-mails in HORIZON_ADMIN_EMAILS (handy before the first admin exists).
      */
     protected function gate(): void
@@ -22,5 +22,8 @@ final class HorizonServiceProvider extends HorizonApplicationServiceProvider
 
             return $user !== null && ($user->is_admin || in_array(strtolower($user->email), $admins, true));
         });
+
+        // Pulse (/pulse) is open to the same people as Horizon.
+        Gate::define('viewPulse', fn (?User $user = null): bool => Gate::forUser($user)->allows('viewHorizon'));
     }
 }

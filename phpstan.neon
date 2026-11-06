@@ -10,6 +10,11 @@ parameters:
         - database/
         - routes/
 
+    # Published verbatim by laravel/pulse; re-publishing would overwrite any fix.
+    excludePaths:
+        - config/pulse.php
+        - database/migrations/*_create_pulse_tables.php
+
     level: 8
 
     checkModelProperties: true
