@@ -22,13 +22,20 @@ const props = withDefaults(
 
 const page = usePage();
 const pending = ref(false);
-const saved = computed(() => props.trackingStatus !== null);
+// Shown at once while the request runs; the server value takes over when it ends (and undoes it on failure).
+const optimistic = ref<boolean | null>(null);
+const saved = computed(() => optimistic.value ?? props.trackingStatus !== null);
 const label = computed(() =>
     trans(saved.value ? 'jobs.card.unsave' : 'jobs.card.save'),
 );
 
 function toggle(): void {
+    if (pending.value) {
+        return;
+    }
+
     pending.value = true;
+    optimistic.value = !saved.value;
     router.post(
         save.url(props.jobId),
         {},
@@ -36,7 +43,10 @@ function toggle(): void {
             preserveScroll: true,
             preserveState: true,
             only: props.reload,
-            onFinish: () => (pending.value = false),
+            onFinish: () => {
+                pending.value = false;
+                optimistic.value = null;
+            },
         },
     );
 }
@@ -62,7 +72,6 @@ function toggle(): void {
         :aria-pressed="saved"
         :aria-label="withLabel ? undefined : label"
         :title="label"
-        :disabled="pending"
         @click="toggle"
     >
         <Star
