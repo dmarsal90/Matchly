@@ -111,7 +111,7 @@ CMD ["fpm"]
 FROM base AS prod
 
 RUN apt-get update \
-    && apt-get install -y --no-install-recommends nginx supervisor \
+    && apt-get install -y --no-install-recommends nginx libnginx-mod-http-brotli-filter supervisor \
     && apt-get purge -y --auto-remove libc6-dev linux-libc-dev \
     && rm -rf /var/lib/apt/lists/* /etc/nginx/sites-enabled /etc/nginx/conf.d/* \
     && mkdir -p /tmp/nginx /var/lib/nginx /var/log/nginx \
