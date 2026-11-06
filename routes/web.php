@@ -29,9 +29,14 @@ use App\Modules\Profiles\Http\Controllers\SearchProfileController;
 use App\Modules\Profiles\Http\Controllers\SkillsController;
 use App\Modules\Profiles\Http\Controllers\SourceDataController;
 use App\Modules\Shared\Http\Controllers\LocaleController;
+use App\Modules\Shared\Http\Controllers\WebVitalController;
+use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
 use Illuminate\Support\Facades\Route;
 
 Route::inertia('/', 'Welcome')->name('home');
+
+// sendBeacon cannot carry a CSRF header; the endpoint is anonymous, write-only telemetry.
+Route::post('vitals', WebVitalController::class)->middleware('throttle:60,1')->withoutMiddleware(PreventRequestForgery::class)->name('vitals');
 
 // Replaces public/robots.txt: the Sitemap line needs the absolute URL of each deployment
 Route::get('robots.txt', fn () => response(

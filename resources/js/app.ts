@@ -6,7 +6,8 @@ import SettingsLayout from '@/layouts/settings/Layout.vue';
 import { pageTitle, setAppName } from '@/lib/brand';
 import { initializeFlashToast } from '@/lib/flashToast';
 import { resolveLanguage } from '@/lib/i18n';
-import { createInertiaApp } from '@inertiajs/vue3';
+import { reportWebVitals, setVitalsPage } from '@/lib/webVitals';
+import { createInertiaApp, router } from '@inertiajs/vue3';
 import { configureEcho } from '@laravel/echo-vue';
 import { i18nVue } from 'laravel-vue-i18n';
 import { createPinia } from 'pinia';
@@ -38,6 +39,12 @@ void createInertiaApp({
     },
     withApp: (app, { page }) => {
         setAppName(page.props.name);
+        setVitalsPage(page.component);
+        if (!import.meta.env.SSR) {
+            router.on('navigate', (event) =>
+                setVitalsPage(event.detail.page.component),
+            );
+        }
 
         // The websocket address comes from the server, not from build-time
         // variables, so the same bundle works in every environment.
@@ -79,3 +86,5 @@ initializeTheme();
 
 // This will listen for flash toast data from the server...
 initializeFlashToast();
+
+reportWebVitals();
