@@ -164,6 +164,17 @@ it('paginates on the server', function (): void {
         ->where('jobs.meta.last_page', 2));
 });
 
+it('serves the total from cache for a minute', function (): void {
+    JobListing::factory()->count(3)->create();
+    $this->get('/jobs')->assertInertia(fn (Assert $page) => $page->where('jobs.meta.total', 3));
+
+    JobListing::factory()->create();
+
+    $this->get('/jobs')->assertInertia(fn (Assert $page) => $page->where('jobs.meta.total', 3));
+    $this->travel(61)->seconds();
+    $this->get('/jobs')->assertInertia(fn (Assert $page) => $page->where('jobs.meta.total', 4));
+});
+
 it('credits the source and links to the original listing', function (): void {
     JobListing::factory()->create(['apply_url' => 'https://acme.test/apply', 'source_url' => 'https://remotive.com/job/1']);
 

@@ -23,6 +23,8 @@ use Illuminate\Database\Eloquent\Builder;
  */
 final readonly class JobSearchQuery
 {
+    private const COUNT_TTL = 60;
+
     public function __construct(
         private JobTextSearch $textSearch,
         private Connection $db,
@@ -51,7 +53,19 @@ final readonly class JobSearchQuery
             JobSort::Newest => null,
         };
 
-        return $query->latestFirst()->paginate($filters->perPage, page: $page)->withQueryString();
+        // shortcut: the total may lag up to COUNT_TTL behind new ingestions; fine for a public listing, revisit if exact totals matter.
+        $total = $filters->usesMatches() ? null : $this->cache->remember(
+            $this->cacheKey('total', $filters),
+            self::COUNT_TTL,
+            fn (): int => $this->filtered($filters)->count(),
+        );
+
+        return $query->latestFirst()->paginate($filters->perPage, page: $page, total: $total)->withQueryString();
+    }
+
+    private function cacheKey(string $kind, JobFilters $filters): string
+    {
+        return 'jobs:'.$kind.':'.hash('xxh128', serialize($filters));
     }
 
     /**
@@ -85,15 +99,11 @@ final readonly class JobSearchQuery
         $column = $filters->groupBy->column();
 
         /** @var array<int|string, int> $rows */
-        $rows = $this->filtered($filters)
-            ->toBase()
-            ->select($column)
-            ->selectRaw('COUNT(*) AS aggregate')
-            ->groupBy($column)
-            ->orderByDesc('aggregate')
-            ->pluck('aggregate', $column)
-            ->map(fn (mixed $count): int => (int) $count)
-            ->all();
+        $rows = $filters->usesMatches() ? $this->groupRows($filters, $column) : $this->cache->remember(
+            $this->cacheKey('groups', $filters),
+            self::COUNT_TTL,
+            fn (): array => $this->groupRows($filters, $column),
+        );
 
         if ($filters->groupBy === JobGroup::Source) {
             $keys = Source::query()->whereIn('id', array_keys($rows))->pluck('key', 'id');
@@ -112,6 +122,22 @@ final readonly class JobSearchQuery
         }
 
         return $counts;
+    }
+
+    /**
+     * @return array<int|string, int>
+     */
+    private function groupRows(JobFilters $filters, string $column): array
+    {
+        return $this->filtered($filters)
+            ->toBase()
+            ->select($column)
+            ->selectRaw('COUNT(*) AS aggregate')
+            ->groupBy($column)
+            ->orderByDesc('aggregate')
+            ->pluck('aggregate', $column)
+            ->map(fn (mixed $count): int => (int) $count)
+            ->all();
     }
 
     /**
