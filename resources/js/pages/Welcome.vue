@@ -25,14 +25,14 @@ const points = ['collect', 'match', 'prepare'] as const;
 
         <main class="mx-auto w-full max-w-6xl flex-1 px-4 sm:px-6">
             <section
-                class="grid items-center gap-10 py-14 md:grid-cols-[1.15fr_0.85fr] md:py-24"
+                    class="grid items-center gap-10 py-12 md:grid-cols-[1.15fr_0.85fr] md:py-20"
             >
                 <div>
                     <p class="text-sm font-medium text-muted-foreground">
                         {{ trans('app.tagline') }}
                     </p>
                     <h1
-                        class="mt-3 text-4xl leading-[1.05] font-semibold tracking-tight text-balance sm:text-6xl"
+                        class="mt-3 max-w-3xl text-4xl leading-[1.08] font-semibold tracking-tight text-balance sm:text-5xl lg:text-6xl"
                     >
                         {{ trans('app.hero_title') }}
                     </h1>
@@ -44,7 +44,7 @@ const points = ['collect', 'match', 'prepare'] as const;
                         }}
                     </p>
                     <div class="mt-8 flex flex-wrap items-center gap-3">
-                        <Button as-child size="lg">
+                        <Button as-child size="lg" class="bg-[#F47761] text-[#292D32] hover:bg-[#e96953]">
                             <Link
                                 :href="
                                     page.props.auth.user
@@ -63,27 +63,21 @@ const points = ['collect', 'match', 'prepare'] as const;
                     </div>
                 </div>
 
-                <!-- The match: where a profile and a job overlap. Decorative. -->
-                <svg
-                    viewBox="0 0 320 240"
-                    class="mx-auto w-full max-w-sm"
-                    fill="none"
-                    aria-hidden="true"
-                >
-                    <circle cx="116" cy="120" r="88" class="fill-brand" />
-                    <circle cx="204" cy="120" r="88" class="fill-brand" />
-                    <path
-                        d="M160 44.4A88 88 0 0 1 160 195.6A88 88 0 0 1 160 44.4Z"
-                        fill="var(--highlight)"
-                    />
-                </svg>
+                <!-- Brand layers: opportunity, fit and application. Decorative. -->
+                <div class="mx-auto flex aspect-square w-full max-w-[19rem] items-center justify-center rounded-[2.5rem] bg-[#292D32] p-12 shadow-[0_24px_60px_rgb(41_45_50/12%)] sm:p-14">
+                    <svg viewBox="0 0 120 120" class="size-full" fill="none" aria-hidden="true">
+                        <path d="m60 12 47 25-47 25-47-25 47-25Z" fill="#F47761" />
+                        <path d="m13 53 47 25 47-25M13 76l47 25 47-25" stroke="#F47761" stroke-width="11" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
             </section>
 
             <section
-                class="grid gap-8 border-t py-10 sm:grid-cols-3"
+                class="grid gap-4 border-t py-8 sm:grid-cols-3 sm:gap-5 sm:py-10"
                 :aria-label="trans('app.how_it_works')"
             >
-                <div v-for="point in points" :key="point">
+                <div v-for="(point, index) in points" :key="point" class="rounded-xl border bg-card p-5 sm:p-6">
+                    <span class="mb-4 flex size-8 items-center justify-center rounded-lg bg-secondary text-sm font-semibold text-secondary-foreground">{{ String(index + 1).padStart(2, '0') }}</span>
                     <h2 class="text-base font-semibold">
                         {{ trans(`app.points.${point}.title`) }}
                     </h2>

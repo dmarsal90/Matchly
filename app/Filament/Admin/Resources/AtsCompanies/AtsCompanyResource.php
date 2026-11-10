@@ -58,18 +58,18 @@ final class AtsCompanyResource extends Resource
         return $table
             ->defaultSort('name')
             ->columns([
-                TextColumn::make('name')->searchable()->sortable(),
-                TextColumn::make('platform')->badge()->sortable(),
-                TextColumn::make('identifier')->searchable()->copyable(),
+                TextColumn::make('name')->width('9rem')->searchable()->sortable(),
+                TextColumn::make('platform')->width('8rem')->badge()->sortable(),
+                TextColumn::make('identifier')->width('8rem')->searchable()->copyable(),
                 ToggleColumn::make('enabled'),
-                TextColumn::make('last_job_count')->label('Jobs (last run)')->numeric()->sortable(),
-                TextColumn::make('last_fetched_at')->since()->sortable()->placeholder('never'),
-                TextColumn::make('last_error')->limit(50)->color('danger')->placeholder('—'),
+                TextColumn::make('last_job_count')->width('7rem')->label('Jobs (last run)')->numeric()->sortable(),
+                TextColumn::make('last_fetched_at')->width('8rem')->since()->sortable()->placeholder('never'),
+                TextColumn::make('last_error')->width('9rem')->limit(18)->tooltip(fn (AtsCompany $record): ?string => $record->last_error)->color('danger')->placeholder('—'),
             ])
             ->filters([
                 SelectFilter::make('platform')->options(array_combine(AtsCompany::PLATFORMS, AtsCompany::PLATFORMS)),
             ])
-            ->recordActions([EditAction::make(), DeleteAction::make()]);
+            ->recordActions([EditAction::make()->iconButton(), DeleteAction::make()->iconButton()]);
     }
 
     public static function getPages(): array

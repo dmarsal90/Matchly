@@ -94,85 +94,94 @@
 
 :root {
     /* Spruce and saffron on a cool, slightly green paper: the lens of the logo is the only warm colour. */
-    --background: hsl(158 17% 96.5%);
-    --foreground: hsl(168 35% 8%);
+    --background: #f7f8f5;
+    --foreground: #24332d;
     --card: hsl(0 0% 100%);
-    --card-foreground: hsl(168 35% 8%);
+    --card-foreground: #24332d;
     --popover: hsl(0 0% 100%);
     --popover-foreground: hsl(168 35% 8%);
-    --primary: hsl(158 61% 15%);
-    --primary-foreground: hsl(165 30% 98%);
-    --secondary: hsl(165 18% 91%);
-    --secondary-foreground: hsl(168 35% 12%);
-    --muted: hsl(165 16% 93.5%);
-    /* 36% keeps 4.5:1 on --muted and on the page background (WCAG AA). */
-    --muted-foreground: hsl(168 10% 36%);
-    --accent: hsl(168 30% 91%);
-    --accent-foreground: hsl(158 61% 15%);
-    --highlight: hsl(37 90% 56%);
-    /* The two fixed colours of the logo, the same in both themes. */
-    --brand: #0f3d2e;
-    --paper: #f7f3e8;
+    --primary: #292d32;
+    --primary-foreground: #ffffff;
+    --secondary: #e8f1ec;
+    --secondary-foreground: #24332d;
+    --muted: #f0f3ef;
+    --muted-foreground: #66736c;
+    --accent: #e8f1ec;
+    --accent-foreground: #24332d;
+    --highlight: #f47761;
+    --brand: #292d32;
+    --paper: #f7f8f5;
     /* red-700: 4.5:1 or more as text on white and behind white text (WCAG AA). */
     --destructive: hsl(0 73.7% 41.8%);
     --destructive-foreground: hsl(0 0% 98%);
-    --border: hsl(165 14% 87%);
-    --input: hsl(165 12% 82%);
-    --ring: hsl(158 50% 28%);
+    --border: #e2e8e3;
+    --input: #c7d1ca;
+    --ring: #292d32;
     --chart-1: hsl(158 55% 26%);
     --chart-2: hsl(37 90% 50%);
     --chart-3: hsl(200 45% 38%);
     --chart-4: hsl(12 65% 52%);
     --chart-5: hsl(280 28% 48%);
     --radius: 0.625rem;
-    --sidebar-background: hsl(160 18% 94.5%);
-    --sidebar-foreground: hsl(168 30% 18%);
-    --sidebar-primary: hsl(158 61% 15%);
-    --sidebar-primary-foreground: hsl(165 30% 98%);
-    --sidebar-accent: hsl(165 22% 89%);
-    --sidebar-accent-foreground: hsl(158 61% 13%);
-    --sidebar-border: hsl(165 14% 87%);
-    --sidebar-ring: hsl(158 50% 28%);
-    --sidebar: hsl(160 18% 94.5%);
+    --sidebar-background: #f0f3ef;
+    --sidebar-foreground: #24332d;
+    --sidebar-primary: #292d32;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #e8f1ec;
+    --sidebar-accent-foreground: #292d32;
+    --sidebar-border: #e2e8e3;
+    --sidebar-ring: #356c59;
+    --sidebar: #f0f3ef;
+    --success: #27734d;
+    --warning: #9a5b00;
+    --info: #28678a;
+    --surface-elevated: #ffffff;
+    --shadow-soft: 0 1px 2px rgb(36 51 45 / 5%), 0 4px 12px rgb(36 51 45 / 3%);
+    --space-page: clamp(1rem, 3vw, 2rem);
 }
 
 .dark {
-    --background: hsl(170 30% 6%);
-    --foreground: hsl(160 20% 96%);
-    --card: hsl(170 24% 9%);
+    --background: #111a17;
+    --foreground: #f1f5f1;
+    --card: #192620;
     --card-foreground: hsl(160 20% 96%);
     --popover: hsl(170 24% 9%);
     --popover-foreground: hsl(160 20% 96%);
-    --primary: hsl(168 55% 62%);
-    --primary-foreground: hsl(170 40% 8%);
-    --secondary: hsl(170 18% 15%);
-    --secondary-foreground: hsl(160 20% 96%);
-    --muted: hsl(170 18% 14%);
-    --muted-foreground: hsl(165 12% 68%);
-    --accent: hsl(170 22% 16%);
-    --accent-foreground: hsl(160 20% 96%);
-    --highlight: hsl(37 90% 56%);
-    --brand: #0f3d2e;
-    --paper: #f7f3e8;
+    --primary: #f47761;
+    --primary-foreground: #292d32;
+    --secondary: #22332b;
+    --secondary-foreground: #f1f5f1;
+    --muted: #22332b;
+    --muted-foreground: #b0bfb5;
+    --accent: #22332b;
+    --accent-foreground: #f1f5f1;
+    --highlight: #f47761;
+    --brand: #292d32;
+    --paper: #111a17;
     --destructive: hsl(0 84% 60%);
     --destructive-foreground: hsl(0 0% 98%);
-    --border: hsl(170 16% 17%);
-    --input: hsl(170 14% 22%);
-    --ring: hsl(168 45% 55%);
+    --border: #35473d;
+    --input: #46594f;
+    --ring: #f47761;
     --chart-1: hsl(168 55% 55%);
     --chart-2: hsl(37 90% 56%);
     --chart-3: hsl(200 60% 60%);
     --chart-4: hsl(12 75% 62%);
     --chart-5: hsl(280 40% 68%);
-    --sidebar-background: hsl(170 28% 5.5%);
-    --sidebar-foreground: hsl(160 20% 94%);
-    --sidebar-primary: hsl(168 55% 62%);
-    --sidebar-primary-foreground: hsl(170 40% 8%);
-    --sidebar-accent: hsl(170 20% 13%);
-    --sidebar-accent-foreground: hsl(160 20% 96%);
-    --sidebar-border: hsl(170 16% 14%);
-    --sidebar-ring: hsl(168 45% 55%);
-    --sidebar: hsl(170 28% 5.5%);
+    --sidebar-background: #192620;
+    --sidebar-foreground: #f1f5f1;
+    --sidebar-primary: #f47761;
+    --sidebar-primary-foreground: #292d32;
+    --sidebar-accent: #22332b;
+    --sidebar-accent-foreground: #f1f5f1;
+    --sidebar-border: #35473d;
+    --sidebar-ring: #f47761;
+    --sidebar: #192620;
+    --success: #78c99b;
+    --warning: #f0b454;
+    --info: #80c3e4;
+    --surface-elevated: #22332b;
+    --shadow-soft: 0 1px 2px rgb(0 0 0 / 18%), 0 8px 20px rgb(0 0 0 / 12%);
 }
 
 @layer base {
@@ -181,6 +190,8 @@
     }
     body {
         @apply bg-background text-foreground antialiased;
+        font-size: 0.9375rem;
+        line-height: 1.55;
     }
     h1,
     h2,
@@ -193,9 +204,29 @@
     }
     :focus-visible {
         outline-offset: 2px;
+        outline: 2px solid var(--ring);
+    }
+    button,
+    [role='button'],
+    a {
+        -webkit-tap-highlight-color: transparent;
+    }
+    input::placeholder,
+    textarea::placeholder {
+        color: var(--muted-foreground);
+        opacity: 0.78;
     }
     ::selection {
         background: color-mix(in oklab, var(--highlight) 38%, transparent);
+    }
+}
+
+@layer components {
+    .surface-card {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: var(--card);
+        box-shadow: var(--shadow-soft);
     }
 }
 

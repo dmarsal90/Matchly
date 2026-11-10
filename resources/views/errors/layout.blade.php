@@ -8,12 +8,6 @@
     }
     app()->setLocale(in_array($locale, $supported, true) ? $locale : ($supported[array_search(request()->getPreferredLanguage($supported), $supported, true)] ?? config('app.locale')));
 
-    $circles = match ($mark ?? 'match') {
-        'apart' => ['a' => 15, 'b' => 49, 'lens' => null],
-        'faded' => ['a' => 24, 'b' => 40, 'lens' => '#9AA8A3'],
-        'broken' => ['a' => 24, 'b' => 40, 'lens' => '#C2410C'],
-        default => ['a' => 24, 'b' => 40, 'lens' => '#F4A62A'],
-    };
 @endphp
 <!DOCTYPE html>
 <html lang="{{ app()->getLocale() }}">
@@ -22,10 +16,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="robots" content="noindex">
     <title>{{ $status }} · {{ __("errors.{$status}.title") }} · {{ config('app.name') }}</title>
-    <link rel="icon" href="/favicon.svg?v=3" type="image/svg+xml">
+    <link rel="icon" href="/favicon.svg?v=4" type="image/svg+xml">
     <style>
-        :root { color-scheme: light dark; --bg: #F5F8F7; --fg: #0E1B19; --muted: #4B5F5A; --brand: #0F3D2E; --on-brand: #F7F3E8; --line: #D6E0DD; --circle: #0F3D2E; }
-        @media (prefers-color-scheme: dark) { :root { --bg: #0B1513; --fg: #F1F6F4; --muted: #A9BAB5; --brand: #7FD6C2; --on-brand: #0B1513; --line: #22332F; --circle: #F7F3E8; } }
+        :root { color-scheme: light dark; --bg: #F7F8F5; --fg: #24332D; --muted: #66736C; --brand: #292D32; --on-brand: #FAF8F6; --line: #E2E8E3; }
+        @media (prefers-color-scheme: dark) { :root { --bg: #111A17; --fg: #F1F5F1; --muted: #B0BFB5; --brand: #F47761; --on-brand: #292D32; --line: #35473D; } }
         * { box-sizing: border-box; }
         body { margin: 0; min-height: 100dvh; display: grid; place-items: center; padding: 2rem 1.25rem; background: var(--bg); color: var(--fg); font: 16px/1.55 'Instrument Sans', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
         main { width: 100%; max-width: 34rem; text-align: center; }
@@ -42,12 +36,9 @@
 </head>
 <body>
     <main>
-        <svg viewBox="0 0 64 40" role="img" aria-label="{{ config('app.name') }}">
-            <circle cx="{{ $circles['a'] }}" cy="20" r="13" fill="var(--circle)"/>
-            <circle cx="{{ $circles['b'] }}" cy="20" r="13" fill="var(--circle)"/>
-            @if ($circles['lens'])
-                <path d="M32 10.72A13 13 0 0 1 32 29.28A13 13 0 0 1 32 10.72Z" fill="{{ $circles['lens'] }}"/>
-            @endif
+        <svg viewBox="0 0 64 64" role="img" aria-label="{{ config('app.name') }}">
+            <rect width="64" height="64" rx="14" fill="#292D32"/>
+            <path d="m32 9 20 11-20 11-20-11L32 9Zm-20 21 20 11 20-11M12 40l20 11 20-11" fill="none" stroke="#F47761" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <p class="code">{{ $status }}</p>
         <h1>{{ __("errors.{$status}.title") }}</h1>

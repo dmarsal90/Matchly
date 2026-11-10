@@ -15,7 +15,9 @@ const page = usePage();
         class="mx-auto flex w-full max-w-6xl items-center justify-between gap-2 px-4 py-4 sm:gap-4 sm:px-6"
     >
         <Link :href="home()" class="flex items-center gap-2 font-semibold">
-            <AppLogoIcon class="size-8 text-primary" />
+            <span class="flex size-9 items-center justify-center rounded-lg bg-[#292D32] p-1 text-[#F47761]">
+                <AppLogoIcon class="size-full" />
+            </span>
             <span>{{ page.props.name }}</span>
         </Link>
 

@@ -40,25 +40,27 @@ final class SourceResource extends Resource
             ]))
             ->defaultSort('key')
             ->columns([
-                TextColumn::make('name')->searchable()->description(fn (Source $record): string => $record->key),
+                TextColumn::make('name')->width('9rem')->searchable()->description(fn (Source $record): string => $record->key),
                 ToggleColumn::make('enabled')->label('Enabled'),
                 TextColumn::make('open_jobs_count')->label('Open jobs')->numeric()->sortable(),
-                TextColumn::make('last_fetched_at')->since()->sortable()->placeholder('never'),
-                TextColumn::make('last_succeeded_at')->since()->placeholder('never'),
+                TextColumn::make('last_fetched_at')->width('8rem')->since()->sortable()->placeholder('never'),
+                TextColumn::make('last_succeeded_at')->width('8rem')->since()->placeholder('never'),
                 TextColumn::make('consecutive_failures')
                     ->label('Failures')
+                    ->width('4rem')
                     ->badge()
                     ->color(fn (int $state): string => match (true) {
                         $state === 0 => 'success',
                         $state < 3 => 'warning',
                         default => 'danger',
                     }),
-                TextColumn::make('last_error')->limit(60)->tooltip(fn (Source $record): ?string => $record->last_error)->placeholder('—'),
+                TextColumn::make('last_error')->width('9rem')->limit(18)->tooltip(fn (Source $record): ?string => $record->last_error)->placeholder('—'),
             ])
             ->recordActions([
                 Action::make('ingest')
                     ->label('Ingest now')
                     ->icon(Heroicon::OutlinedArrowPath)
+                    ->iconButton()
                     ->requiresConfirmation()
                     ->action(function (Source $record): void {
                         IngestProviderJob::dispatch($record->key);

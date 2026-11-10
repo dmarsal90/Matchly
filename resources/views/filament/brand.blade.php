@@ -1,11 +1,10 @@
-<div class="flex items-center gap-2.5">
-    <svg viewBox="0 0 64 64" class="h-8 w-8 shrink-0" aria-hidden="true">
-        <rect width="64" height="64" rx="14" fill="#0F3D2E"/>
-        <g transform="translate(32 32) scale(1.12) translate(-32 -32)">
-            <circle cx="22.9" cy="32" r="13" fill="#F7F3E8"/>
-            <circle cx="41.1" cy="32" r="13" fill="#F7F3E8"/>
-            <path d="M32 22.72A13 13 0 0 1 32 41.28A13 13 0 0 1 32 22.72Z" fill="#F4A62A"/>
+<div style="display:flex;align-items:center;gap:.625rem;max-width:12rem;overflow:hidden">
+    <svg viewBox="0 0 64 64" width="32" height="32" style="display:block;flex:none" aria-hidden="true">
+        <rect width="64" height="64" rx="14" fill="#292D32"/>
+        <g fill="none" stroke="#F47761" stroke-width="5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="m32 9 20 11-20 11-20-11L32 9Z" fill="#F47761" stroke="none"/>
+            <path d="m12 30 20 11 20-11M12 40 32 51l20-11"/>
         </g>
     </svg>
-    <span class="text-base font-semibold tracking-tight">{{ config('app.name') }} <span class="font-normal opacity-60">Admin</span></span>
+    <span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:.95rem;font-weight:650;letter-spacing:-.02em;color:inherit">{{ config('app.name') }} <span style="font-weight:400;opacity:.6">Admin</span></span>
 </div>
