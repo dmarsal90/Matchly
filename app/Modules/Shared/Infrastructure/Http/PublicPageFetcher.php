@@ -8,6 +8,7 @@ use GuzzleHttp\Psr7\UriResolver;
 use GuzzleHttp\Psr7\Utils;
 use Illuminate\Contracts\Config\Repository as Config;
 use Illuminate\Http\Client\Factory as Http;
+use RuntimeException;
 use Throwable;
 
 /**
@@ -49,6 +50,8 @@ final readonly class PublicPageFetcher
                     ->withOptions([
                         'allow_redirects' => false,
                         'curl' => [CURLOPT_RESOLVE => ["{$target['host']}:{$target['port']}:{$ip}"], CURLOPT_MAXFILESIZE => self::MAX_BYTES * 4],
+                        // MAXFILESIZE only sees a declared length: stop a chunked or endless body as it arrives.
+                        'progress' => static fn (int $total, int $received) => $received > self::MAX_BYTES * 4 ? throw new RuntimeException('Response too large') : null,
                     ])
                     ->get($current);
 

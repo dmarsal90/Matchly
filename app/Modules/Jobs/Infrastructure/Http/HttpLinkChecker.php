@@ -25,6 +25,8 @@ final readonly class HttpLinkChecker implements LinkChecker
 {
     private const int MAX_REDIRECTS = 5;
 
+    private const int MAX_BODY_BYTES = 2_000_000;
+
     /** Final URLs ATSs redirect to when a posting no longer exists. */
     private const array CLOSED_URL_PATTERNS = [
         '/[?&]error=true\b/',           // Greenhouse
@@ -119,6 +121,8 @@ final readonly class HttpLinkChecker implements LinkChecker
                 'allow_redirects' => false,
                 // Pin DNS to the address that passed the guard.
                 'curl' => [CURLOPT_RESOLVE => ["{$target['host']}:{$target['port']}:{$ip}"]],
+                // Only the status and Location matter: never download a feed-supplied page without a limit.
+                'progress' => static fn (int $total, int $received) => $received > self::MAX_BODY_BYTES ? throw new RuntimeException('Response too large') : null,
             ])
             ->send(strtoupper($method), $url);
     }
