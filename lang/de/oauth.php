@@ -8,4 +8,5 @@ return [
     'failed' => 'Die Anmeldung mit diesem Anbieter ist fehlgeschlagen. Bitte versuche es erneut.',
     'linked' => 'Konto verknüpft.',
     'email_required' => 'Der Anbieter hat deine E-Mail-Adresse nicht weitergegeben; bitte registriere dich mit E-Mail und Passwort.',
+    'email_unverified' => 'Dein Anbieter hat diese E-Mail-Adresse nicht bestätigt; bestätige sie dort oder registriere dich mit E-Mail und Passwort.',
 ];

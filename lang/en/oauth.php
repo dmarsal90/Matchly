@@ -8,4 +8,5 @@ return [
     'failed' => 'Could not sign in with that provider. Please try again.',
     'linked' => 'Account linked.',
     'email_required' => 'The provider did not share your e-mail; please sign up with e-mail and password.',
+    'email_unverified' => 'Your provider has not verified that e-mail address; verify it there or sign up with e-mail and password.',
 ];

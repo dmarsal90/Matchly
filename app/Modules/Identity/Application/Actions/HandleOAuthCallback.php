@@ -43,6 +43,11 @@ final readonly class HandleOAuthCallback
             throw ValidationException::withMessages(['email' => __('oauth.email_required')]);
         }
 
+        // Never trust an address the provider itself did not verify: it decides which account we log into.
+        if ($current === null && ! $this->emailVerified($provider, $identity)) {
+            throw ValidationException::withMessages(['email' => __('oauth.email_unverified')]);
+        }
+
         return $this->db->transaction(function () use ($provider, $identity, $current, $email): User {
             $user = $current ?? User::query()->where('email', $email)->first();
 
@@ -66,6 +71,16 @@ final readonly class HandleOAuthCallback
 
             return $user;
         });
+    }
+
+    /** Google reports the claim; the GitHub driver only returns verified e-mails. */
+    private function emailVerified(OAuthProvider $provider, SocialiteUser $identity): bool
+    {
+        if ($provider !== OAuthProvider::Google) {
+            return true;
+        }
+
+        return property_exists($identity, 'user') && is_array($identity->user) && ($identity->user['verified_email'] ?? false) === true;
     }
 
     private function storeTokens(SocialAccount $account, SocialiteUser $identity): void
