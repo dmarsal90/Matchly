@@ -54,3 +54,13 @@ it('returns nothing for empty or broken pages', function (): void {
     expect((new CompanyFactExtractor)->extract(''))->toBe([])
         ->and((new CompanyFactExtractor)->extract('<p>unclosed <b>tags'))->toBe([]);
 });
+
+it('ignores robots.txt rules built to be expensive to match', function (): void {
+    $robots = RobotsTxt::parse("User-agent: *\nDisallow: /*a*a*a*a*a*a*a*b\nDisallow: /".str_repeat('x', 300)."\nDisallow: /blocked\n", 'AcmeBot');
+
+    expect($robots->allows('/'.str_repeat('a', 250)))->toBeTrue()
+        ->and($robots->allows('/blocked'))->toBeFalse();
+
+    $many = RobotsTxt::parse("User-agent: *\n".str_repeat("Disallow: /a\n", 600)."Disallow: /late\n", 'AcmeBot');
+    expect($many->allows('/late'))->toBeTrue();
+});

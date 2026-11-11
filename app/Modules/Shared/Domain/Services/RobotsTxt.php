@@ -11,6 +11,13 @@ namespace App\Modules\Shared\Domain\Services;
  */
 final readonly class RobotsTxt
 {
+    // The file is written by the site we are checking: bound what it can make us compile and match.
+    private const int MAX_RULES = 500;
+
+    private const int MAX_PATH = 200;
+
+    private const int MAX_WILDCARDS = 5;
+
     /**
      * @param  list<array{allow: bool, path: string}>  $rules
      */
@@ -23,6 +30,7 @@ final readonly class RobotsTxt
         $groups = [];
         $current = [];
         $collecting = false;
+        $total = 0;
 
         foreach (preg_split('/\R/', $body) ?: [] as $line) {
             $line = trim((string) preg_replace('/#.*$/', '', $line));
@@ -46,6 +54,10 @@ final readonly class RobotsTxt
 
             if (in_array($field, ['allow', 'disallow'], true) && $current !== []) {
                 $collecting = true;
+                if ($total >= self::MAX_RULES || strlen($value) > self::MAX_PATH || substr_count($value, '*') > self::MAX_WILDCARDS) {
+                    continue;
+                }
+                $total++;
                 foreach ($current as $name) {
                     $groups[$name][] = ['allow' => $field === 'allow', 'path' => $value];
                 }
