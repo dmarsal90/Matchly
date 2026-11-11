@@ -20,7 +20,10 @@ final class HorizonServiceProvider extends HorizonApplicationServiceProvider
             /** @var list<string> $admins */
             $admins = config('horizon.admin_emails', []);
 
-            return $user !== null && ($user->is_admin || in_array(strtolower($user->email), $admins, true));
+            // Same bar as the Filament panel: an allowlisted address nobody has verified yet is not proof of identity.
+            return $user !== null
+                && $user->hasVerifiedEmail()
+                && ($user->is_admin || in_array(strtolower($user->email), $admins, true));
         });
 
         // Pulse (/pulse) is open to the same people as Horizon.
