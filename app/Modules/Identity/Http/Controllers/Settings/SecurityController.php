@@ -9,6 +9,7 @@ use App\Modules\Identity\Http\Requests\Settings\TwoFactorAuthenticationRequest;
 use App\Modules\Identity\Infrastructure\Models\User;
 use Illuminate\Container\Attributes\CurrentUser;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rules\Password;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -61,6 +62,9 @@ class SecurityController
         $user->update([
             'password' => $request->password,
         ]);
+
+        // Keeps this session, ends the others.
+        Auth::logoutOtherDevices($request->password);
 
         Inertia::flash('toast', ['type' => 'success', 'message' => __('Password updated.')]);
 
