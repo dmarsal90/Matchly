@@ -121,3 +121,34 @@ it('lets passwordless accounts open security settings and set a first password',
 
     expect($user->refresh()->password)->not->toBeNull();
 });
+
+function googleIdentity(bool $verified): SocialiteUser
+{
+    return (new SocialiteUser)->map([
+        'id' => 'g-1',
+        'name' => 'Mona Lisa',
+        'email' => 'mona@example.com',
+        'user' => ['verified_email' => $verified],
+    ])->setToken('ya29.token');
+}
+
+it('does not link a Google identity whose e-mail Google has not verified', function (): void {
+    config(['services.google.client_id' => 'id', 'services.google.client_secret' => 'secret', 'services.google.redirect' => 'http://localhost/auth/google/callback']);
+    $existing = User::factory()->create(['email' => 'mona@example.com']);
+    Socialite::fake('google', googleIdentity(false));
+
+    $this->get('/auth/google/callback')->assertRedirect(route('login'))->assertSessionHasErrors('email');
+
+    $this->assertGuest();
+    expect(SocialAccount::query()->count())->toBe(0)->and($existing->refresh()->password)->not->toBeNull();
+});
+
+it('links a Google identity whose e-mail Google has verified', function (): void {
+    config(['services.google.client_id' => 'id', 'services.google.client_secret' => 'secret', 'services.google.redirect' => 'http://localhost/auth/google/callback']);
+    $existing = User::factory()->create(['email' => 'mona@example.com']);
+    Socialite::fake('google', googleIdentity(true));
+
+    $this->get('/auth/google/callback');
+
+    $this->assertAuthenticatedAs($existing);
+});

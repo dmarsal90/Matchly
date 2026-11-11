@@ -8,4 +8,5 @@ return [
     'failed' => 'Impossibile accedere con questo provider. Riprova.',
     'linked' => 'Account collegato.',
     'email_required' => 'Il provider non ha condiviso la tua e-mail; registrati con e-mail e password.',
+    'email_unverified' => 'Il provider non ha verificato questa e-mail; verificala lì o registrati con e-mail e password.',
 ];

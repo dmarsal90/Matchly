@@ -12,6 +12,7 @@ use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Middleware\AddLinkHeadersForPreloadedAssets;
 use Illuminate\Http\Request;
+use Illuminate\Session\Middleware\AuthenticateSession;
 use Illuminate\Support\Facades\Route;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -39,6 +40,8 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->preventRequestForgery(except: ['alerts/*/unsubscribe']);
 
         $middleware->web(append: [
+            // A password change or reset must end every other session of that user.
+            AuthenticateSession::class,
             SetLocale::class,
             HandleAppearance::class,
             HandleInertiaRequests::class,

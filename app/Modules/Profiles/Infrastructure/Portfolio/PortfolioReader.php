@@ -22,6 +22,8 @@ final readonly class PortfolioReader
 
     private const int MAX_SKILLS = 40;
 
+    private const int MAX_SECONDS = 40;
+
     public function __construct(private PublicPageFetcher $pages, private SkillCatalog $catalog) {}
 
     /**
@@ -45,7 +47,12 @@ final readonly class PortfolioReader
 
         $mentions = [];
         $read = [];
+        // The job has a hard timeout: stop between pages instead of being killed mid-import.
+        $deadline = microtime(true) + self::MAX_SECONDS;
         foreach ($targets as $target) {
+            if (microtime(true) > $deadline) {
+                break;
+            }
             if (! $robots->allows((string) (parse_url($target, PHP_URL_PATH) ?: '/'))) {
                 continue;
             }
@@ -82,8 +89,31 @@ final readonly class PortfolioReader
     /** The visible text of a page: no scripts, styles or markup (tags become spaces so neighbouring elements never glue into one word). */
     private function text(string $html): string
     {
-        $html = (string) preg_replace('~<(script|style|noscript|svg)\b.*?</\1>~is', ' ', $html);
+        foreach (['script', 'style', 'noscript', 'svg'] as $tag) {
+            $html = $this->dropBlocks($html, $tag);
+        }
 
-        return trim((string) preg_replace('/\s+/u', ' ', html_entity_decode((string) preg_replace('~<[^>]*>~', ' ', $html), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+        return trim((string) preg_replace('/\s+/u', ' ', html_entity_decode(strip_tags(str_replace('<', ' <', $html)), ENT_QUOTES | ENT_HTML5, 'UTF-8')));
+    }
+
+    /** Linear scan (the page is hostile input, so no lazy regex that rescans to the end per unclosed tag). */
+    private function dropBlocks(string $html, string $tag): string
+    {
+        $out = '';
+        $pos = 0;
+        while (($start = stripos($html, "<{$tag}", $pos)) !== false) {
+            if (ctype_alnum($html[$start + strlen($tag) + 1] ?? ' ')) {
+                $out .= substr($html, $pos, $start + 1 - $pos);
+                $pos = $start + 1;
+
+                continue;
+            }
+            $out .= substr($html, $pos, $start - $pos).' ';
+            $end = stripos($html, "</{$tag}", $start);
+            $close = $end === false ? false : strpos($html, '>', $end);
+            $pos = $close === false ? strlen($html) : $close + 1;
+        }
+
+        return $out.substr($html, $pos);
     }
 }
