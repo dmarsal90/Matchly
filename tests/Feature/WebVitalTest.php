@@ -14,3 +14,14 @@ it('rejects unknown metrics, odd page names and out-of-range values', function (
     'negative' => [['metric' => 'LCP', 'page' => 'jobs/Index', 'value' => -1]],
     'huge' => [['metric' => 'LCP', 'page' => 'jobs/Index', 'value' => 999999]],
 ]);
+
+it('never touches the session, so a concurrent beacon cannot eat flash data', function (): void {
+    $this->withSession(['flash_probe' => 'kept'])
+        ->postJson('/vitals', ['metric' => 'LCP', 'page' => 'jobs/Index', 'value' => 10])
+        ->assertNoContent()
+        ->assertCookieMissing(config('session.cookie'));
+});
+
+it('answers 422 to an invalid beacon sent without a JSON Accept header', function (): void {
+    $this->call('POST', '/vitals', [], [], [], ['CONTENT_TYPE' => 'application/json'], '{"metric":"FID"}')->assertUnprocessable();
+});
