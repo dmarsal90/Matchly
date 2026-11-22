@@ -242,8 +242,7 @@ const sourceLabel = computed(() =>
                     >
                         <span class="font-medium text-foreground">{{
                             item.repository
-                        }}</span
-                        >: {{ item.note }}
+                        }}</span>: {{ item.note }}
                     </li>
                 </ul>
             </section>
