@@ -55,8 +55,7 @@ const page = usePage();
 const auth = computed(() => page.props.auth);
 const { isCurrentUrl, whenCurrentUrl } = useCurrentUrl();
 
-const activeItemStyles =
-    'bg-sidebar-accent text-sidebar-accent-foreground';
+const activeItemStyles = 'bg-sidebar-accent text-sidebar-accent-foreground';
 
 const { main: mainNavItems, secondary: rightNavItems } = useNavigation();
 </script>
@@ -82,7 +81,9 @@ const { main: mainNavItems, secondary: rightNavItems } = useNavigation();
                                 trans('common.navigation_menu')
                             }}</SheetTitle>
                             <SheetHeader class="flex justify-start text-left">
-                                <span class="flex size-8 items-center justify-center rounded-lg bg-[#292D32] p-1 text-[#F47761]">
+                                <span
+                                    class="flex size-8 items-center justify-center rounded-lg bg-[#292D32] p-1 text-[#F47761]"
+                                >
                                     <AppLogoIcon class="size-full" />
                                 </span>
                             </SheetHeader>
@@ -243,7 +244,7 @@ const { main: mainNavItems, secondary: rightNavItems } = useNavigation();
                                         :alt="auth.user.name"
                                     />
                                     <AvatarFallback
-                                    class="rounded-lg bg-secondary font-semibold text-secondary-foreground"
+                                        class="rounded-lg bg-secondary font-semibold text-secondary-foreground"
                                     >
                                         {{ getInitials(auth.user?.name) }}
                                     </AvatarFallback>

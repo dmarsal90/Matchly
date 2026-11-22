@@ -6,6 +6,7 @@ namespace App\Modules\Shared\Http\Controllers;
 
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 use Laravel\Pulse\Facades\Pulse;
 
 /**
@@ -18,11 +19,16 @@ final class WebVitalController
 
     public function __invoke(Request $request): JsonResponse
     {
-        $data = $request->validate([
+        // No session on this route, so a failure cannot use validate()'s redirect-with-errors.
+        $validator = Validator::make($request->json()->all(), [
             'metric' => ['required', 'string', 'in:'.implode(',', self::METRICS)],
             'page' => ['required', 'string', 'max:80', 'regex:/^[A-Za-z0-9_\/.-]+$/'],
             'value' => ['required', 'numeric', 'min:0', 'max:60000'],
         ]);
+
+        abort_if($validator->fails(), 422);
+
+        $data = $validator->validated();
 
         // Pulse stores integers; CLS is a small unitless score, so keep three decimals.
         $value = (int) round((float) $data['value'] * ($data['metric'] === 'CLS' ? 1000 : 1));

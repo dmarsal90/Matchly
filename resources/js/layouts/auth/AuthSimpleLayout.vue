@@ -27,7 +27,9 @@ const page = usePage();
                         <div
                             class="mb-1 flex h-9 w-9 items-center justify-center rounded-md"
                         >
-                            <span class="flex size-12 items-center justify-center rounded-xl bg-[#292D32] p-1.5 text-[#F47761]">
+                            <span
+                                class="flex size-12 items-center justify-center rounded-xl bg-[#292D32] p-1.5 text-[#F47761]"
+                            >
                                 <AppLogoIcon class="size-full" />
                             </span>
                         </div>

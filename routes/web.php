@@ -30,13 +30,19 @@ use App\Modules\Profiles\Http\Controllers\SkillsController;
 use App\Modules\Profiles\Http\Controllers\SourceDataController;
 use App\Modules\Shared\Http\Controllers\LocaleController;
 use App\Modules\Shared\Http\Controllers\WebVitalController;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
 use Illuminate\Foundation\Http\Middleware\PreventRequestForgery;
+use Illuminate\Session\Middleware\StartSession;
 use Illuminate\Support\Facades\Route;
+use Illuminate\View\Middleware\ShareErrorsFromSession;
 
 Route::inertia('/', 'Welcome')->name('home');
 
 // sendBeacon cannot carry a CSRF header; the endpoint is anonymous, write-only telemetry.
-Route::post('vitals', WebVitalController::class)->middleware('throttle:60,1')->withoutMiddleware(PreventRequestForgery::class)->name('vitals');
+// It must not start the session: the beacon fires on the user's first click, and a concurrent session write
+// would age or overwrite the flash data (validation errors, one-time tokens) of the form being submitted.
+Route::post('vitals', WebVitalController::class)->middleware('throttle:60,1')->withoutMiddleware([PreventRequestForgery::class, StartSession::class, ShareErrorsFromSession::class, AddQueuedCookiesToResponse::class, EncryptCookies::class])->name('vitals');
 
 // Replaces public/robots.txt: the Sitemap line needs the absolute URL of each deployment
 Route::get('robots.txt', fn () => response(
